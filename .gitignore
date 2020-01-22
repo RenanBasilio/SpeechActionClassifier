@@ -6,3 +6,6 @@ Pipfile.lock
 
 # dataset
 data/
+
+# generated files
+export/
