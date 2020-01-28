@@ -7,12 +7,13 @@ verify_ssl = true
 
 [packages]
 tensorflow = "*"
-tensorflow-datasets = "*"
 matplotlib = "*"
 keras = "*"
 jupyter = "*"
 notebook = "*"
 opencv-python = "*"
+dlib = "*"
+imutils = "*"
 
 [requires]
 python_version = "3.7"
