@@ -13,3 +13,4 @@ data/
 # generated files
 export/
 log.txt
+*.tar.gz
