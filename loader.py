@@ -16,7 +16,6 @@ with open(data_dir/"classes.txt") as classes_file:
 def get_label(path):
     return path.parts[-2]
 
-
 def get_label_from_index(idx):
     return CLASS_NAMES[idx]
 
@@ -63,7 +62,7 @@ def load_video_as_ndarray(path):
 # Classe que carrega dados de maneira assíncrona para o preditor
 # Necessário para reduzir o custo de memória do treinamento do modelo
 # Código adaptado a partir de https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly (https://github.com/afshinea/keras-data-generator)
-class DataGenerator(keras.utils.Sequence):
+class VideoDataGenerator(keras.utils.Sequence):
     def __init__(self, list_IDs, labels, batch_size=4, dim=(15, 240, 320), n_channels=3, n_classes=len(CLASS_NAMES), shuffle=True):
         self.dim = dim
         self.batch_size = batch_size
@@ -84,8 +83,8 @@ class DataGenerator(keras.utils.Sequence):
         Y = np.empty((self.batch_size), dtype=int)
 
         for i, ID in enumerate(list_IDs_temp):
-            # load data
-            pass
+            X[i,] = load_video_as_ndarray(data_dir / ID)
+            y = get_label(ID)
 
         return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
 
