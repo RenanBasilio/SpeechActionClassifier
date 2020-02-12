@@ -1,0 +1,147 @@
+%%
+%% This is file `example.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% coppe.dtx  (with options: `example')
+%% 
+%% This is a sample monograph which illustrates the use of `coppe' document
+%% class and `coppe-unsrt' BibTeX style.
+%% 
+%% \CheckSum{1416}
+%% \CharacterTable
+%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%%   Digits        \0\1\2\3\4\5\6\7\8\9
+%%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%%   Dollar        \$     Percent       \%     Ampersand     \&
+%%   Acute accent  \'     Left paren    \(     Right paren   \)
+%%   Asterisk      \*     Plus          \+     Comma         \,
+%%   Minus         \-     Point         \.     Solidus       \/
+%%   Colon         \:     Semicolon     \;     Less than     \<
+%%   Equals        \=     Greater than  \>     Question mark \?
+%%   Commercial at \@     Left bracket  \[     Backslash     \\
+%%   Right bracket \]     Circumflex    \^     Underscore    \_
+%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%%   Right brace   \}     Tilde         \~}
+%%
+
+%% Adapted by Cabral, Felipe G. for undergraduated projects for POLI students
+
+%% Adapted by Lima, Publio M. for undergraduated projects for EQ students
+
+\documentclass[grad,numbers]{coppe}% Check the following table in order to know how to fill the command \documentclass[opt,numbers]{coppe} according to your degree, i.e., undergraduate projects, from POLI or EQ, master or doctor thesis from COPPE.
+
+%% substitute where opt can be:
+%% msc     - for Master Dissertations
+%% dscexam - for Doctorade Qualification Exams
+%% dsc     - for Doctorade Thesis
+%% grad    - for Undergraduate Projects for Poli Students
+%% gradeq  - for Undergraduate Projects for EQ Students
+
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{float}
+\usepackage[center]{caption}
+\usepackage{arydshln}
+\usepackage{blkarray}
+\usepackage{textcomp}
+\graphicspath{{figures/}}
+\newtheorem{defi}{Definição}[chapter]
+\newtheorem{obse}{Observação}[chapter]
+\makelosymbols
+\makeloabbreviations
+
+\newcommand{\Inhib}{\textit{Inhib}}
+
+\begin{document}
+  \title{Diarização e Identificação de Locutor em Conteúdo de Vídeo Baseada em Análise de Expressão Facial via Aprendizado de Máquina Supervisionado}
+  \foreigntitle{Facial Expression Analysis for Speaker Diarization and Identification in Video Content via Supervised Machine Learning}
+  \author{Renan Fasolato}{Basilio}
+  \advisor{Prof.}{Geraldo Zimbrão}{da Silva}{D.Sc.}
+
+  \examiner{Prof.}{}{}
+  \examiner{Prof.}{}{}
+  \examiner{Prof.}{}{}
+  
+  
+  \department{ECI}% Confira a tabela a seguir para saber como preencher o comando \department de acordo com seu curso (Graduação - Poli,Graduação - EQ) ou programa (Pós-Graduação - COPPE).
+  
+  
+  %%%%%% Para alunos da EQ %%%%%%
+  
+  %% Course											Option
+  %% Engenharia Química                               EQ
+  %% Engenharia de Bioprocessos                       EB
+  %% Engenharia de Alimentos                          EAL
+  %% Química industrial                               QI
+  
+  %%%%%% Para alunos da POLI %%%%%%
+  
+  %% Course											Option
+  %% Engenharia Ambiental                             EA
+  %% Engenharia Civil                                 ECV
+  %% Engenharia de Computação e Informação            ECI
+  %% Engenharia de Controle e Automação               ECA
+  %% Engenharia de Materiais                          EMAT
+  %% Engenharia de Petróleo                           EPT
+  %% Engenharia de Produção                           EPR
+  %% Engenharia Eletrônica e de Computação            EEC
+  %% Engenharia Elétrica                              EET
+  %% Engenharia Mecânica                              EMC
+  %% Engenharia Metalúrgica                           EMET
+  %% Engenharia Naval e Oceânica                      ENO
+  %% Engenharia Nuclear                               ENU
+  
+  
+  %%%%%% Para alunos da COPPE %%%%%%
+  
+  %% Program											Option
+  %% Engenharia Biomédica								PEB
+  %% Engenharia Civil									PEC
+  %% Engenharia Elétrica								PEE
+  %% Engenharia Mecânica								PEM
+  %% Engenharia Metalúrgica e de Materiais				PEMM
+  %% Engenharia Nuclear									PEN
+  %% Engenharia Oceânica								PENO
+  %% Planejamento Energético							PPE
+  %% Engenharia de Produção								PEP
+  %% Engenharia Química									PEQ
+  %% Engenharia de Sistemas e Computação				PESC
+  %% Engenharia de Transportes							PET
+  
+  
+  \date{\the\month}{\the\year}
+
+  \keyword{Aprendizado Supervisionado}
+  \keyword{Aprendizado de Máquina}
+  \keyword{Diarização de Locutor}
+
+  \maketitle
+  
+  \frontmatter
+  \makecatalog
+  \dedication{To-Do: Write Dedication}
+  
+  \mainmatter
+
+  \include{intro}
+
+  \backmatter
+  \bibliographystyle{ieeetran}
+  \bibliography{citations}
+
+  %\appendix
+  %\chapter{Algumas Demonstrações}
+  
+  
+\end{document}
+%% 
+%%
+%% End of file `example.tex'.

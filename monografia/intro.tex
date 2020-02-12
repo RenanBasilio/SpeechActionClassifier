@@ -1,0 +1,36 @@
+\chapter{Introdução}
+
+\section{Descrição do Problema}
+
+A diarização de locutor consiste no processo de identificar os diferentes 
+locutores em um conteúdo multimídia, de forma a separa-los temporalmente, 
+definindo quando quem falou, e produzindo um tipo de roteiro para o mesmo.
+
+Tradicionalmente, tenta-se resolver esse problema analizando exclusivamente 
+o áudio, através da extração de \textit{features} na forma de vetores 
+denominados \textit{I-vectors}, e a clusterização destes vetores. Porém, 
+trata-se de um problema difícil; o timbre, principal característica sonora 
+responsável pela identificação do locutor pelo ser humano, é de caráter 
+neurológico\cite{oxenhamPitchPerception2012}, produzido pela decomposição da
+onda sonora em seus harmônicos pelo trato auditivo. E, ainda, como propriedade
+intrínseca da etapa de clusterização, a grande maioria desses algoritmos 
+depende do conhecimento prévio do número de locutores que participam do áudio. 
+
+Dadas essas limitações, temos que o desempenho dos algoritmos considerados 
+estado da arte é insuficiente, com taxa de erro de diarização (daqui em diante 
+chamada de DER, do inglês \textit{Diarization Error Rate}) de cerca de 
+20\%\cite{zewoudieUseLongtermFeatures2018}. Portanto, a busca de outras
+técnicas capazes de prover um melhor desempenho nos leva a considerar também 
+outros sinais do conteúdo multimídia, como o de vídeo dos locutores 
+individuais que acompanha o texto.
+
+\section{Motivação}
+
+Em muitas situações, no processo de transcrição de áudio e vídeo, é 
+interessante obter também a informação de quem está falando. Com essa 
+informação seria possível roteirizar a mídia, viabilizando uma melhor 
+formatação do texto transcrito. Além disso, essa informação adicional 
+permite viabilizar novos critérios de busca sobre o texto transcrito, 
+tornando possível filtrar os resultados por locutor.
+
+\section{Escopo}
