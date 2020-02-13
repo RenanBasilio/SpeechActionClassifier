@@ -2,35 +2,20 @@
 
 \section{Descrição do Problema}
 
-A diarização de locutor consiste no processo de identificar os diferentes 
-locutores em um conteúdo multimídia, de forma a separa-los temporalmente, 
-definindo quando quem falou, e produzindo um tipo de roteiro para o mesmo.
+A diarização de locutor consiste no processo de identificar os diferentes locutores em um conteúdo multimídia, de forma a separa-los temporalmente, definindo quando quem falou, e produzindo um tipo de roteiro para o mesmo.
 
-Tradicionalmente, tenta-se resolver esse problema analizando exclusivamente 
-o áudio, através da extração de \textit{features} na forma de vetores 
-denominados \textit{I-vectors}, e a clusterização destes vetores. Porém, 
-trata-se de um problema difícil; o timbre, principal característica sonora 
-responsável pela identificação do locutor pelo ser humano, é de caráter 
-neurológico\cite{oxenhamPitchPerception2012}, produzido pela decomposição da
-onda sonora em seus harmônicos pelo trato auditivo. E, ainda, como propriedade
-intrínseca da etapa de clusterização, a grande maioria desses algoritmos 
-depende do conhecimento prévio do número de locutores que participam do áudio. 
+Tradicionalmente, tenta-se resolver esse problema através da análise exclusiva do áudio, por meio da extração de \textit{features} na forma de vetores denominados \textit{I-vectors}, e subsequente clusterização destes vetores. Porém, trata-se de um problema difícil; o timbre, principal característica sonora responsável pela identificação do locutor pelo ser humano, é de caráter neurológico\cite{oxenhamPitchPerception2012}, produzido pela decomposição da onda sonora em seus harmônicos pelo trato auditivo. E, ainda, como propriedade intrínseca da etapa de clusterização, a grande maioria desses algoritmos depende do conhecimento prévio do número de locutores que participam do áudio. 
 
-Dadas essas limitações, temos que o desempenho dos algoritmos considerados 
-estado da arte é insuficiente, com taxa de erro de diarização (daqui em diante 
-chamada de DER, do inglês \textit{Diarization Error Rate}) de cerca de 
-20\%\cite{zewoudieUseLongtermFeatures2018}. Portanto, a busca de outras
-técnicas capazes de prover um melhor desempenho nos leva a considerar também 
-outros sinais do conteúdo multimídia, como o de vídeo dos locutores 
-individuais que acompanha o texto.
+Dadas essas limitações, temos que o desempenho dos algoritmos considerados estado da arte é insuficiente, com taxa de erro de diarização (daqui em diante chamada de DER, do inglês \textit{Diarization Error Rate}) de cerca de 20\%\cite{zewoudieUseLongtermFeatures2018}. Portanto, a busca de outras técnicas capazes de prover um melhor desempenho nos leva a considerar também outros sinais constituintes do conteúdo multimídia, como o de vídeo do orador.
 
 \section{Motivação}
 
-Em muitas situações, no processo de transcrição de áudio e vídeo, é 
-interessante obter também a informação de quem está falando. Com essa 
-informação seria possível roteirizar a mídia, viabilizando uma melhor 
-formatação do texto transcrito. Além disso, essa informação adicional 
-permite viabilizar novos critérios de busca sobre o texto transcrito, 
-tornando possível filtrar os resultados por locutor.
+Em muitas situações, no processo de transcrição de áudio e vídeo, é interessante obter também a informação de quem está falando. Com essa informação seria possível roteirizar a mídia, viabilizando uma melhor formatação do texto transcrito. Além disso, essa informação adicional permite viabilizar novos critérios de busca sobre o texto transcrito, tornando possível filtrar os resultados por locutor.
 
 \section{Escopo}
+
+De forma geral, gostaríamos de identificar as falas de todos os oradores do texto. No entanto, muitas vezes é suficiente identificar apenas um destes, por exemplo no caso de audiências e depoimentos do Tribunal de Justiça. Nesse caso especificamente, desejamos identificar com maior precisão os trechos falados pelo depoente, independentemente do número de participantes da audiência, de forma a identificar futuramente o que foi dito pelo mesmo em seu depoimento.
+
+Para esta finalidade, possuímos um vídeo frontal ou em perfil da face do locutor (depoente), além do áudio combinado de todos os participantes em canal monoaural. Assim, este trabalho ficará limitado a tratar de casos nos quais estas informações estejam disponíveis, e com a determinação de que o vídeo deve ser de boa qualidade.
+
+\section{Estrutura do Trabalho}
