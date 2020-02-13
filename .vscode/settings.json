@@ -1,0 +1,9 @@
+{
+    "[latex]": {
+        "editor.wordWrap": "on"
+    },
+    "ltex.language": "pt-BR",
+    "ltex.pt-BR.disabledRules": [
+        "HUNSPELL_RULE"
+    ]
+}

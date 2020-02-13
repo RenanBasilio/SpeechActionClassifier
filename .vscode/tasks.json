@@ -1,0 +1,31 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Current Document",
+            "type": "shell",
+            "command": "pdflatex",
+            "args": [
+                "-jobname=the${fileBasenameNoExtension}",
+                "'\\includeonly{${fileBasenameNoExtension}}\\input{tcc}';",
+                "bibtex", 
+                "theintro;",
+                "pdflatex", 
+                "-jobname=the${fileBasenameNoExtension}",
+                "'\\includeonly{${fileBasenameNoExtension}}\\input{tcc}';",
+                "pdflatex", 
+                "-jobname=the${fileBasenameNoExtension}",
+                "'\\includeonly{${fileBasenameNoExtension}}\\input{tcc}';",
+                "mv", "the${fileBasenameNoExtension}.pdf", "${fileBasenameNoExtension}.pdf", "-Force;",
+                "rm", "the${fileBasenameNoExtension}.*"
+                ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [],
+            "group": "build"
+        }
+    ]
+}
