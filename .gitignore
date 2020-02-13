@@ -280,3 +280,4 @@ TSWLatexianTemp*
 #*Notes.bib
 
 data/
+Pipfile.lock
