@@ -1,16 +1,29 @@
 import cv2 as cv2
 import numpy as np
 import pathlib
+import dlib
+import matplotlib.pyplot as plt
 import tensorflow as tf
-import numpy as np
 from enum import Enum
 
 from termcolor import cprint
+from imutils import face_utils
+from math import floor, ceil
+from matplotlib.colors import LinearSegmentedColormap
 
 # Get class names from classes.txt
 data_dir = pathlib.Path("data/")
 cache_dir = data_dir / "__cache__/"
 cache_dir.mkdir(parents=True, exist_ok=True)
+
+face_detector = None
+face_predictor = None
+
+color_array = plt.get_cmap('hot')(range(256))
+color_array[0:32,-1] = np.linspace(0.0,1.0,32)
+color_array[223:255,-1] = np.linspace(1.0,0.0,32)
+map_object = LinearSegmentedColormap.from_list(name='hot_alpha',colors=color_array)
+plt.register_cmap(cmap=map_object)
 
 def get_classes(path):
     class_names = []
@@ -33,6 +46,9 @@ def load_frame_as_ndarray(cap, colormode):
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         elif colormode == 'gray':
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        elif colormode == 'landmarks':
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frame = compute_facial_landmarks(frame)
         else:
             cprint("\r\nERROR: Invalid colormode specified.", 'red')
             return None
@@ -42,6 +58,39 @@ def load_frame_as_ndarray(cap, colormode):
         return frame
     else:
         return None
+
+def compute_facial_landmarks(image):
+    global face_predictor
+    global face_detector
+
+    if face_predictor is None:
+        face_detector = dlib.get_frontal_face_detector()
+        face_predictor = dlib.shape_predictor("resources/shape_predictor_68_face_landmarks.dat")
+
+    rects = face_detector(image, 0)
+    blank_image = np.full(image.shape, 255, np.uint8)
+    face_chip = None
+    for (i, rect) in enumerate(rects):
+        shape = face_predictor(image, rect)
+        shape_np = face_utils.shape_to_np(shape)
+
+        #for (x, y) in shape_np:
+            #cv2.circle(blank_image, (x,y), 0, (0, 0, 0))
+
+        cv2.polylines(blank_image, [shape_np[0:16]], False, (0,0,0), 0, cv2.LINE_8) # Boundaries
+        cv2.polylines(blank_image, [shape_np[17:21]], False, (0,0,0), 0, cv2.LINE_8) # Left Eyebrow
+        cv2.polylines(blank_image, [shape_np[22:26]], False, (0,0,0), 0, cv2.LINE_8) # Right Eyebrow
+        cv2.polylines(blank_image, [shape_np[27:30]], False, (0,0,0), 0, cv2.LINE_8) # Nose Bridge
+        cv2.polylines(blank_image, [shape_np[31:35]], False, (0,0,0), 0, cv2.LINE_8) # Nose
+        cv2.polylines(blank_image, [shape_np[36:41]], True, (0,0,0), 0, cv2.LINE_8) # Left Eye
+        cv2.polylines(blank_image, [shape_np[42:47]], True, (0,0,0), 0, cv2.LINE_8) # Right Eye
+        cv2.polylines(blank_image, [shape_np[48:59]], True, (0,0,0), 0, cv2.LINE_8) # Mouth Outer
+        cv2.polylines(blank_image, [shape_np[60:67]], True, (0,0,0), 0, cv2.LINE_8) # Mouth Inner
+
+        face_chip = dlib.get_face_chip(blank_image, shape, 150, 0.33)
+
+    face_chip = cv2.cvtColor(face_chip, cv2.COLOR_RGB2GRAY)
+    return face_chip
 
 # Código adaptado a partir de em https://github.com/ferreirafabio/video2tfrecord
 def compute_dense_optical_flow(prev_image, current_image):
@@ -71,6 +120,7 @@ def compute_dense_optical_flow(prev_image, current_image):
 
 # Loads the video file in the provided path as an array of frames
 def load_video_as_ndarray(path, colormode='rgb', optical_flow=False, warnings=True, enable_cache=True):
+    path = pathlib.Path(path)
     cache_file_path = cache_dir / colormode / str(optical_flow) / path.relative_to(data_dir).with_suffix('.npy')
 
     if enable_cache and cache_file_path.is_file():
@@ -95,7 +145,7 @@ def load_video_as_ndarray(path, colormode='rgb', optical_flow=False, warnings=Tr
                     if last_frame is not None:
                         flow = compute_dense_optical_flow(last_frame, frame)
                     else:
-                        flow = np.zeros((frame.shape[0], frame.shape[1]))
+                        flow = np.zeros((frame.shape[0], frame.shape[1]), dtype=np.float32)
                     last_frame = frame
 
                 if len(frame.shape) < 3:
@@ -117,6 +167,26 @@ def load_video_as_ndarray(path, colormode='rgb', optical_flow=False, warnings=Tr
     else:
         cprint("ERROR: File does not exist '{}'".format(path), 'red')
         return None
+
+def print_video_frames(video, step=2):
+    f, axarr = plt.subplots(1, floor((len(video)) / step), sharey=True)
+    f.set_figwidth(4 * floor((len(video)) / step))
+    f.set_figheight(4)
+    for i in range(0,  floor(len(video) / step)):
+        fig = axarr[i]
+        fig.text(0.5, -0.2, 'Frame {}/{}'.format(floor(i * step) + 1, len(video)), size=12, ha="center", transform=fig.transAxes)
+        if len(video[i].shape) > 2:
+            if video[i].shape[2] >= 3:
+                fig.imshow(video[floor(i * step)])
+            elif video[i].shape[2] == 1:
+                fig.imshow(video[floor(i * step)].squeeze(), cmap='gray')
+            else:
+                imgs = np.dsplit(video[floor(i * step)], 2)
+                fig.imshow(imgs[0].squeeze(), cmap='gray')
+                fig.imshow(imgs[1].squeeze(), cmap='hot_alpha')
+        else:
+            fig.imshow(video[floor(i * step)])
+    f.show()
 
 # Classe que carrega dados de maneira assíncrona para o preditor
 # Necessário para reduzir o custo de memória do treinamento do modelo
