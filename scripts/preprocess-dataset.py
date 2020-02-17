@@ -12,6 +12,10 @@ log_file = open("log.txt", "w+")
 
 errors = ['Partial', '!! BAD', 'Inaudible', 'Maybe']
 
+def write_tee(file, message):
+    file.write(message)
+    print(message, end='')
+
 def print_progress(curr, total):
     bars = floor((curr/total)*10)*'|'
     dashes = (11 - ceil((curr/total)*10))*'='
@@ -154,29 +158,29 @@ def print_usage():
     print("sort    - Sort dataset into directories according to splits.txt and classes.txt")
     print("update  - Updates dataset.info in dataset directory")
 
-def print_info(data_dir):
+def update_info(data_dir):
     counts = count_samples(data_dir)
     counts_sorted = sorted(counts, key=counts.get, reverse=True)
 
     info_file = data_dir / "dataset.info"
     with open(info_file, "w+", encoding='utf-8') as info_file:
-        info_file.write("Este arquivo enumera e define as classes de segmentos de vídeo presentes no dataset:\n\n")
-        info_file.write("Idle    - O depoente se encontra parado ou realizando outra ação irrelevante ao propósito do reconhecedor.\n")
-        info_file.write("Speak   - O depoente se encontra falando.\n")
-        info_file.write("Nod     - O depoente balança a cabeça como se para dizer que sim.\n")
-        info_file.write("Shake   - O depoente balança a cabeça como se para dizer que não.\n")
-        info_file.write("Examine - O depoente se aproxima da câmera para examinar alguma evidência que lhe é apresentada.\n")
-        info_file.write("\n")
-        info_file.write("As seguintes classes estão sob análise devido à falta de vídeos representativos da mesma nos dados diarizados até agora.\n")
-        info_file.write("\n")
-        info_file.write("KindOf - O depoente balança a cabeça como que para dizer que \"mais ou menos\"\n")
-        info_file.write("\n")
-        info_file.write("Total de Amostras por Classe (Atualizado em {}):\n".format(date.today()))
+        write_tee(info_file, "Este arquivo enumera e define as classes de segmentos de vídeo presentes no dataset:\n\n")
+        write_tee(info_file, "Idle    - O depoente se encontra parado ou realizando outra ação irrelevante ao propósito do reconhecedor.\n")
+        write_tee(info_file, "Speak   - O depoente se encontra falando.\n")
+        write_tee(info_file, "Nod     - O depoente balança a cabeça como se para dizer que sim.\n")
+        write_tee(info_file, "Shake   - O depoente balança a cabeça como se para dizer que não.\n")
+        write_tee(info_file, "Examine - O depoente se aproxima da câmera para examinar alguma evidência que lhe é apresentada.\n")
+        write_tee(info_file, "\n")
+        write_tee(info_file, "As seguintes classes estão sob análise devido à falta de vídeos representativos da mesma nos dados diarizados até agora.\n")
+        write_tee(info_file, "\n")
+        write_tee(info_file, "KindOf - O depoente balança a cabeça como que para dizer que \"mais ou menos\"\n")
+        write_tee(info_file, "\n")
+        write_tee(info_file, "Total de Amostras por Classe (Atualizado em {}):\n".format(date.today()))
         for c in counts_sorted:
             if c is not "Errors":
-                info_file.write("{}: {}\n".format(c, counts[c]))
-        info_file.write("\n")
-        info_file.write("Total de Amostras Inutilizáveis: {}".format(counts["Errors"]))
+                write_tee(info_file,"{}: {}\n".format(c, counts[c]))
+        write_tee(info_file, "\n")
+        write_tee(info_file, "Total de Amostras Inutilizáveis: {}".format(counts["Errors"]))
 
 if __name__ == '__main__':
     if len(sys.argv) > 2:
@@ -200,13 +204,14 @@ if __name__ == '__main__':
                 print_usage()
         
         elif sys.argv[1] == "package":
+            update_info(data_dir)
             if sys.platform == "linux" or sys.platform == "linux2":
                 subprocess.call([format(os.path.dirname(os.path.realpath(sys.argv[0]))) + "/package_dataset.sh", data_dir])
             else:
                 cprint("Command only available in linux. Current platform: {}".format(sys.platform), 'red')
 
         elif sys.argv[1] == "update":
-            print_info(data_dir)
+            update_info(data_dir)
         else:
             print_usage()
 
