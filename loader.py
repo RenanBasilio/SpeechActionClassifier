@@ -3,26 +3,26 @@ import numpy as np
 import pathlib
 import dlib
 import matplotlib.pyplot as plt
-import tensorflow as tf
 from enum import Enum
 
 from termcolor import cprint
 from imutils import face_utils
 from math import floor, ceil
-from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.colors import LinearSegmentedColormap, DivergingNorm
 
 # Get class names from classes.txt
-data_dir = pathlib.Path("data/")
-cache_dir = data_dir / "__cache__/"
+# data_dir = pathlib.Path("data/")
+cache_dir = pathlib.Path("__datacache__/")
 cache_dir.mkdir(parents=True, exist_ok=True)
 
 face_detector = None
 face_predictor = None
 
-color_array = plt.get_cmap('hot')(range(256))
-color_array[0:32,-1] = np.linspace(0.0,1.0,32)
-color_array[223:255,-1] = np.linspace(1.0,0.0,32)
-map_object = LinearSegmentedColormap.from_list(name='hot_alpha',colors=color_array)
+color_array = plt.get_cmap('RdYlBu')(range(256))
+color_array[0:128,-1] = np.linspace(1.0,0.0,128)
+color_array[128:256,-1] = np.linspace(0.0,1.0,128)
+
+map_object = LinearSegmentedColormap.from_list(name='seismic_alpha',colors=color_array)
 plt.register_cmap(cmap=map_object)
 
 def get_classes(path):
@@ -35,8 +35,8 @@ def get_classes(path):
 def get_label(path):
     return path.parts[-2]
 
-def get_label_from_index(idx):
-    return get_classes(data_dir / "classes.txt")[idx]
+def get_label_from_index(classes_file, idx):
+    return get_classes(classes_file)[idx]
 
 # Load a frame from an opencv capture and returns it as a numpy ndarray
 def load_frame_as_ndarray(cap, colormode):
@@ -49,6 +49,9 @@ def load_frame_as_ndarray(cap, colormode):
         elif colormode == 'landmarks':
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = compute_facial_landmarks(frame)
+        elif colormode == 'raw':
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            return frame
         else:
             cprint("\r\nERROR: Invalid colormode specified.", 'red')
             return None
@@ -116,15 +119,18 @@ def compute_dense_optical_flow(prev_image, current_image):
     mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])
     hsv[..., 0] = ang * 180 / np.pi / 2
     hsv[..., 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
-    return cv2.cvtColor(cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR), cv2.COLOR_BGR2GRAY)
+    of = cv2.cvtColor(cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR), cv2.COLOR_BGR2GRAY)
+    return of
 
 # Loads the video file in the provided path as an array of frames
 def load_video_as_ndarray(path, colormode='rgb', optical_flow=False, warnings=True, enable_cache=True):
     path = pathlib.Path(path)
-    cache_file_path = cache_dir / colormode / str(optical_flow) / path.relative_to(data_dir).with_suffix('.npy')
 
-    if enable_cache and cache_file_path.is_file():
-        return np.load(cache_file_path)
+    cache_file_path = None
+    if enable_cache:
+        cache_file_path = cache_dir / colormode / str(optical_flow) / path.with_suffix('.npy')
+        if cache_file_path.is_file():
+            return np.load(cache_file_path)
 
     if path.is_file():
         #print("Loading file {}...".format(path))
@@ -176,78 +182,18 @@ def print_video_frames(video, step=2):
         fig = axarr[i]
         fig.text(0.5, -0.2, 'Frame {}/{}'.format(floor(i * step) + 1, len(video)), size=12, ha="center", transform=fig.transAxes)
         if len(video[i].shape) > 2:
-            if video[i].shape[2] >= 3:
+            if video[i].shape[2] == 4:
+                imgs = np.dsplit(video[floor(i * step)], np.array([3, 6]))
+                fig.imshow(imgs[0])
+                fig.imshow(imgs[1].squeeze(), cmap='seismic_alpha', vmin=-5000, vmax=5000)
+            elif video[i].shape[2] == 3:
                 fig.imshow(video[floor(i * step)])
             elif video[i].shape[2] == 1:
                 fig.imshow(video[floor(i * step)].squeeze(), cmap='gray')
             else:
                 imgs = np.dsplit(video[floor(i * step)], 2)
                 fig.imshow(imgs[0].squeeze(), cmap='gray')
-                fig.imshow(imgs[1].squeeze(), cmap='hot_alpha')
+                fig.imshow(imgs[1].squeeze(), cmap='seismic_alpha', vmin=-5000, vmax=5000)
         else:
             fig.imshow(video[floor(i * step)])
     f.show()
-
-# Classe que carrega dados de maneira assíncrona para o preditor
-# Necessário para reduzir o custo de memória do treinamento do modelo
-# Código adaptado a partir de https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly (https://github.com/afshinea/keras-data-generator)
-class VideoDataGenerator(tf.keras.utils.Sequence):
-    def __init__(self, list_IDs, batch_size=4, dim=(15, 240, 320), color_mode='rgb', optical_flow=False, classes=[], shuffle=True):
-        self.dim = dim
-        self.batch_size = batch_size
-        self.list_IDs = list_IDs
-        self.color_mode = color_mode
-        self.optical_flow = optical_flow
-
-        if color_mode == 'rgb':
-            self.n_channels = 3
-        elif color_mode == 'gray':
-            self.n_channels = 1
-        if optical_flow:
-            self.n_channels += 1
-
-        self.classes = classes
-        self.n_classes = len(classes)
-        self.shuffle = shuffle
-        self.on_epoch_end()
-
-    def on_epoch_end(self):
-        self.indexes = np.arange(len(self.list_IDs))
-        if self.shuffle == True:
-            np.random.shuffle(self.indexes)
-
-    def __data_generation(self, list_IDs_temp):
-        X = np.empty((self.batch_size, *self.dim, self.n_channels))
-        y = np.empty((self.batch_size), dtype=int)
-
-        for i, ID in enumerate(list_IDs_temp):
-            if self.n_channels >= 3:
-                X[i,] = load_video_as_ndarray(ID, colormode=self.color_mode, optical_flow=self.optical_flow, warnings=False)
-            elif self.n_channels >= 1:
-                X[i,] = load_video_as_ndarray(ID, colormode=self.color_mode, optical_flow=self.optical_flow, warnings=False)
-            
-            y[i] = self.classes.index(get_label(ID))
-
-        return X, tf.keras.utils.to_categorical(y, num_classes=self.n_classes)
-
-    def __len__(self):
-        return int(np.floor(len(self.list_IDs) / self.batch_size))
-
-    def __getitem__(self, index):
-        indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
-        list_IDs_temp = [self.list_IDs[k] for k in indexes]
-
-        X, y = self.__data_generation(list_IDs_temp)
-
-        return (X, y)
-
-class FacialDataGenerator(tf.keras.utils.Sequence):
-    def __init__(self, list_IDs, batch_size=4, dim=(15, 240, 320), n_channels=3, classes=[], shuffle=True):
-        self.dim = dim
-        self.batch_size = batch_size
-        self.list_IDs = list_IDs
-        self.n_channels = n_channels
-        self.classes = classes
-        self.n_classes = len(classes)
-        self.shuffle = shuffle
-        self.on_epoch_end()

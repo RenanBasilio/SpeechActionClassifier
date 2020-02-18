@@ -1,24 +1,33 @@
 from math import floor, ceil
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from termcolor import cprint, colored
+from loader import load_video_as_ndarray
+import dlib
+import cv2 as cv2
 import shutil
 import pandas as pd
+import numpy as np
 import sys
 import os
 import subprocess
+import tarfile
+import pytz
 
 log_file = open("log.txt", "w+")
 
 errors = ['Partial', '!! BAD', 'Inaudible', 'Maybe']
 
-def write_tee(file, message):
+face_detector = None
+
+def write_tee(file, message, verbose=True):
     file.write(message)
-    print(message, end='')
+    if verbose:
+        print(message, end='')
 
 def print_progress(curr, total):
-    bars = floor((curr/total)*10)*'|'
-    dashes = (11 - ceil((curr/total)*10))*'='
+    bars = floor((curr/total)*20)*'■'
+    dashes = colored((21 - ceil((curr/total)*20))*'-', 'grey')
     print("\r[{}{}]".format(bars, dashes), end="")
 
 def count_entries(class_files):
@@ -57,7 +66,7 @@ def sort_dataset(splits, classes, unsorted_dir, out_dir):
     total = count_entries(manual_classes)
 
     for csv in manual_classes:
-        data = pd.read_csv(csv, header=None)
+        data = pd.read_csv(csv)
         
         # Directory with video segments corresponding to this csv file
         seg_dir = csv.parent / 'segments'
@@ -125,13 +134,14 @@ def sort_dataset(splits, classes, unsorted_dir, out_dir):
 
 def count_samples(data_dir):
     classes = {
-        "Errors": 0
+        "Errors": 0,
+        "Validated": 0
     }
         
     classes_files = list(data_dir.glob("**/_classes.csv"))
 
     for f in classes_files:
-        data = pd.read_csv(f, header=None)
+        data = pd.read_csv(f)
         for index, row in data.iterrows():
             if row[1] not in classes:
                 classes[row[1]] = 0
@@ -140,8 +150,10 @@ def count_samples(data_dir):
                 classes["Errors"] += 1
                 continue
             else:
+                if 'validated' in data and row[3] is True:
+                    classes["Validated"] += 1
                 classes[row[1]] += 1
-            
+
             if pd.notnull(row[2]) and not any([x in row[2] for x in errors]):
                 for c in row[2].split(", "):
                     if c not in classes:
@@ -150,37 +162,124 @@ def count_samples(data_dir):
 
     return classes
 
+def validate(data_dir, verbose=True):
+    classes_files = list(data_dir.glob("**/_classes.csv"))
+    count = 0
+    validated = 0
+    failed = 0
+
+    for f in classes_files:
+        data = pd.read_csv(f)
+        
+        if 'validated' not in data:
+            curr = str(f.relative_to(unsorted_path).parent)
+            data['validated'] = np.nan
+
+            for index, row in data.iterrows():
+                count += 1
+                infile = f.parent / 'segments' / "{:06d}.mp4".format(row[0])
+
+                if validate_face(infile):
+                    cprint("File {} successfully validated.".format(infile), 'green')
+                    data.loc[index, 'validated'] = True
+                    validated += 1
+                else:
+                    cprint("File {} failed to validate.".format(infile), 'red')
+                    data.loc[index, 'validated'] = False
+                    failed += 1
+
+            f.rename(f.parent / "_classes.csv.old")
+            data.to_csv(f, index=False)
+            
+            cprint("Wrote validation results to {}.".format(f), 'cyan')
+
+    print("Validated {} files ({} succeeded, {} failed).".format(count, validated, failed))
+
+def validate_face(file):
+    global face_detector
+    if face_detector is None:
+        face_detector = dlib.get_frontal_face_detector()
+
+    video = load_video_as_ndarray(file, colormode='raw', optical_flow=False, enable_cache=False)
+
+    for frame in video:
+        rects = face_detector(frame, 0)
+        if len(rects) == 0:
+            return False
+
+    return True
+
 def print_usage():
     print("Usage: preprocess_dataset.py <command> <dataset_directory>")
     print("")
     print("Commands:")
-    print("package - Package dataset into a tarball")
-    print("sort    - Sort dataset into directories according to splits.txt and classes.txt")
-    print("update  - Updates dataset.info in dataset directory")
+    print(" package - Package dataset into a tarball")
+    print("    sort - Sort dataset into directories according to splits.txt and classes.txt")
+    print("validate - Validates facial recognition for new videos")
+    print("  update - Updates dataset.info in dataset directory")
 
-def update_info(data_dir):
+def update_info(data_dir, verbose=True):
     counts = count_samples(data_dir)
     counts_sorted = sorted(counts, key=counts.get, reverse=True)
 
     info_file = data_dir / "dataset.info"
     with open(info_file, "w+", encoding='utf-8') as info_file:
-        write_tee(info_file, "Este arquivo enumera e define as classes de segmentos de vídeo presentes no dataset:\n\n")
-        write_tee(info_file, "Idle    - O depoente se encontra parado ou realizando outra ação irrelevante ao propósito do reconhecedor.\n")
-        write_tee(info_file, "Speak   - O depoente se encontra falando.\n")
-        write_tee(info_file, "Nod     - O depoente balança a cabeça como se para dizer que sim.\n")
-        write_tee(info_file, "Shake   - O depoente balança a cabeça como se para dizer que não.\n")
-        write_tee(info_file, "Examine - O depoente se aproxima da câmera para examinar alguma evidência que lhe é apresentada.\n")
-        write_tee(info_file, "\n")
-        write_tee(info_file, "As seguintes classes estão sob análise devido à falta de vídeos representativos da mesma nos dados diarizados até agora.\n")
-        write_tee(info_file, "\n")
-        write_tee(info_file, "KindOf - O depoente balança a cabeça como que para dizer que \"mais ou menos\"\n")
-        write_tee(info_file, "\n")
-        write_tee(info_file, "Total de Amostras por Classe (Atualizado em {}):\n".format(date.today()))
+        write_tee(info_file, "D3PERJ-COPPETEC\n\n", verbose)
+        write_tee(info_file, "Este arquivo enumera e define as classes de segmentos de vídeo presentes no dataset:\n\n", verbose)
+        write_tee(info_file, "Idle    - O depoente se encontra parado ou realizando outra ação irrelevante ao propósito do reconhecedor.\n", verbose)
+        write_tee(info_file, "Speak   - O depoente se encontra falando.\n", verbose)
+        write_tee(info_file, "Nod     - O depoente balança a cabeça como se para dizer que sim.\n", verbose)
+        write_tee(info_file, "Shake   - O depoente balança a cabeça como se para dizer que não.\n", verbose)
+        write_tee(info_file, "Examine - O depoente se aproxima da câmera para examinar alguma evidência que lhe é apresentada.\n", verbose)
+        write_tee(info_file, "\n", verbose)
+        write_tee(info_file, "As seguintes classes estão sob análise devido à falta de vídeos representativos da mesma nos dados diarizados até agora.\n", verbose)
+        write_tee(info_file, "\n", verbose)
+        write_tee(info_file, "KindOf - O depoente balança a cabeça como que para dizer que \"mais ou menos\"\n", verbose)
+        write_tee(info_file, "\n", verbose)
+        write_tee(info_file, "Total de Amostras por Classe (Atualizado em {}):\n".format(date.today()), verbose)
         for c in counts_sorted:
-            if c is not "Errors":
-                write_tee(info_file,"{}: {}\n".format(c, counts[c]))
-        write_tee(info_file, "\n")
-        write_tee(info_file, "Total de Amostras Inutilizáveis: {}".format(counts["Errors"]))
+            if c not in ["Errors", "Validated"]:
+                write_tee(info_file,"{}: {}\n".format(c, counts[c]), verbose)
+        write_tee(info_file, "\n", verbose)
+        write_tee(info_file, "Total de Amostras Inutilizáveis: {}\n".format(counts["Errors"]), verbose)
+        write_tee(info_file, "Total de Amostras com Reconhecimento Facial: {}\n".format(counts["Validated"]), verbose)
+
+def package_dataset(out_file, data_dir):
+    unsorted_path = data_dir / "unsorted"
+    classes_file = data_dir / "classes.txt"
+    splits_file = data_dir / "splits.txt"
+    info_file = data_dir / "dataset.info"
+    changelog = data_dir / "changes.log"
+    manifest = data_dir / "MANIFEST"
+
+    tar = tarfile.open(out_file, "w:gz")
+    files = [manifest, info_file, classes_file, splits_file, changelog]
+    files.extend(list(unsorted_path.glob("**/*.*")))
+
+    with open(manifest, 'w', encoding='utf-8') as f:
+        for item in files:
+            f.write("%s\n" % Path(item).relative_to(data_dir))
+
+    for idx, name in enumerate(files):
+        tar.add(Path(name))
+        print_progress(idx, len(files) - 1)
+        print(" {0:.1f}%                            ".format((idx / (len(files) - 1)) * 100) ,end='')
+    
+    tar.close()
+
+def update_changelog(data_dir):
+    message = input("Changelog Message: ").strip()
+    if not message:
+        cprint("No message set.", 'red')
+        return False
+    else:
+        with open(changelog, 'a', encoding='utf-8') as file:
+            file.write("\n")
+            file.write(datetime.utcnow().replace(tzinfo=pytz.utc).strftime("%Y-%m-%d %H:%M %z"))
+            file.write("\n")
+            file.write(message)
+            file.write("\n")
+        return True
 
 if __name__ == '__main__':
     if len(sys.argv) > 2:
@@ -190,6 +289,7 @@ if __name__ == '__main__':
         out_path = data_dir
         classes_file = data_dir / "classes.txt"
         splits_file = data_dir / "splits.txt"
+        changelog = data_dir / "changes.log"
 
         if sys.argv[1] == "sort":
 
@@ -204,14 +304,32 @@ if __name__ == '__main__':
                 print_usage()
         
         elif sys.argv[1] == "package":
-            update_info(data_dir)
-            if sys.platform == "linux" or sys.platform == "linux2":
-                subprocess.call([format(os.path.dirname(os.path.realpath(sys.argv[0]))) + "/package_dataset.sh", data_dir])
-            else:
-                cprint("Command only available in linux. Current platform: {}".format(sys.platform), 'red')
+
+            if not update_changelog(data_dir):
+                cprint("Packaging dataset without adding a changelog message.", 'red')
+
+            print("Validating new files...")
+            validate(data_dir, verbose=False)
+
+            print("Updating dataset information...")
+            update_info(data_dir, verbose=False)
+            
+            print("Packaging dataset...")
+            out_file = out_path / ("D3PERJ-COPPETEC-{}.tar.gz".format(date.today().strftime("%Y-%m-%d")))
+            if len(sys.argv) > 3:
+                out_file = Path(sys.argv[3]).resolve()
+
+            package_dataset(out_file, data_dir)
+
+            print("Done")
 
         elif sys.argv[1] == "update":
             update_info(data_dir)
+            update_changelog(data_dir)
+
+        elif sys.argv[1] == "validate":
+            validate(data_dir)
+            
         else:
             print_usage()
 
