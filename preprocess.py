@@ -27,7 +27,7 @@ def write_tee(file, message, verbose=True):
 
 def print_progress(curr, total):
     bars = floor((curr/total)*20)*'■'
-    dashes = colored((21 - ceil((curr/total)*20))*'-', 'grey')
+    dashes = colored((20 - floor((curr/total)*20))*'-', 'grey')
     print("\r[{}{}]".format(bars, dashes), end="")
 
 def count_entries(class_files):
@@ -210,13 +210,16 @@ def validate_face(file):
     return True
 
 def print_usage():
-    print("Usage: preprocess_dataset.py <command> <dataset_directory>")
+    print("Script for dataset preprocessing.\n")
+    print("Usage: ")
+    print("      preprocess_dataset.py <command> <dataset_directory> [output_path]")
     print("")
     print("Commands:")
-    print(" package - Package dataset into a tarball")
-    print("    sort - Sort dataset into directories according to splits.txt and classes.txt")
-    print("validate - Validates facial recognition for new videos")
-    print("  update - Updates dataset.info in dataset directory")
+    print("      sort       Sort dataset into directories according to splits.txt and classes.txt")
+    print("      update     Updates dataset.info in dataset directory")
+    print("      validate   Validates facial recognition for new videos")
+    print("      package    Package dataset into a tarball")
+    print("")
 
 def update_info(data_dir, verbose=True):
     counts = count_samples(data_dir)
@@ -268,7 +271,11 @@ def package_dataset(out_file, data_dir):
     tar.close()
 
 def update_changelog(data_dir):
-    message = input("Changelog Message: ").strip()
+    try:
+        message = input("Changelog Message: ").strip()
+    except KeyboardInterrupt:
+        cprint("\nCancelled by user.", 'red')
+        exit()
     if not message:
         cprint("No message set.", 'red')
         return False
@@ -285,8 +292,13 @@ if __name__ == '__main__':
     if len(sys.argv) > 2:
         data_dir = Path(sys.argv[2]).resolve()
 
+        out_path = None
+        if len(sys.argv) > 3:
+            out_path = Path(sys.argv[3]).resolve()
+        else:
+            out_path = data_dir
+
         unsorted_path = data_dir / "unsorted"
-        out_path = data_dir
         classes_file = data_dir / "classes.txt"
         splits_file = data_dir / "splits.txt"
         changelog = data_dir / "changes.log"
@@ -315,13 +327,16 @@ if __name__ == '__main__':
             update_info(data_dir, verbose=False)
             
             print("Packaging dataset...")
-            out_file = out_path / ("D3PERJ-COPPETEC-{}.tar.gz".format(date.today().strftime("%Y-%m-%d")))
-            if len(sys.argv) > 3:
+            out_file = None
+            if out_path.suffixes == ['.tar', '.gz']:
                 out_file = Path(sys.argv[3]).resolve()
+            else:
+                out_path.mkdir(parents=True, exist_ok=True)
+                out_file = out_path / ("D3PERJ-COPPETEC-{}.tar.gz".format(date.today().strftime("%Y-%m-%d")))
 
             package_dataset(out_file, data_dir)
 
-            print("Done")
+            print("\nDone")
 
         elif sys.argv[1] == "update":
             update_info(data_dir)
