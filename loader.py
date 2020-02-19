@@ -123,12 +123,12 @@ def compute_dense_optical_flow(prev_image, current_image):
     return of
 
 # Loads the video file in the provided path as an array of frames
-def load_video_as_ndarray(path, colormode='rgb', optical_flow=False, warnings=True, enable_cache=True):
+def load_video_as_ndarray(path, color_mode='rgb', optical_flow=False, warnings=True, enable_cache=True):
     path = pathlib.Path(path)
 
     cache_file_path = None
     if enable_cache:
-        cache_file_path = cache_dir / colormode / str(optical_flow) / path.with_suffix('.npy')
+        cache_file_path = cache_dir / color_mode / str(optical_flow) / path.with_suffix('.npy')
         if cache_file_path.is_file():
             return np.load(cache_file_path)
 
@@ -145,7 +145,7 @@ def load_video_as_ndarray(path, colormode='rgb', optical_flow=False, warnings=Tr
         frames = []
         last_frame = None
         for i in range(15):
-            frame = load_frame_as_ndarray(cap, colormode)
+            frame = load_frame_as_ndarray(cap, color_mode)
             if frame is not None:
                 if optical_flow:
                     if last_frame is not None:
