@@ -81,7 +81,7 @@ def diarize(path, outpath):
             frame = draw_dot(frame, color)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             out.write(frame)
-            cv2.imshow('video', frame)
+            #cv2.imshow('video', frame)
             cv2.waitKey(1)
 
         #print_video_frames(window)
@@ -89,11 +89,12 @@ def diarize(path, outpath):
     capture.release()
     out.release()
 
-    cmd = "ffmpeg -i \"{}\" -i \"{}\" -map 0:0 -map 1:1 -c:v copy -c:a copy -shortest \"{}\"".format(temppath.absolute(), path.absolute(), outpath.absolute())
-    returned_output = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    cmd = ['ffmpeg', '-i', temppath.absolute(), '-i', path.absolute(), '-y', '-hide_banner', '-loglevel', 'panic', '-nostats', 
+                     '-map', '0:0', '-map', '1:1', '-c:v', 'copy', '-c:a', 'copy', '-shortest', outpath.absolute()]
+    returned_output = subprocess.check_output(cmd)
     temppath.unlink()
-    cv2.destroyAllWindows()
-    print("\nDone")
+    #cv2.destroyAllWindows()
+    print("\rDone                                            ")
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
@@ -101,6 +102,8 @@ if __name__ == '__main__':
         outdir.mkdir(parents=True, exist_ok=True)
 
         path = pathlib.Path(sys.argv[1]).resolve()
+        print("Processing file {}...".format(path.absolute()))
+
         outpath = outdir / (str(path.stem) + ".diarized.mp4")
 
         diarize(path, outpath)
