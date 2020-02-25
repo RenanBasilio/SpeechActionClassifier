@@ -281,3 +281,20 @@ TSWLatexianTemp*
 
 data/
 Pipfile.lock
+
+# python
+__pycache__/
+
+# pipenv
+Pipfile.lock
+
+# vscode
+.vscode
+
+# dataset
+data/
+
+# generated files
+export/
+log.txt
+*.tar.gz
