@@ -6,20 +6,12 @@
         {
             "label": "Build Current Document",
             "type": "shell",
-            "command": "pdflatex",
+            "command": "latexmk",
             "args": [
-                "-jobname=the${fileBasenameNoExtension}",
-                "'\\includeonly{${fileBasenameNoExtension}}\\input{tcc}';",
-                "bibtex", 
-                "theintro;",
-                "pdflatex", 
-                "-jobname=the${fileBasenameNoExtension}",
-                "'\\includeonly{${fileBasenameNoExtension}}\\input{tcc}';",
-                "pdflatex", 
-                "-jobname=the${fileBasenameNoExtension}",
-                "'\\includeonly{${fileBasenameNoExtension}}\\input{tcc}';",
-                "mv", "the${fileBasenameNoExtension}.pdf", "${fileBasenameNoExtension}.pdf", "-Force;",
-                "rm", "the${fileBasenameNoExtension}.*"
+                "-jobname=${fileBasenameNoExtension}",
+                "-pdf",
+                "-pdflatex='pdflatex %O -interaction=nonstopmode \"\\includeonly{${fileBasenameNoExtension}}\\input{%S}\"'",
+                "tcc"
                 ],
             "options": {
                 "cwd": "${fileDirname}"

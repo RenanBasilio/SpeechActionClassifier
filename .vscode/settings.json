@@ -5,5 +5,15 @@
     "ltex.language": "pt-BR",
     "ltex.pt-BR.disabledRules": [
         "HUNSPELL_RULE"
+    ],
+    "ltex.ignoreRuleInSentence": [
+        {
+            "rule": "GENERAL_GENDER_AGREEMENT_ERRORS",
+            "sentence": "^\\QNo apêndice, apresentamos o código fonte desenvolvido para este trabalho.\\E$"
+        },
+        {
+            "rule": "PT_BARBARISMS_REPLACE",
+            "sentence": "^\\QNo capítulo 4 demonstramos os resultados de nosso método quando aplicado sobre dataset fornecido pela Defensoria Pública do Estado do Rio de Janeiro, além do dataset AMI Meeting Corpus \\EDummy[0-9]+\\Q, que cotém vídeos dos participantes individuais, em alta resolução e com as características desejadas.\\E$"
+        }
     ]
 }
