@@ -1,6 +1,7 @@
 {
     "[latex]": {
-        "editor.wordWrap": "on"
+        "editor.wordWrap": "on",
+        "editor.minimap.enabled": false
     },
     "ltex.language": "pt-BR",
     "ltex.pt-BR.disabledRules": [

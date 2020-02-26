@@ -16,11 +16,29 @@
   number = {2}
 }
 
+@inproceedings{dalalHistogramsOrientedGradients2005,
+  title = {Histograms of {{Oriented Gradients}} for {{Human Detection}}},
+  booktitle = {2005 {{IEEE Computer Society Conference}} on {{Computer Vision}} and {{Pattern Recognition}} ({{CVPR}}'05)},
+  author = {Dalal, N. and Triggs, B.},
+  year = {2005},
+  volume = {1},
+  pages = {886--893},
+  publisher = {{IEEE}},
+  address = {{San Diego, CA, USA}},
+  doi = {10.1109/CVPR.2005.177},
+  abstract = {We study the question of feature sets for robust visual object recognition, adopting linear SVM based human detection as a test case. After reviewing existing edge and gradient based descriptors, we show experimentally that grids of Histograms of Oriented Gradient (HOG) descriptors significantly outperform existing feature sets for human detection. We study the influence of each stage of the computation on performance, concluding that fine-scale gradients, fine orientation binning, relatively coarse spatial binning, and high-quality local contrast normalization in overlapping descriptor blocks are all important for good results. The new approach gives near-perfect separation on the original MIT pedestrian database, so we introduce a more challenging dataset containing over 1800 annotated human images with a large range of pose variations and backgrounds.},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\7I8IHMMA\\Dalal and Triggs - 2005 - Histograms of Oriented Gradients for Human Detecti.pdf},
+  isbn = {978-0-7695-2372-9},
+  language = {en}
+}
+
 @article{dimitriadisEnhancementsAudioonlyDiarization2019,
   title = {Enhancements for {{Audio}}-Only {{Diarization Systems}}},
   author = {Dimitriadis, Dimitrios},
   year = {2019},
   month = aug,
+  url = {http://arxiv.org/abs/1909.00082},
+  urldate = {2020-02-08},
   abstract = {In this paper two different approaches to enhance the performance of the most challenging component of a Speaker Diarization system are presented, i.e. the speaker clustering part. A processing step is proposed enhancing the input features with a temporal smoothing process combined with nonlinear filtering. We, also, propose improvements on the Deep Embedded Clustering (DEC) algorithm -- a nonlinear feature transformation. The performance of these enhancements is compared with different clustering algorithms, such as the UISRNN, k-Means, Spectral clustering and x-Means. The evaluation is held on three different tasks, i.e. the AMI, DIHARD and an internal meeting transcription task. The proposed approaches assume a known number of speakers and time segmentations for the audio files. Since, we focus only on the clustering component of diarization for this work, the segmentation provided is assumed perfect. Finally, we present how supervision, in the form of given speaker profiles, can further improve the overall diarization performance. The proposed enhancements yield substantial relative improvements in all 3 tasks, with 20\textbackslash\% in AMI and 19\textbackslash\% better than the best diarization system for DIHARD task, when the number of speakers is known.},
   archivePrefix = {arXiv},
   eprint = {1909.00082},
@@ -51,6 +69,22 @@
   abstract = {Matplotlib is a 2D graphics package used for Python for application development, interactive scripting, and publication-quality image generation across user interfaces and operating systems.},
   journal = {Computing in Science \& Engineering},
   number = {3}
+}
+
+@inproceedings{kazemiOneMillisecondFace2014a,
+  title = {One Millisecond Face Alignment with an Ensemble of Regression Trees},
+  booktitle = {2014 {{IEEE Conference}} on {{Computer Vision}} and {{Pattern Recognition}}},
+  author = {Kazemi, Vahid and Sullivan, Josephine},
+  year = {2014},
+  month = jun,
+  pages = {1867--1874},
+  publisher = {{IEEE}},
+  address = {{Columbus, OH}},
+  doi = {10.1109/CVPR.2014.241},
+  abstract = {This paper addresses the problem of Face Alignment for a single image. We show how an ensemble of regression trees can be used to estimate the face's landmark positions directly from a sparse subset of pixel intensities, achieving super-realtime performance with high quality predictions. We present a general framework based on gradient boosting for learning an ensemble of regression trees that optimizes the sum of square error loss and naturally handles missing or partially labelled data. We show how using appropriate priors exploiting the structure of image data helps with efficient feature selection. Different regularization strategies and its importance to combat overfitting are also investigated. In addition, we analyse the effect of the quantity of training data on the accuracy of the predictions and explore the effect of data augmentation using synthesized data.},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\7CIFBZ8V\\Kazemi and Sullivan - 2014 - One millisecond face alignment with an ensemble of.pdf},
+  isbn = {978-1-4799-5118-5},
+  language = {en}
 }
 
 @inproceedings{Kluyver:2016aa,
@@ -92,6 +126,17 @@
   editor = {{van der Walt}, St{\'e}fan and {Jarrod Millman}},
   year = {2010},
   pages = {51--56}
+}
+
+@misc{mtheilerDeteccaoMarcadoresFaciais2019,
+  title = {Detec{\c c}{\~a}o de {{Marcadores Faciais}} Pela Biblioteca {{Dlib}}},
+  shorttitle = {English},
+  author = {{MTheiler}},
+  year = {2019},
+  month = jan,
+  url = {https://commons.wikimedia.org/wiki/File:Dlib-face_landmark_detection.jpg},
+  urldate = {2020-02-25},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\M34H965E\\FileDlib-face_landmark_detection.html}
 }
 
 @article{opencv_library,
@@ -144,6 +189,7 @@
   title = {{{TensorFlow}}: {{Large}}-Scale {{Machine Learning}} on {{Heterogeneous Systems}}},
   author = {Abadi, Mart{\'i}n and Agarwal, Ashish and Barham, Paul and Brevdo, Eugene and Chen, Zhifeng and Citro, Craig and Corrado, Greg S. and Davis, Andy and Dean, Jeffrey and Devin, Matthieu and Ghemawat, Sanjay and Goodfellow, Ian and Harp, Andrew and Irving, Geoffrey and Isard, Michael and Jia, Yangqing and Jozefowicz, Rafal and Kaiser, Lukasz and Kudlur, Manjunath and Levenberg, Josh and Man{\'e}, Dandelion and Monga, Rajat and Moore, Sherry and Murray, Derek and Olah, Chris and Schuster, Mike and Shlens, Jonathon and Steiner, Benoit and Sutskever, Ilya and Talwar, Kunal and Tucker, Paul and Vanhoucke, Vincent and Vasudevan, Vijay and Vi{\'e}gas, Fernanda and Vinyals, Oriol and Warden, Pete and Wattenberg, Martin and Wicke, Martin and Yu, Yuan and Zheng, Xiaoqiang},
   year = {2015},
+  url = {https://www.tensorflow.org/},
   abstract = {TensorFlow is a machine learning system that operates at large scale and in heterogeneous environments. TensorFlow uses dataflow graphs to represent computation, shared state, and the operations that mutate that state. It maps the nodes of a dataflow graph across many machines in a cluster, and within a machine across multiple computational devices, including multicore CPUs, generalpurpose GPUs, and custom-designed ASICs known as Tensor Processing Units (TPUs). This architecture gives flexibility to the application developer: whereas in previous ``parameter server'' designs the management of shared state is built into the system, TensorFlow enables developers to experiment with novel optimizations and training algorithms. TensorFlow supports a variety of applications, with a focus on training and inference on deep neural networks. Several Google services use TensorFlow in production, we have released it as an open-source project, and it has become widely used for machine learning research. In this paper, we describe the TensorFlow dataflow model and demonstrate the compelling performance that TensorFlow achieves for several real-world applications.}
 }
 

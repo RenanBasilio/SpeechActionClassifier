@@ -10,22 +10,41 @@ Na seção \ref{sec:tools} apresentamos as ferramentas principais utilizadas no 
 
 Nesta seção apresentamos as principais ferramentas utilizadas durante a implementação deste trabalho. Definiremos suas principais características, assim como as funcionalidades das mesmas que foram utilizadas, e as motivações por trás de sua escolha.
 
-Na seção \ref{subsec:dlib} apresentaremos a biblioteca dlib, utilizada para propósito de reconhecimento e demarcação facial no projeto. Em seguida, na seção \ref{subsec:tf} apresentaremos a biblioteca Tensorflow, utilizada por sua robusta implementação de rede neural. Na seção \ref{subsec:environ} apresentaremos o ambiente utilizado para treinamento do modelo, assim como seus recursos computacionais. Por fim, na seção seção \ref{subsec:otools}, acreditaremos brevemente as demais ferramentas utilizadas em caráter pontual no trabalho, e que, portanto não receberão seções dedicadas.
+Na seção \ref{subsec:dlib} apresentaremos a biblioteca dlib, utilizada para propósito de reconhecimento e demarcação facial no projeto. Em seguida, na seção \ref{subsec:tf} apresentaremos a biblioteca Tensorflow, utilizada por sua robusta implementação de rede neural. Na seção \ref{subsec:environ} apresentaremos o ambiente utilizado para treinamento do modelo, assim como seus recursos computacionais. Por fim, na seção \ref{subsec:otools}, mencionaremos brevemente as demais ferramentas utilizadas em caráter pontual no trabalho, e que, portanto, não receberam seções dedicadas.
 
-\subsection{dlib}
+\subsection{Dlib}
 \label{subsec:dlib}
-\cite{dlib09}
-% TODO: Escrever sobre a dlib
+A Dlib\cite{dlib09} é uma biblioteca de código aberto desenvolvida em C++ e com interface em Python, com foco principal aplicação se encontra na área de processamento de imagens e reconhecimento facial. 
+
+A biblioteca possui um reconhecedor facial frontal baseado em \textit{Histogram of Oriented Gradients} (HOG) capaz de detectar rostos frontais mesmo em imagens de baixa resolução. As características específicas deste reconhecedor estão discutidas na seção \ref{sec:faciallm}.
+
+% FIXME: Colocar mais aprofundadamente na fundamentação teórica
+% HOG é uma técnica de visão computacional na qual são calculados gradientes para cada pixel da imagem a partir de seus vizinhos de forma a identificar as fronteiras entre os objetos da figura. Os gradientes calculados são então utilizados para computar blocos descritores de 8x8 pixels com 9 canais. Esses blocos sofrem normalização local para compensar fatores como a iluminação do ambiente, e servem como entrada para uma Máquina de Vetores de Suporte, resultando em um reconhecedor de faces rápido e robusto. Uma explicação mais aprofundada sobre esta técnica pode ser obtida em \cite{dalalHistogramsOrientedGradients2005}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\textwidth]{dlib-face_landmark_detection.jpg}    
+    \caption{Detecção de Marcadores Faciais pela biblioteca Dlib. Imagem publicada sob licença Creative Commons\cite{mtheilerDeteccaoMarcadoresFaciais2019}. }
+    \label{fig:dlib-landmarking}
+\end{figure}
+
+Além disso, a biblioteca implementa um detector de marcadores faciais baseado em uma floresta de árvores de regressão, capaz de identificar (ou estimar, caso não estejam visíveis) as posições de um conjunto de pontos em um rosto, como mostra a figura \ref{fig:dlib-landmarking}. A biblioteca fornece também um modelo pré-treinado para este detector para identificação de 68 destes marcadores, sob licença que permite uso acadêmico. Esta funcionalidade foi chave para a escolha dessa biblioteca para a implementação do trabalho, visto que permitiu o treinamento do classificador utilizando um conjunto exponencialmente menor de dados, sem preocupações quanto a biases relacionados às características físicas do locutor.
 
 \subsection{Tensorflow}
 \label{subsec:tf}
-\cite{tensorflow2015-whitepaper}
-% TODO: Escrever sobre Tensorflow
+
+Tensorflow\cite{tensorflow2015-whitepaper} é um framework de código aberto para aplicações de aprendizado de máquina. A biblioteca, construída pela Google, apresenta implementações robustas de diversos algoritmos da área, além de uma API que permite a declaração de uma rede neural em função de suas camadas. A biblioteca suporta, ainda, o uso de uma ou mais GPUs para treinamento da rede neural, através da biblioteca cuDNN. No trabalho, o Tensorflow foi utilizada para modelagem da rede neural, assim como o treinamento e posterior execução desta.
+
+Sua escolha para o propósito do trabalho se deu devido à sua implementação de algoritmos chave para o desenvolvimento deste, tais como a rede neural convolucional tridimensional, discutida na seção \ref{sec:3dcnn}. Além disso, suas interfaces nas linguagens de programação C++ e Python, viculadas à facilidade de utilização da interface em Python da biblioteca, foram decisivas para a escolha desta para a realização do trabalho.
 
 \subsection{Ambiente de Desenvolvimento}
 \label{subsec:environ}
 
+No desenvolvimento deste trabalho foi utilizada em caráter primário a linguagem de programação Python. Originalmente, o trabalho seria desenvolvido em C++ devido ao mais alto desempenho desta, porém a utilização de diversas bibliotecas com interface em Python levou à sua escolha para a implementação final do projeto.
 
+A IDE utilizada no desenvolvimento foi o Visual Studio Code, ferramenta de código aberto criada pela Microsoft, e o Jupyter Notebook\cite{Kluyver:2016aa}, por sua capacidade de subdividir e visualizar com facilidade o estado do programa em execução.
+
+O treinamento da rede neural foi realizado em máquina com sistema operacional Windows, equipado com uma CPU Intel Core i7 de quarta geração, 12 GB de memória RAM e uma GPU Nvidia GTX 980 com 4 GB de VRAM.
 
 \subsection{Outras Ferramentas}
 \label{subsec:otools}
@@ -34,21 +53,17 @@ Nesta seção apresentamos as demais bibliotecas utilizadas no desenvolvimento d
 
 As bibliotecas se encontram ordenadas por sua função na pipeline do classificador, discutida de forma mais aprofundada na seção \ref{sec:sysarch}.
 
-\subsubsection{Jupyter Notebook}
-
-O Jupyter Notebook \cite{Kluyver:2016aa} foi a IDE utilizada na maior parte do desenvolvimento do classificador, por permitir rápida visualização e alteração de seções individuais do código. Essa capacidade foi fundamental para validação de várias funcionalidades implementadas, tais como o carregamento de vídeo, a produção da imagem intermediária com os marcadores faciais, e o cálculo do fluxo ótico denso.
-
 \subsubsection{OpenCV}
 
-OpenCV \cite{opencv_library} é uma biblioteca de código aberto para aplicações de Visão Computacional. Ela foi utilizada para realizar a leitura quadro a quadro dos arquivos de vídeo a serem processados pelo sistema, e para codificar em video a saída do classificador.
+OpenCV\cite{opencv_library} é uma biblioteca de código aberto para aplicações de Visão Computacional. Ela foi utilizada para realizar a leitura quadro a quadro dos arquivos de vídeo a serem processados pelo sistema, e para codificar em video a saída do classificador.
 
 \subsubsection{Matplotlib}
 
-A Matplotlib \cite{Hunter:2007} é uma biblioteca para produção de gráficos e imagens em Python. Ela foi utilizada para produzir as imagens intermediárias, através do desenho de polígonos a partir dos vértices produzidos pelo processo de marcação facial.
+A Matplotlib\cite{Hunter:2007} é uma biblioteca para produção de gráficos e imagens em Python. Ela foi utilizada para produzir as imagens intermediárias, através do desenho de polígonos a partir dos vértices produzidos pelo processo de marcação facial.
 
 \subsubsection{Pandas}
 
-Pandas \cite{mckinney-proc-scipy-2010} é uma biblioteca de processamento de dados em Python. Ela foi utilizada no préprocessamento dos dados com a finalidade de manipular os arquivos csv produzidos pelo processo de diarização manual dos videos do dataset de depoimentos.
+Pandas\cite{mckinney-proc-scipy-2010} é uma biblioteca de processamento de dados em Python. Ela foi utilizada no préprocessamento dos dados com a finalidade de manipular os arquivos csv produzidos pelo processo de diarização manual dos videos do dataset de depoimentos.
 
 \section{Preparação dos Dados}
 \label{sec:preproc}
