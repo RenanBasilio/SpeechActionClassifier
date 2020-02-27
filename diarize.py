@@ -12,10 +12,13 @@ import math
 import subprocess
 import sys
 
+classes=['Idle','Speak']
+
 def draw_dot(frame, color):
-    cx, cy = 310, 10
-    y, x = np.ogrid[-5:5, -5:5]
-    frame[cy-5:cy+5, cx-5:cx+5][x**2 + y**2 <= 25] = color
+    cx, cy = math.floor(frame.shape[1] * 0.95), math.floor(frame.shape[1] * 0.05)
+    rad = math.floor(frame.shape[0] * 0.025)
+    y, x = np.ogrid[-rad:rad, -rad:rad]
+    frame[cy-rad:cy+rad, cx-rad:cx+rad][x**2 + y**2 <= rad**2] = color
     return frame
 
 def diarize(path, outpath):
@@ -24,7 +27,7 @@ def diarize(path, outpath):
 
     temppath = pathlib.Path("export/diarized/") / (str(path.stem) + ".temp.mp4")
     capture = cv2.VideoCapture(str(path.absolute()))
-    out = cv2.VideoWriter(str(temppath.absolute()), cv2.VideoWriter_fourcc(*'mp4v'), 30.0, (320, 240))
+    out = cv2.VideoWriter(str(temppath.absolute()), cv2.VideoWriter_fourcc(*'mp4v'), capture.get(cv2.CAP_PROP_FPS), (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
 
     ret = True
     length = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -66,7 +69,7 @@ def diarize(path, outpath):
 
             prediction = model.predict(prediction_window)
 
-            label = get_label_from_index(pathlib.Path("data/classes.txt"), np.argmax(prediction[0]))
+            label = classes[np.argmax(prediction[0])]
         else:
             label = None
             errors = False
@@ -81,7 +84,6 @@ def diarize(path, outpath):
             frame = draw_dot(frame, color)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             out.write(frame)
-            cv2.imshow('video', frame)
             cv2.waitKey(1)
 
         #print_video_frames(window)
@@ -89,11 +91,15 @@ def diarize(path, outpath):
     capture.release()
     out.release()
 
-    cmd = "ffmpeg -i \"{}\" -i \"{}\" -map 0:0 -map 1:1 -c:v copy -c:a copy -shortest \"{}\"".format(temppath.absolute(), path.absolute(), outpath.absolute())
-    returned_output = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    temppath.unlink()
-    cv2.destroyAllWindows()
-    print("\nDone")
+    try:
+        cmd = ['ffmpeg', '-i', temppath.absolute(), '-i', path.absolute(), '-y', '-hide_banner', '-loglevel', 'panic', '-nostats', 
+                     '-map', '0:0', '-map', '1:1', '-c:v', 'copy', '-c:a', 'copy', '-shortest', outpath.absolute()]
+        returned_output = subprocess.check_output(cmd)
+        temppath.unlink()
+    except:
+        temppath.rename(outpath)
+
+    print("\rDone                                            ")
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
@@ -101,6 +107,8 @@ if __name__ == '__main__':
         outdir.mkdir(parents=True, exist_ok=True)
 
         path = pathlib.Path(sys.argv[1]).resolve()
+        print("Processing file {}...".format(path.absolute()))
+
         outpath = outdir / (str(path.stem) + ".diarized.mp4")
 
         diarize(path, outpath)

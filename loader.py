@@ -67,14 +67,15 @@ def compute_facial_landmarks(image):
     global face_detector
 
     if face_predictor is None:
-        face_detector = dlib.get_frontal_face_detector()
+        face_detector = dlib.cnn_face_detection_model_v1("resources/mmod_human_face_detector.dat")
+	#face_detector = dlib.get_frontal_face_detector()
         face_predictor = dlib.shape_predictor("resources/shape_predictor_68_face_landmarks.dat")
 
-    rects = face_detector(image, 0)
+    faces = face_detector(image, 1)
     blank_image = np.full(image.shape, 255, np.uint8)
     face_chip = None
-    for (i, rect) in enumerate(rects):
-        shape = face_predictor(image, rect)
+    for (i, face) in enumerate(faces):
+        shape = face_predictor(image, face.rect)
         shape_np = face_utils.shape_to_np(shape)
 
         #for (x, y) in shape_np:
