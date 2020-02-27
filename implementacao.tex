@@ -40,7 +40,7 @@ Sua escolha para o propósito do trabalho se deu devido à sua implementação d
 \subsection{Ambiente de Desenvolvimento}
 \label{subsec:environ}
 
-No desenvolvimento deste trabalho foi utilizada em caráter primário a linguagem de programação Python. Originalmente, o trabalho seria desenvolvido em C++ devido ao mais alto desempenho desta, porém a utilização de diversas bibliotecas com interface em Python levou à sua escolha para a implementação final do projeto.
+No desenvolvimento deste trabalho foi utilizada em caráter primário a linguagem de programação Python. Originalmente, o trabalho seria desenvolvido em C++ devido ao mais alto desempenho desta linguagem, porém a utilização de diversas bibliotecas com interface em Pythona ssim como sua facilidade de prototipagem levou à decisão de utiliza-la para a implementação final do projeto.
 
 A IDE utilizada no desenvolvimento foi o Visual Studio Code, ferramenta de código aberto criada pela Microsoft, e o Jupyter Notebook\cite{Kluyver:2016aa}, por sua capacidade de subdividir e visualizar com facilidade o estado do programa em execução.
 
@@ -68,7 +68,15 @@ Pandas\cite{mckinney-proc-scipy-2010} é uma biblioteca de processamento de dado
 \section{Preparação dos Dados}
 \label{sec:preproc}
 
-% TODO: Escrever sobre o préprocessamento dos dados
+Originalmente, foi fornecido pela Defensoria Pública do Estado do Rio de Janeiro um dataset contendo cerca de 5 horas de vídeo, divididas em 30 vídeos de depoimentos, cada um referente às declarações de um ou mais depoentes. Os videos fornecidos apresenta resolução de $320\times240$ pixels, a uma taxa de 30 quadros por segundo. O conjunto de dados não apresentava nenhuma anotação quanto à fala do depoente, portanto nossa primeira etapa foi constituída pela diarização manual de alguns dos videos fornecidos.
+
+A primeira etapa foi constituída pela segmentação dos videos em fragmentos de 15 quadros, ou meio segundo. A motivação para a segmentação do video de entrada em trechos deste comprimento foi a estipulação de que o tempo necessário para a fala da primeira sílaba em uma frase por uma pessoa normal, no português do brazil, é de 252 milisegundos\cite{barbosaSyllabletimingBrazilianPortuguese2000}, o que constitui aproximadamente metade deste tempo. Sendo assim, julgamos que seria possível detectar mesmo falas curtas considerando este o tamanho da janela.
+
+Estes trechos foram validados para determinar se a face do depoente poderia ser reconhecida, com finalidade de descartar fragmentos nos quais este não olhava em direção à câmera. Posteriormente, cada trecho foi classificado quanto à ocorrência de fala pelo depoente, produzindo uma tabela que associava o identificador de cada arquivo à classe correspondente ao mesmo.
+
+Feita a diarização, os videos foram separados em conjuntos de teste e treinamento, tais que vídeos diferentes seriam utilizados para cada fase do treinamento da rede. Essa separação foi feita pois, como os fragmentos possuem relação temporal entre si, seria possível que o treinamento da rede neural utilizando segmentos imediatamente posteriores ao fragmento de teste pudesse inflar o desempenho da mesma nas predições realizadas sobre este.
+
+Por fim, as diarizações produzidas manualmente foram utilizadas para organizar os fragmentos em uma estrutura de diretórios, tal que a primeiramente estivessem separados por conjunto de teste ou treinamento, depois por classe, e por fim por vídeo de origem. Essa estrutura foi construída tal que as informações relevantes ao gerador de amostras da rede neural pudessem ser obtidas todas a partir do caminho para o mesmo.
 
 \section{Arquitetura do Sistema}
 \label{sec:sysarch}
