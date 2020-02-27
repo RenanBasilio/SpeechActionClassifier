@@ -83,6 +83,51 @@ Para a execução de todas essas tarefas foram desenvolvidos scripts em Python e
 \section{Arquitetura do Sistema}
 \label{sec:sysarch}
 
+Foram desenvolvidos dois conjuntos scripts distintos para este trabalho; um sistema para treinamento da rede neural convolucional, e outro para a diarização de locutor em um vídeo com as características definidas anteriormente. Sendo assim, discutiremos a arquitetura utilizada para treinamento do modelo na seção \ref{subsec:train}, e a utilizada no processamento de uma mídia de entrada na seção \ref{subsec:application}.
+
+\subsection{Treinamento}
+\label{subsec:train}
+
+A arquitetura do sistema de treinamento consiste em um gerador de dados e um modelo de rede neural convolucional a ser treinado.
+
+% \input{figures/arch-train}
+
+A função primária do gerador de dados é carregar dinâmicamente os vídeos a serem alimentados ao modelo em cada etapa de seu treinamento. Para isto, ele é inicializado com uma lista dos arquivos a serem carregados, assim como uma série de parâmetros que definem aspectos de sua operação, tais como o tamanho da batelada ou o pré-processamento a ser aplicado aos quadros.
+
+O gerador de dados possui 3 modos distintos de operação. Estes são:
+\begin{itemize}
+    \item RGB: Nesse modo, o quadro é retornado como uma imagem em padrão RGB, ou seja, com suas cores representadas por suas componentes vermelha, verde, e azul, nesta ordem.
+    \item Grayscale: Nesse modo, o quadro é retornado convertido para escala de cinza, segundo a função $Y = 0.299 R + 0.587 G + 0.114 B$.
+    \item Landmarks: Nesse modo, é gerada uma imagem em preto e branco, rasterizada a partir dos pontos identificados pela detecção de marcadores faciais em cada quadro carregado. Este foi o modo utilizado na implementação final do trabalho.
+\end{itemize}
+O gerador é capaz, ainda, de manter um \textit{cache} atualizado com os cálculos realizados no carregamento dos quadros, a fim de possibilitar treinamento mais rápido do modelo em épocas consecutivas.
+
+Em nossa implementação final, utilizamos o modo de \textit{landmarks}. Esse modo consiste em três operações consecutivas; primeiramente, o segmento de video é carregado do disco quadro a quadro. Depois, estes quadros sofrem reconhecimento facial e, em seguida, as faces detectadas passam pelo detector de marcadores faciais, que retorna o conjunto de 68 pontos correspondentes aos marcadores detectados. Estes pontos são, então, utilizados para o desenho de polígonos sobre um canvas branco de mesmo tamanho da imagem original, na etapa que chamamos de rasterização. Essa etapa garante a preservação das relações entre os marcadores faciais. Por fim, a imagem rasterizada é recortada segundo o retângulo delimitado pelo reconhecedor facial e alinhada horizontalmente.
+
+Em seguida, configuramos o modelo da rede neural. Os detalhes e decisões referentes à configuração deste podem ser encontradas na seção \ref{sec:topology}. O treinamento é então realizado em um loop. Como critérios de parada, utilizamos um limite de 100 épocas no treinamento. Como medida de prevenção ao \textit{overfitting} na rede neural, paramos o treinamento quando o valor da função custo no conjunto de validação não for reduzido em um período de 3 épocas.
+
+\begin{equation} \label{eq:categorical_crossentropy}
+    L(y,\hat{y})=-\sum\limits_{j=0}^M\sum\limits_{i=0}^N(y_{ij}*log(\hat{y}_{ij}))
+\end{equation}
+
+Como função de custo, dado que estamos lidando com um problema de classificação, utilizamos a função de entropia categórica cruzada, ou \textit{custo softmax} (equação \ref{eq:categorical_crossentropy}). Nessa equação, $\hat{y}$ é o vetor das probabilidades das categorias, e $y$ é a categoria real, codificada \textit{one-hot}.
+
+A cada época, o modelo chama o gerador de dados de treinamento, que lhe retorna uma batelada composta por um número fixo de amostras. Cada uma dessas amostras é, como discutido anteriormente, um segmento de 15 quadros consecutivos, extraído de um vídeo e pré-processado pelo gerados. Ao esgotarem as amostras de teste, o modelo chama, então, o gerador de dados de validação, realizando predições sem retropropagação sobre as entradas retornadas, e calculando o valor da função custo para os resultados. Por fim, ao se esgotarem também essas amostras, dá-se o final de uma época de treinamento, e os geradores tem suas listas de arquivos embaralhadas de forma a garantir aleatoriedade na ordem da próxima época.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{training_metrics_evolution.pdf}
+    \caption{Evolução das métricas do treinamento ao longo do tempo. A métrica val\_loss, valor da função custo sobre os resultados do conjunto de validação, foi critério de parada do treinamento.}
+    \label{fig:train_metrics_evo}
+\end{figure}
+
+O processo de trinamento do modelo levou 15 épocas em nosso treinamento inicial, como mostra a figura \ref{fig:train_metrics_evo}. Ao fim do processo, os pesos com menor custo no conjunto de validação foram restaurados.
+
+\subsection{Aplicação}
+\label{subsec:application}
+
+% \input{figures/arch-run}
+
 % TODO: Escrever sobre a arquitetura do sistema
 
 \section{Topologia da Rede Neural}
