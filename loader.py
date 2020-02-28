@@ -138,10 +138,14 @@ def load_video_as_ndarray(path, color_mode='rgb', optical_flow=False, warnings=T
         cap = cv2.VideoCapture(str(path.absolute()))
         n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-        if n_frames > 15 and warnings:
-            cprint("\r\nWARNING: Video file {} contains more than 15 frames (was: {}). Extra frames will be ignored.".format(path, n_frames), 'yellow')
+        if n_frames > 15 and warnings != False:
+            cprint("\nWARNING: Video file {} contains more than 15 frames (was: {}). Extra frames will be ignored.".format(path, n_frames), 'yellow')
+            if warnings is 'except':
+                raise Exception("Invalid video data.") 
         elif n_frames < 15 and warnings:
-            cprint("\r\nWARNING: Video file {} contains less than 15 frames (was: {}). Last frame will be duplicated.".format(path, n_frames), 'yellow')
+            cprint("\nWARNING: Video file {} contains less than 15 frames (was: {}). Last frame will be duplicated.".format(path, n_frames), 'yellow')
+            if warnings is 'except':
+                raise Exception("Invalid video data.") 
 
         frames = []
         last_frame = None

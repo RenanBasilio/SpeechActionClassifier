@@ -213,14 +213,20 @@ def validate_face(file):
     if face_detector is None:
         face_detector = dlib.cnn_face_detection_model_v1("resources/mmod_human_face_detector.dat")
 
-    video = load_video_as_ndarray(file, color_mode='raw', optical_flow=False, enable_cache=False)
+    try:
+        video = load_video_as_ndarray(file, color_mode='raw', optical_flow=False, enable_cache=False, warnings='except')
 
-    for frame in video:
-        faces = face_detector(frame, 0)
-        if len(faces) == 0:
-            return False
+        for frame in video:
+            faces = face_detector(frame, 0)
+            if len(faces) == 0:
+                return False
+        
+        return True
+    except KeyboardInterrupt:
+        raise KeyboardInterrupt
+    except:
+        return False
 
-    return True
 
 def update_info(data_dir, verbose=True):
     counts = count_samples(data_dir)
