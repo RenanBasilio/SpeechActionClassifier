@@ -67,7 +67,7 @@ def sort_dataset(splits, classes, unsorted_dir, out_dir):
     total = count_entries(manual_classes)
 
     for csv in manual_classes:
-        data = pd.read_csv(csv)
+        data = pd.read_csv(csv, dtype={'id': np.int32})
         
         # Directory with video segments corresponding to this csv file
         seg_dir = csv.parent / 'segments'
@@ -152,7 +152,7 @@ def count_samples(data_dir):
     classes_files = list(data_dir.glob("**/_classes.csv"))
 
     for f in classes_files:
-        data = pd.read_csv(f)
+        data = pd.read_csv(f, dtype={'id': np.int32})
         for index, row in data.iterrows():
             if pd.notnull(row[1]) and row[1] not in classes:
                 classes[row[1]] = 0
@@ -181,7 +181,7 @@ def validate(data_dir, revalidate=False, verbose=True):
     failed = 0
 
     for f in classes_files:
-        data = pd.read_csv(f)
+        data = pd.read_csv(f, dtype={'id': np.int32})
         
         if revalidate or  'validated' not in data or data['validated'].isnull().sum() > 0:
             curr = str(f.relative_to(unsorted_path).parent)
@@ -190,7 +190,7 @@ def validate(data_dir, revalidate=False, verbose=True):
             for index, row in data.iterrows():
                 if revalidate or pd.isnull(row['validated']):
                     count += 1
-                    infile = f.parent / 'segments' / "{:06d}.mp4".format(row[0].astype('int32'))
+                    infile = f.parent / 'segments' / "{:06d}.mp4".format(row['id'].astype('int32'))
 
                     if validate_face(infile):
                         cprint("File {} successfully validated.".format(infile), 'green')
