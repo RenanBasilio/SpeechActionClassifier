@@ -50,7 +50,6 @@ def load_frame_as_ndarray(cap, colormode):
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = compute_facial_landmarks(frame)
         elif colormode == 'raw':
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             return frame
         else:
             cprint("\r\nERROR: Invalid colormode specified.", 'red')

@@ -217,6 +217,7 @@ def validate_face(file):
         video = load_video_as_ndarray(file, color_mode='raw', optical_flow=False, enable_cache=False, warnings='except')
 
         for frame in video:
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             faces = face_detector(frame, 0)
             if len(faces) == 0:
                 return False
