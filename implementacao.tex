@@ -94,6 +94,15 @@ A arquitetura do sistema de treinamento consiste em um gerador de dados e um mod
 
 A função primária do gerador de dados é carregar dinâmicamente os vídeos a serem alimentados ao modelo em cada etapa de seu treinamento. Para isto, ele é inicializado com uma lista dos arquivos a serem carregados, assim como uma série de parâmetros que definem aspectos de sua operação, tais como o tamanho da batelada ou o pré-processamento a ser aplicado aos quadros.
 
+\begin{figure}[ht]
+    \centering
+    \includesvg[width=0.85\textwidth]{loader_rgb.svg}
+    \includesvg[width=0.85\textwidth]{loader_gray.svg}
+    \includesvg[width=0.85\textwidth]{loader_lm.svg}
+    \caption{Os três modos de operação do gerador de dados.}
+    \label{fig:train_metrics_evo}
+\end{figure}
+
 O gerador de dados possui 3 modos distintos de operação. Estes são:
 \begin{itemize}
     \item RGB: Nesse modo, o quadro é retornado como uma imagem em padrão RGB, ou seja, com suas cores representadas por suas componentes vermelha, verde, e azul, nesta ordem.
@@ -104,7 +113,7 @@ O gerador é capaz, ainda, de manter um \textit{cache} atualizado com os cálcul
 
 Em nossa implementação final, utilizamos o modo de \textit{landmarks}. Esse modo consiste em três operações consecutivas; primeiramente, o segmento de video é carregado do disco quadro a quadro. Depois, estes quadros sofrem reconhecimento facial e, em seguida, as faces detectadas passam pelo detector de marcadores faciais, que retorna o conjunto de 68 pontos correspondentes aos marcadores detectados. Estes pontos são, então, utilizados para o desenho de polígonos sobre um canvas branco de mesmo tamanho da imagem original, na etapa que chamamos de rasterização. Essa etapa garante a preservação das relações entre os marcadores faciais. Por fim, a imagem rasterizada é recortada segundo o retângulo delimitado pelo reconhecedor facial e alinhada horizontalmente.
 
-Em seguida, configuramos o modelo da rede neural. Os detalhes e decisões referentes à configuração deste podem ser encontradas na seção \ref{sec:topology}. O treinamento é então realizado em um loop. Como critérios de parada, utilizamos um limite de 100 épocas no treinamento. Como medida de prevenção ao \textit{overfitting} na rede neural, paramos o treinamento quando o valor da função custo no conjunto de validação não for reduzido em um período de 3 épocas.
+Em seguida, configuramos o modelo da rede neural. Os detalhes e decisões referentes à configuração deste podem ser encontradas na seção \ref{sec:topology}. O treinamento é então realizado em um loop. Como critérios de parada, utilizamos um limite de 100 épocas no treinamento. Como medida de prevenção ao \textit{overfitting} na rede neural, paramos o treinamento quando o valor da função custo no conjunto de validação não for reduzido em um período de três épocas.
 
 \begin{equation} \label{eq:categorical_crossentropy}
     L(y,\hat{y})=-\sum\limits_{j=0}^M\sum\limits_{i=0}^N(y_{ij}*log(\hat{y}_{ij}))
