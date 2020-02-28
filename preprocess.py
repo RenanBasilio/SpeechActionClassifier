@@ -218,8 +218,8 @@ def validate_face(file):
 
         for frame in video:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            faces = face_detector(frame, 0)
-            if len(faces) == 0:
+            faces = face_detector(frame, 1)
+            if len(list(enumerate(faces))) == 0:
                 return False
         
         return True
