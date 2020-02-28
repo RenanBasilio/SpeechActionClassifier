@@ -85,56 +85,56 @@ def sort_dataset(splits, classes, unsorted_dir, out_dir):
                 (out_dir / c).mkdir(parents=True, exist_ok=True)
 
             # For each row of the manual classification file
-            for index, row in data.iterrows():
-                infile = seg_dir / "{:06d}.mp4".format(row[0])
-                outfile = out_dir / row[1] / "{:06d}.mp4".format(row[0])
+            for index, row in enumerate(data.itertuples()):
+                infile = seg_dir / "{:06d}.mp4".format(row.id)
+                outfile = out_dir / row.tag / "{:06d}.mp4".format(row.id)
 
                 print_progress(count, total)
 
                 # If second row contains an error type, skip
-                if pd.notnull(row[2]) and any([x in row[2] for x in errors]):
+                if pd.notnull(row.notes) and any([x in row.notes for x in errors]):
                     print("", end="\r")
-                    cprint(" Skipped ({:06d}, {}, {})             ".format(row[0], row[1], row[2], row[3]), 'red', end="", flush=True)
-                    log_file.write("Skipped copying file {} with entry ({:06d}, {}, {}). Reason: Matched a known error subclass.\n".format(infile, row[0], row[1], row[2]))
+                    cprint(" Skipped ({:06d}, {}, {})             ".format(row.id, row.tag, row.notes, row.validated), 'red', end="", flush=True)
+                    log_file.write("Skipped copying file {} with entry ({:06d}, {}, {}). Reason: Matched a known error subclass.\n".format(infile, row.id, row.tag, row.notes))
                     skipped += 1
 
                 # If second row contains a speaker change, split video at change and skip
-                elif pd.notnull(row[2]) and "Speaker Change" in row[2]:
+                elif pd.notnull(row.notes) and "Speaker Change" in row.notes:
                     print("", end="\r")
-                    cprint("Found Speaker Change in file {} at {:06d}. Splitting data into new set.".format(csv, row[0]), 'blue', flush=True)
+                    cprint("Found Speaker Change in file {} at {:06d}. Splitting data into new set.".format(csv, row.id), 'blue', flush=True)
                     curr_splits += 1
                     curr =  str(csv.relative_to(unsorted_path).parent) + "-" + str(curr_splits)
                     out_dir = out_dir.parent / curr
                     out_dir.mkdir(parents=True, exist_ok=True)
                     for c in classes:
                         (out_dir / c).mkdir(parents=True, exist_ok=True)
-                    log_file.write("Split video dataset defined in {} at {} due to speaker change. New ID: {}\n".format(csv, row[0],  curr))
+                    log_file.write("Split video dataset defined in {} at {} due to speaker change. New ID: {}\n".format(csv, row.id,  curr))
                     skipped += 1
 
                 # If validation failed, skip
-                elif pd.isnull(row[3]) or row[3] == False:
+                elif pd.isnull(row.validated) or row.validated == False:
                     print("", end="\r")
-                    cprint(" Skipped ({:06d}, {}, {})             ".format(row[0], row[1], row[2], row[3]), 'red', end="", flush=True)
-                    log_file.write("Skipped copying file {} with entry ({:06d}, {}, {}). Reason: Validation failure.\n".format(infile, row[0], row[1], row[2]))
+                    cprint(" Skipped ({:06d}, {}, {})             ".format(row.id, row.tag, row.notes, row.validated), 'red', end="", flush=True)
+                    log_file.write("Skipped copying file {} with entry ({:06d}, {}, {}). Reason: Validation failure.\n".format(infile, row.id, row.tag, row.notes))
                     skipped += 1
 
                 # If second row is not null, show a message but copy anyways
-                elif pd.notnull(row[2]):
-                    cprint(" Copying ({:06d}, {}, {})             ".format(row[0], row[1], row[2], row[3]), 'yellow', end="", flush=True)
+                elif pd.notnull(row.notes):
+                    cprint(" Copying ({:06d}, {}, {})             ".format(row.id, row.tag, row.notes, row.validated), 'yellow', end="", flush=True)
                     shutil.copy(str(infile), str(outfile))
                     copied += 1
 
                 # If first row is a valid class name, copy file to output directory
-                elif row[1] in classes:
-                    print(" Copying ({:06d}, {})...               ".format(row[0], row[1]), end="", flush=True)
+                elif row.tag in classes:
+                    print(" Copying ({:06d}, {})...               ".format(row.id, row.tag), end="", flush=True)
                     shutil.copy(str(infile), str(outfile))
                     copied += 1
 
                 # Otherwise, show an error and skip
                 else:
                     print("", end="\r")
-                    cprint("Failed to copy ({:06d}, {}, {}): Unknown class '{}'".format(row[0], row[1], row[2], row[1]), 'red', flush=True)
-                    log_file.write("Skipped copying file {} with entry ({:06d}, {}, {}). Reason: Unknown class {}.\n".format(infile, row[0], row[1], row[2], row[1]))
+                    cprint("Failed to copy ({:06d}, {}, {}): Unknown class '{}'".format(row.id, row.tag, row.notes, row.tag), 'red', flush=True)
+                    log_file.write("Skipped copying file {} with entry ({:06d}, {}, {}). Reason: Unknown class {}.\n".format(infile, row.id, row.tag, row.notes, row.tag))
                     skipped += 1
                 
                 count += 1
@@ -153,21 +153,21 @@ def count_samples(data_dir):
 
     for f in classes_files:
         data = pd.read_csv(f, dtype={'id': np.int32})
-        for index, row in data.iterrows():
-            if pd.notnull(row[1]) and row[1] not in classes:
-                classes[row[1]] = 0
+        for index, row in enumerate(data.itertuples()):
+            if pd.notnull(row.tag) and row.tag not in classes:
+                classes[row.tag] = 0
             
-            if pd.notnull(row[2]) and any([x in row[2] for x in errors]) :
+            if pd.notnull(row.notes) and any([x in row.notes for x in errors]) :
                 classes["Errors"] += 1
                 continue
             
-            if pd.notnull(row[1]):
-                classes[row[1]] += 1
-                if 'validated' in data and row[3] is True:
+            if pd.notnull(row.tag):
+                classes[row.tag] += 1
+                if 'validated' in data and row.validated is True:
                     classes["Validated"] += 1
 
-            if pd.notnull(row[2]) and not any([x in row[2] for x in errors]):
-                for c in row[2].split(", "):
+            if pd.notnull(row.notes) and not any([x in row.notes for x in errors]):
+                for c in row.notes.split(", "):
                     if c not in classes:
                         classes[c] = 0
                     classes[c] += 1
@@ -181,16 +181,16 @@ def validate(data_dir, revalidate=False, verbose=True):
     failed = 0
 
     for f in classes_files:
-        data = pd.read_csv(f, dtype={'id': np.int32})
+        data = pd.read_csv(f, dtype={'id': 'int32'})
         
         if revalidate or  'validated' not in data or data['validated'].isnull().sum() > 0:
             curr = str(f.relative_to(unsorted_path).parent)
             data['validated'] = np.nan
 
-            for index, row in data.iterrows():
-                if revalidate or pd.isnull(row['validated']):
+            for index, row in enumerate(data.itertuples()):
+                if revalidate or pd.isnull(row.validated):
                     count += 1
-                    infile = f.parent / 'segments' / "{:06d}.mp4".format(row['id'].astype('int32'))
+                    infile = f.parent / 'segments' / "{:06d}.mp4".format(row.id)
 
                     if validate_face(infile):
                         cprint("File {} successfully validated.".format(infile), 'green')
