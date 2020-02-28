@@ -174,7 +174,7 @@ def count_samples(data_dir):
 
     return classes
 
-def validate(data_dir, verbose=True):
+def validate(data_dir, revalidate=False, verbose=True):
     classes_files = list(data_dir.glob("**/_classes.csv"))
     count = 0
     validated = 0
@@ -183,12 +183,12 @@ def validate(data_dir, verbose=True):
     for f in classes_files:
         data = pd.read_csv(f)
         
-        if 'validated' not in data or data['validated'].isnull().sum() > 0:
+        if revalidate or  'validated' not in data or data['validated'].isnull().sum() > 0:
             curr = str(f.relative_to(unsorted_path).parent)
             data['validated'] = np.nan
 
             for index, row in data.iterrows():
-                if pd.isnull(row['validated']):
+                if revalidate or pd.isnull(row['validated']):
                     count += 1
                     infile = f.parent / 'segments' / "{:06d}.mp4".format(row[0].astype('int32'))
 
@@ -201,7 +201,7 @@ def validate(data_dir, verbose=True):
                         data.loc[index, 'validated'] = False
                         failed += 1
 
-            f.rename(f.parent / "_classes.csv.old")
+            f.replace(f.parent / "_classes.csv.old")
             data.to_csv(f, index=False)
             
             cprint("Wrote validation results to {}.".format(f), 'cyan')
@@ -211,13 +211,13 @@ def validate(data_dir, verbose=True):
 def validate_face(file):
     global face_detector
     if face_detector is None:
-        face_detector = dlib.get_frontal_face_detector()
+        face_detector = dlib.cnn_face_detection_model_v1("resources/mmod_human_face_detector.dat")
 
-    video = load_video_as_ndarray(file, colormode='raw', optical_flow=False, enable_cache=False)
+    video = load_video_as_ndarray(file, color_mode='raw', optical_flow=False, enable_cache=False)
 
     for frame in video:
-        rects = face_detector(frame, 0)
-        if len(rects) == 0:
+        faces = face_detector(frame, 0)
+        if len(faces) == 0:
             return False
 
     return True
@@ -292,25 +292,27 @@ def update_changelog(data_dir):
 def print_usage():
     print("Script for dataset preprocessing.\n")
     print("Usage: ")
-    print("      preprocess_dataset.py <command> <dataset_directory> [output_path]")
+    print("   preprocess_dataset.py <command> <dataset_directory> [<options>]")
     print("")
     print("Commands:")
-    print("      sort       Sort dataset into directories according to splits.txt and classes.txt")
-    print("      update     Updates dataset.info in dataset directory")
-    print("      validate   Validates facial recognition for new videos")
-    print("      package    Package dataset into a tarball")
-    print("      clean      Removes all folders created by sort from the output directory")
+    print("   sort       Sort dataset into directories according to splits.txt and classes.txt")
+    print("   update     Updates dataset.info in dataset directory")
+    print("   validate   Validates facial recognition for new videos")
+    print("   package    Package dataset into a tarball")
+    print("   clean      Removes all folders created by sort from the output directory")
     print("")
+    print("Options:")
+    print("   --force-revalidate  Forces validation to run again for files already validated")
 
 if __name__ == '__main__':
     if len(sys.argv) > 2:
         data_dir = Path(sys.argv[2]).resolve()
 
-        out_path = None
-        if len(sys.argv) > 3:
-            out_path = Path(sys.argv[3]).resolve()
-        else:
-            out_path = data_dir
+        out_path = data_dir
+        #if len(sys.argv) > 3:
+        #    out_path = Path(sys.argv[3]).resolve()
+        #else:
+        #    out_path = data_dir
 
         unsorted_path = data_dir / "unsorted"
         classes_file = data_dir / "classes.txt"
@@ -357,7 +359,10 @@ if __name__ == '__main__':
             update_changelog(data_dir)
 
         elif sys.argv[1] == "validate":
-            validate(data_dir)
+            if "--force-revalidate" in sys.argv:
+                validate(data_dir, revalidate=True)
+            else:
+                validate(data_dir)
         
         elif sys.argv[1] == "clean":
             splits = get_splits(splits_file)
