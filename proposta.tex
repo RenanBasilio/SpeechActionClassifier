@@ -1,7 +1,18 @@
 \chapter{Proposta}
+\label{ch:proposal}
 
 \section{Definição do Problema}
+\label{sec:problem-desc}
 
-\section{Proposta}
+\section{Solução Proposta}
+\label{sec:proposed-solution}
+
+% NOTE: em tempo real?
+Nossa proposta consiste em um sistema capaz de diarizar as falas de um único locutor a partir somente de um video frontal deste. Nesse momento não consideraremos o audio; julgamos que o resultado da diarização do video que o acompanha poderia ser utilizado para apoiar a diarização desse.
+
+Para isso, esse sistema de diarização deve ser capaz de, a partir de uma sequência de quadros extraída do vídeo original, determinar se o sujeito da gravação está ou não falando. 
+
+Com esta finalidade, propomos uma arquitetura em três etapas. Primeiramente, com o uso de um identificador facial, o sistema deve identificar faces nas imagens que lhe forem fornecidas. Em seguida, pontos de referência relevantes devem ser extraídos das faces identificadas. Por fim, através de um modelo de aprendizado de máquina previamente treinado, o sistema deve conseguir determinar se a face identificada está ou não falando.
 
 \section{Trabalhos Relacionados}
+\label{sec:related-work}
