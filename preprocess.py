@@ -211,7 +211,8 @@ def validate(data_dir, revalidate=False, verbose=True):
 def validate_face(file):
     global face_detector
     if face_detector is None:
-        face_detector = dlib.cnn_face_detection_model_v1("resources/mmod_human_face_detector.dat")
+        face_detector = dlib.get_frontal_face_detector()
+        #face_detector = dlib.cnn_face_detection_model_v1("resources/mmod_human_face_detector.dat")
 
     try:
         video = load_video_as_ndarray(file, color_mode='raw', optical_flow=False, enable_cache=False, warnings='except')
