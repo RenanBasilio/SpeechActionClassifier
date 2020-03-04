@@ -4,15 +4,49 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from loader import load_frame_as_ndarray, print_video_frames, compute_facial_landmarks, get_label_from_index
 from preprocess import print_progress
 from termcolor import cprint
+from imutils import face_utils
 import numpy as np
 import cv2 as cv2
 import tensorflow as tf
 import pathlib
 import math
+import dlib
 import subprocess
 import sys
 
 classes=['Idle','Speak']
+
+face_predictor = None
+face_detector = None
+
+def draw_facial_reco(image):
+    global face_predictor
+    global face_detector
+
+    if face_predictor is None:
+        face_detector = dlib.get_frontal_face_detector()
+        face_predictor = dlib.shape_predictor("resources/shape_predictor_68_face_landmarks.dat")
+
+    faces = face_detector(image, 1)
+    face_chip = None
+    for (i, face) in enumerate(faces):
+        #shape = face_predictor(image, face.rect)
+        shape = face_predictor(image, face)
+        shape_np = face_utils.shape_to_np(shape)
+
+        #for (x, y) in shape_np:
+            #cv2.circle(blank_image, (x,y), 0, (0, 0, 0))
+
+        cv2.polylines(image, [shape_np[0:16]], False, (0,255,0), 0, cv2.LINE_8) # Boundaries
+        cv2.polylines(image, [shape_np[17:21]], False, (0,255,0), 0, cv2.LINE_8) # Left Eyebrow
+        cv2.polylines(image, [shape_np[22:26]], False, (0,255,0), 0, cv2.LINE_8) # Right Eyebrow
+        cv2.polylines(image, [shape_np[27:30]], False, (0,255,0), 0, cv2.LINE_8) # Nose Bridge
+        cv2.polylines(image, [shape_np[31:35]], False, (0,255,0), 0, cv2.LINE_8) # Nose
+        cv2.polylines(image, [shape_np[36:41]], True, (0,255,0), 0, cv2.LINE_8) # Left Eye
+        cv2.polylines(image, [shape_np[42:47]], True, (0,255,0), 0, cv2.LINE_8) # Right Eye
+        cv2.polylines(image, [shape_np[48:59]], True, (0,255,0), 0, cv2.LINE_8) # Mouth Outer
+        cv2.polylines(image, [shape_np[60:67]], True, (0,255,0), 0, cv2.LINE_8) # Mouth Inner
+    return image
 
 def draw_dot(frame, color):
     cx, cy = math.floor(frame.shape[1] * 0.95), math.floor(frame.shape[1] * 0.05)
@@ -82,6 +116,7 @@ def diarize(path, outpath):
 
         for frame in window:
             frame = draw_dot(frame, color)
+            frame = draw_facial_reco(frame)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             out.write(frame)
             cv2.waitKey(1)
