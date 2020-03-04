@@ -32,6 +32,23 @@
   language = {en}
 }
 
+@article{dehakFrontEndFactorAnalysis2011,
+  title = {Front-{{End Factor Analysis}} for {{Speaker Verification}}},
+  author = {Dehak, Najim and Kenny, Patrick J. and Dehak, R{\'e}da and Dumouchel, Pierre and Ouellet, Pierre},
+  year = {2011},
+  month = may,
+  volume = {19},
+  pages = {788--798},
+  issn = {1558-7924},
+  doi = {10.1109/TASL.2010.2064307},
+  abstract = {This paper presents an extension of our previous work which proposes a new speaker representation for speaker verification. In this modeling, a new low-dimensional speaker- and channel-dependent space is defined using a simple factor analysis. This space is named the total variability space because it models both speaker and channel variabilities. Two speaker verification systems are proposed which use this new representation. The first system is a support vector machine-based system that uses the cosine kernel to estimate the similarity between the input data. The second system directly uses the cosine similarity as the final decision score. We tested three channel compensation techniques in the total variability space, which are within-class covariance normalization (WCCN), linear discriminate analysis (LDA), and nuisance attribute projection (NAP). We found that the best results are obtained when LDA is followed by WCCN. We achieved an equal error rate (EER) of 1.12\% and MinDCF of 0.0094 using the cosine distance scoring on the male English trials of the core condition of the NIST 2008 Speaker Recognition Evaluation dataset. We also obtained 4\% absolute EER improvement for both-gender trials on the 10 s-10 s condition compared to the classical joint factor analysis scoring.},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\C52WASEX\\Dehak et al. - 2011 - Front-End Factor Analysis for Speaker Verification.pdf;C\:\\Users\\renan\\Zotero\\storage\\2WDMW3E4\\5545402.html},
+  journal = {IEEE Transactions on Audio, Speech, and Language Processing},
+  keywords = {channel compensation technique,channel dependent space,Context modeling,Cosine distance scoring,cosine kernel,decision score,front end factor analysis,joint factor analysis (JFA),Kernel,Linear discriminant analysis,linear discriminate analysis,low dimensional speaker,Natural languages,NIST,nuisance attribute projection,Permission,similarity estimation,speaker recognition,Speaker recognition,speaker recognition evaluation,speaker representation,speaker verification,Speech analysis,support vector machine,support vector machines,Support vector machines,support vector machines (SVMs),Testing,total variability space,variability space,within class covariance normalization},
+  note = {Conference Name: IEEE Transactions on Audio, Speech, and Language Processing},
+  number = {4}
+}
+
 @article{dimitriadisEnhancementsAudioonlyDiarization2019,
   title = {Enhancements for {{Audio}}-Only {{Diarization Systems}}},
   author = {Dimitriadis, Dimitrios},
@@ -58,6 +75,39 @@
   journal = {Journal of Machine Learning Research}
 }
 
+@article{ephratLookingListenCocktail2018,
+  title = {Looking to {{Listen}} at the {{Cocktail Party}}: {{A Speaker}}-{{Independent Audio}}-{{Visual Model}} for {{Speech Separation}}},
+  shorttitle = {Looking to {{Listen}} at the {{Cocktail Party}}},
+  author = {Ephrat, Ariel and Mosseri, Inbar and Lang, Oran and Dekel, Tali and Wilson, Kevin and Hassidim, Avinatan and Freeman, William T. and Rubinstein, Michael},
+  year = {2018},
+  month = jul,
+  volume = {37},
+  pages = {1--11},
+  issn = {07300301},
+  doi = {10.1145/3197517.3201357},
+  abstract = {We present a joint audio-visual model for isolating a single speech signal from a mixture of sounds such as other speakers and background noise. Solving this task using only audio as input is extremely challenging and does not provide an association of the separated speech signals with speakers in the video. In this paper, we present a deep network-based model that incorporates both visual and auditory signals to solve this task. The visual features are used to "focus" the audio on desired speakers in a scene and to improve the speech separation quality. To train our joint audio-visual model, we introduce AVSpeech, a new dataset comprised of thousands of hours of video segments from the Web. We demonstrate the applicability of our method to classic speech separation tasks, as well as real-world scenarios involving heated interviews, noisy bars, and screaming children, only requiring the user to specify the face of the person in the video whose speech they want to isolate. Our method shows clear advantage over state-of-the-art audio-only speech separation in cases of mixed speech. In addition, our model, which is speaker-independent (trained once, applicable to any speaker), produces better results than recent audio-visual speech separation methods that are speaker-dependent (require training a separate model for each speaker of interest).},
+  archivePrefix = {arXiv},
+  eprint = {1804.03619},
+  eprinttype = {arxiv},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\658VDDKT\\Ephrat et al. - 2018 - Looking to Listen at the Cocktail Party A Speaker.pdf;C\:\\Users\\renan\\Zotero\\storage\\9WEKHLPB\\1804.html},
+  journal = {ACM Transactions on Graphics},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Sound,Electrical Engineering and Systems Science - Audio and Speech Processing},
+  number = {4}
+}
+
+@inproceedings{hersheyAudiovisualGraphicalModels2004,
+  title = {Audio-Visual Graphical Models for Speech Processing},
+  booktitle = {Acoustics, {{Speech}}, and {{Signal Processing}}, 1988. {{ICASSP}}-88., 1988 {{International Conference}} On},
+  author = {Hershey, John and Attias, H. and Jojic, Nebojsa and Kristjansson, Trausti},
+  year = {2004},
+  month = jun,
+  volume = {5},
+  pages = {V-649},
+  doi = {10.1109/ICASSP.2004.1327194},
+  abstract = {Perceiving sounds in a noisy environment is a challenging problem. Visual lip-reading can provide relevant information but is also challenging because lips are moving and a tracker must deal with a variety of conditions. Typically audio-visual systems have been assembled from individually engineered modules. We propose to fuse audio and video in a probabilistic generative model that implements cross-model self-supervised learning, enabling adaptation to audio-visual data. The video model features a Gaussian mixture model embedded in a linear subspace of a sprite which translates in the video. The system can learn to detect and enhance speech in noise given only a short (30 second) sequence of audio-visual data. We show some results for speech detection and enhancement, and discuss extensions to the model that are under investigation.},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\NB5IPHQA\\Hershey et al. - 2004 - Audio-visual graphical models for speech processin.pdf}
+}
+
 @article{hintonFastLearningAlgorithm2006,
   title = {A {{Fast Learning Algorithm}} for {{Deep Belief Nets}}},
   author = {Hinton, Geoffrey E. and Osindero, Simon and Teh, Yee-Whye},
@@ -73,17 +123,55 @@
   number = {7}
 }
 
-@article{Hunter:2007,
-  title = {Matplotlib: {{A 2D}} Graphics Environment},
-  author = {Hunter, J. D.},
+@article{hunterMatplotlib2DGraphics2007,
+  title = {Matplotlib: {{A 2D Graphics Environment}}},
+  shorttitle = {Matplotlib},
+  author = {Hunter, John D.},
   year = {2007},
+  month = may,
   volume = {9},
   pages = {90--95},
-  publisher = {{IEEE COMPUTER SOC}},
+  issn = {1558-366X},
   doi = {10.1109/MCSE.2007.55},
-  abstract = {Matplotlib is a 2D graphics package used for Python for application development, interactive scripting, and publication-quality image generation across user interfaces and operating systems.},
-  journal = {Computing in Science \& Engineering},
+  abstract = {Matplotlib is a 2D graphics package used for Python for application development, interactive scripting,and publication-quality image generation across user interfaces and operating systems},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\5Q4ITRYD\\Hunter - 2007 - Matplotlib A 2D Graphics Environment.pdf;C\:\\Users\\renan\\Zotero\\storage\\3P3S2ZSI\\4160265.html},
+  journal = {Computing in Science Engineering},
+  keywords = {2D graphics package,application development,computer graphics,Computer languages,Equations,Graphical user interfaces,Graphics,Image generation,interactive scripting,Interpolation,mathematics computing,Matplotlib,object-oriented programming,operating system,Operating systems,Packaging,Programming profession,publication-quality image generation,Python,scientific programming,scripting languages,software packages,user interface,User interfaces},
+  note = {Conference Name: Computing in Science Engineering},
   number = {3}
+}
+
+@article{ji3DConvolutionalNeural2013,
+  title = {{{3D Convolutional Neural Networks}} for {{Human Action Recognition}}},
+  author = {Ji, Shuiwang and Xu, Wei and Yang, Ming and Yu, Kai},
+  year = {2013},
+  month = jan,
+  volume = {35},
+  pages = {221--231},
+  issn = {1939-3539},
+  doi = {10.1109/TPAMI.2012.59},
+  abstract = {We consider the automated recognition of human actions in surveillance videos. Most current methods build classifiers based on complex handcrafted features computed from the raw inputs. Convolutional neural networks (CNNs) are a type of deep model that can act directly on the raw inputs. However, such models are currently limited to handling 2D inputs. In this paper, we develop a novel 3D CNN model for action recognition. This model extracts features from both the spatial and the temporal dimensions by performing 3D convolutions, thereby capturing the motion information encoded in multiple adjacent frames. The developed model generates multiple channels of information from the input frames, and the final feature representation combines information from all channels. To further boost the performance, we propose regularizing the outputs with high-level features and combining the predictions of a variety of different models. We apply the developed models to recognize human actions in the real-world environment of airport surveillance videos, and they achieve superior performance in comparison to baseline methods.},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\CYDYGKBJ\\Ji et al. - 2013 - 3D Convolutional Neural Networks for Human Action .pdf;C\:\\Users\\renan\\Zotero\\storage\\LH9LMTIB\\6165309.html},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  keywords = {3D CNN model,3D convolution,3D convolutional neural networks,action recognition,airport surveillance videos,Algorithms,automated human action recognition,baseline methods,complex handcrafted features,Computational modeling,Computer architecture,convolutional neural networks,Decision Support Techniques,Deep learning,deep model,feature extraction,Feature extraction,feature representation,gesture recognition,high-level features,image classification,Image Interpretation; Computer-Assisted,image motion analysis,image representation,Imaging; Three-Dimensional,Kernel,model combination,motion information encoding,Movement,neural nets,Neural Networks (Computer),Pattern Recognition; Automated,Solid modeling,spatial dimensions,spatiotemporal phenomena,Subtraction Technique,temporal dimensions,Three dimensional displays,video surveillance,Videos},
+  note = {Conference Name: IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  number = {1}
+}
+
+@inproceedings{karpathyLargeScaleVideoClassification2014,
+  title = {Large-{{Scale Video Classification}} with {{Convolutional Neural Networks}}},
+  booktitle = {2014 {{IEEE Conference}} on {{Computer Vision}} and {{Pattern Recognition}}},
+  author = {Karpathy, Andrej and Toderici, George and Shetty, Sanketh and Leung, Thomas and Sukthankar, Rahul and {Fei-Fei}, Li},
+  year = {2014},
+  month = jun,
+  pages = {1725--1732},
+  publisher = {{IEEE}},
+  address = {{Columbus, OH, USA}},
+  doi = {10.1109/CVPR.2014.223},
+  abstract = {Convolutional Neural Networks (CNNs) have been established as a powerful class of models for image recognition problems. Encouraged by these results, we provide an extensive empirical evaluation of CNNs on largescale video classification using a new dataset of 1 million YouTube videos belonging to 487 classes. We study multiple approaches for extending the connectivity of a CNN in time domain to take advantage of local spatio-temporal information and suggest a multiresolution, foveated architecture as a promising way of speeding up the training. Our best spatio-temporal networks display significant performance improvements compared to strong feature-based baselines (55.3\% to 63.9\%), but only a surprisingly modest improvement compared to single-frame models (59.3\% to 60.9\%). We further study the generalization performance of our best model by retraining the top layers on the UCF101 Action Recognition dataset and observe significant performance improvements compared to the UCF-101 baseline model (63.3\% up from 43.9\%).},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\GAFPKLB7\\Karpathy et al. - 2014 - Large-Scale Video Classification with Convolutiona.pdf},
+  isbn = {978-1-4799-5118-5},
+  language = {en}
 }
 
 @inproceedings{kazemiOneMillisecondFace2014,
@@ -210,6 +298,20 @@
   journal = {Psychological Review}
 }
 
+@inproceedings{sellSpeakerDiarizationPlda2014,
+  title = {Speaker Diarization with Plda I-Vector Scoring and Unsupervised Calibration},
+  booktitle = {2014 {{IEEE Spoken Language Technology Workshop}} ({{SLT}})},
+  author = {Sell, Gregory and {Garcia-Romero}, Daniel},
+  year = {2014},
+  month = dec,
+  pages = {413--417},
+  issn = {null},
+  doi = {10.1109/SLT.2014.7078610},
+  abstract = {Speaker diarization via unsupervised i-vector clustering has gained popularity in recent years. In this approach, i-vectors are extracted from short clips of speech segmented from a larger multi-speaker conversation and organized into speaker clusters, typically according to their cosine score. In this paper, we propose a system that incorporates probabilistic linear discriminant analysis (PLDA) for i-vector scoring, a method already frequently utilized in speaker recognition tasks, and uses unsupervised calibration of the PLDA scores to determine the clustering stopping criterion. We also demonstrate that denser sampling in the i-vector space with overlapping temporal segments provides a gain in the diarization task. We test our system on the CALLHOME conversational telephone speech corpus, which includes multiple languages and a varying number of speakers, and we show that PLDA scoring outperforms the same system with cosine scoring, and that overlapping segments reduce diarization error rate (DER) as well.},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\PMETV7U2\\Sell and Garcia-Romero - 2014 - Speaker diarization with plda i-vector scoring and.pdf;C\:\\Users\\renan\\Zotero\\storage\\6Q9TFBAT\\7078610.html},
+  keywords = {calibration,Calibration,CALLHOME conversational telephone speech corpus,cosine score,denser sampling,Density estimation robust algorithm,DER,diarization error rate,multispeaker conversation,pattern clustering,PLDA i-vector scoring,Principal component analysis,probabilistic linear discriminant analysis,sampling methods,segmented speech,speaker clusters,speaker diarization,speaker recognition,Speaker recognition,speaker recognition tasks,Speech,Speech processing,unsupervised calibration,unsupervised i-vector clustering}
+}
+
 @inproceedings{snyderXVectorsRobustDNN2018,
   title = {X-{{Vectors}}: {{Robust DNN Embeddings}} for {{Speaker Recognition}}},
   shorttitle = {X-{{Vectors}}},
@@ -233,6 +335,20 @@
   year = {2015},
   url = {https://www.tensorflow.org/},
   abstract = {TensorFlow is a machine learning system that operates at large scale and in heterogeneous environments. TensorFlow uses dataflow graphs to represent computation, shared state, and the operations that mutate that state. It maps the nodes of a dataflow graph across many machines in a cluster, and within a machine across multiple computational devices, including multicore CPUs, generalpurpose GPUs, and custom-designed ASICs known as Tensor Processing Units (TPUs). This architecture gives flexibility to the application developer: whereas in previous ``parameter server'' designs the management of shared state is built into the system, TensorFlow enables developers to experiment with novel optimizations and training algorithms. TensorFlow supports a variety of applications, with a focus on training and inference on deep neural networks. Several Google services use TensorFlow in production, we have released it as an open-source project, and it has become widely used for machine learning research. In this paper, we describe the TensorFlow dataflow model and demonstrate the compelling performance that TensorFlow achieves for several real-world applications.}
+}
+
+@inproceedings{wangSpeakerDiarizationLSTM2018,
+  title = {Speaker {{Diarization}} with {{LSTM}}},
+  booktitle = {2018 {{IEEE International Conference}} on {{Acoustics}}, {{Speech}} and {{Signal Processing}} ({{ICASSP}})},
+  author = {Wang, Quan and Downey, Carlton and Wan, Li and Mansfield, Philip Andrew and Moreno, Ignacio Lopz},
+  year = {2018},
+  month = apr,
+  pages = {5239--5243},
+  issn = {2379-190X},
+  doi = {10.1109/ICASSP.2018.8462628},
+  abstract = {For many years, i-vector based audio embedding techniques were the dominant approach for speaker verification and speaker diarization applications. However, mirroring the rise of deep learning in various domains, neural network based audio embeddings, also known as d-vectors, have consistently demonstrated superior speaker verification performance. In this paper, we build on the success of d-vector based speaker verification systems to develop a new d-vector based approach to speaker diarization. Specifically, we combine LSTM-based d-vector audio embeddings with recent work in non-parametric clustering to obtain a state-of-the-art speaker diarization system. Our system is evaluated on three standard public datasets, suggesting that d-vector based diarization systems offer significant advantages over traditional i-vector based systems. We achieved a 12.0\% diarization error rate on NIST SRE 2000 CALLHOME, while our model is trained with out-of-domain data from voice search logs.},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\YSEJMTVN\\Wang et al. - 2018 - Speaker Diarization with LSTM.pdf;C\:\\Users\\renan\\Zotero\\storage\\7QZAM5ZR\\8462628.html},
+  keywords = {audio embedding,audio signal processing,Clustering algorithms,d-vector based diarization systems,d-vector based speaker verification systems,deep learning,diarization error rate,Feature extraction,i-vector based audio embedding techniques,i-vector based systems,LSTM,LSTM-based d-vector audio embeddings,Machine learning,Neural networks,NIST,recurrent neural nets,Speaker diarization,speaker diarization system,speaker recognition,spectral clustering,Voice activity detection}
 }
 
 @book{werbosRegressionNewTools1975,

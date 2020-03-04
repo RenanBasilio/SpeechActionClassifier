@@ -10,7 +10,7 @@ Na seção \ref{sec:tools} apresentamos as ferramentas principais utilizadas no 
 
 Nesta seção apresentamos as principais ferramentas utilizadas durante a implementação deste trabalho. Definiremos suas principais características, assim como as funcionalidades das mesmas que foram utilizadas, e as motivações por trás de sua escolha.
 
-Na seção \ref{subsec:dlib} apresentaremos a biblioteca dlib, utilizada para propósito de identificação e demarcação facial no projeto. Em seguida, na seção \ref{subsec:tf} apresentaremos a biblioteca Tensorflow, utilizada por sua robusta implementação do modelo de rede neural convolucional. Na seção \ref{subsec:environ} apresentaremos o ambiente utilizado para treinamento do modelo, assim como seus recursos computacionais. Por fim, na seção \ref{subsec:otools}, mencionaremos brevemente as demais ferramentas utilizadas em caráter pontual no trabalho, e que, por essa razão, não receberam seções dedicadas.
+Na seção \ref{subsec:dlib} apresentaremos a biblioteca Dlib, utilizada para propósito de identificação e demarcação facial no projeto. Em seguida, na seção \ref{subsec:tf} apresentaremos a biblioteca Tensorflow, utilizada por sua robusta implementação do modelo de rede neural convolucional. Na seção \ref{subsec:environ} apresentaremos o ambiente utilizado para treinamento do modelo, assim como seus recursos computacionais. Por fim, na seção \ref{subsec:otools}, mencionaremos brevemente as demais ferramentas utilizadas em caráter pontual no trabalho, e que, por essa razão, não receberam seções dedicadas.
 
 \subsection{Dlib}
 \label{subsec:dlib}
@@ -28,21 +28,26 @@ A biblioteca possui um identificador facial baseado em \textit{Histogram of Orie
     \label{fig:dlib-landmarking}
 \end{figure}
 
-Além disso, a mesma implementa um detector de marcadores faciais baseado em uma floresta de árvores de regressão, capaz de identificar (ou estimar, caso não estejam visíveis) as posições de um conjunto de pontos em um rosto, como mostra a figura \ref{fig:dlib-landmarking}. A biblioteca fornece também um modelo pré-treinado para este detector para identificação de 68 destes marcadores, sob licença que permite uso acadêmico. Esta funcionalidade foi chave para a escolha da biblioteca para a implementação do trabalho, visto que permitiu o treinamento do classificador utilizando um conjunto menor de dados, sem preocupações quanto a viéses relacionados às características físicas do locutor.
+Além disso, a mesma implementa um detector de marcadores faciais baseado em uma floresta de árvores de regressão, capaz de identificar (ou estimar, caso não estejam visíveis) as posições de um conjunto de pontos em um rosto, como mostra a figura \ref{fig:dlib-landmarking}. A biblioteca fornece também um modelo pré-treinado para este detector para identificação de 68 destes marcadores, sob licença que permite uso acadêmico. Esta funcionalidade foi chave para a escolha da biblioteca para a implementação do trabalho, visto que permitiu o treinamento do classificador utilizando um conjunto menor de dados, sem preocupações quanto a vieses relacionados às características físicas do locutor.
+
+A biblioteca Dlib foi utilizada em sua versão 19.19.0, compilada a partir do código fonte com suporte para GPU e otimizações referentes à arquitetura da CPU.
 
 \subsection{Tensorflow}
 \label{subsec:tf}
 
 Tensorflow\cite{tensorflow2015-whitepaper} é um framework de código aberto para aplicações de aprendizado de máquina. A biblioteca, construída pela empresa Google, apresenta implementações robustas de diversos algoritmos da área, além de uma API que permite a declaração de uma rede neural em função de suas camadas. A biblioteca suporta, ainda, o uso de uma ou mais GPUs para treinamento da rede neural, através da biblioteca cuDNN. No trabalho, essa foi utilizada para assistir na modelagem da rede neural, assim como seu treinamento e posterior execução como parte do sistema completo.
 
-A escolha desta biblioteca se deu devido à sua implementação de algoritmos chave para o desenvolvimento deste, tais como a rede neural convolucional tridimensional, discutida na seção \ref{sec:3dcnn}. Além disso, suas interfaces nas linguagens de programação C++ e Python, assim como a facilidade de utilização de interface em Python para prototipagem rápida de redes neurais convolucionais com topologias diferentes foram decisivas para sua escolha para a realização do trabalho.
+A escolha desta biblioteca se deu devido à sua implementação de algoritmos chave para o desenvolvimento do trabalho, tais como a rede neural convolucional tridimensional, discutida na seção \ref{sec:dnn}. Além disso, suas interfaces nas linguagens de programação C++ e Python, assim como a facilidade de utilização de interface em Python para prototipagem rápida de redes neurais convolucionais com topologias diferentes foram decisivas para sua escolha para a realização do trabalho.
+
+Nesse trabalho, utilizamos a versão do Tensorflow 2.1.0, compilada a partir do código fonte com suporte para GPU e otimizações do referentes à arquitetura da CPU.
 
 \subsection{Ambiente de Desenvolvimento}
 \label{subsec:environ}
 
 No desenvolvimento deste trabalho foi utilizada em caráter primário a linguagem de programação Python. Originalmente, o trabalho seria desenvolvido em C++ devido ao mais alto desempenho desta linguagem; no entanto, a utilização de diversas bibliotecas com interface em Python assim como o mais rápido desenvolvimento e prototipagem nesta linguagem levou à decisão final de utiliza-la para a implementação do projeto.
 
-A IDE utilizada no desenvolvimento foi o Visual Studio Code, ferramenta de código aberto criada pela Microsoft, e o Jupyter Notebook\cite{Kluyver:2016aa}, por sua capacidade de subdividir e visualizar o estado do programa em execução. O treinamento da rede neural foi realizado em máquina com sistema operacional Windows, equipado com uma CPU Intel Core i7 de quarta geração, 12 GB de memória RAM e uma GPU Nvidia GTX 980 com 4 GB de memória dedicada.
+% TODO: Remover texto em strikethrough
+A IDE utilizada no desenvolvimento foi o Visual Studio Code, ferramenta de código aberto criada pela Microsoft, e o Jupyter Notebook\cite{Kluyver:2016aa}, por sua capacidade de subdividir e visualizar o estado do programa em execução. \sout{O treinamento da rede neural foi realizado em máquina com sistema operacional Windows 10, equipada com uma CPU Intel Core i7 de quarta geração, 12 GB de memória RAM e uma GPU Nvidia GTX 980 com 4 GB de memória dedicada.} O treinamento da rede neural foi realizado em máquina com sistema operacional Ubuntu 16.04, equipada com uma CPU Intel Core i7 de primeira geração, 12 GB de memória RAM, e uma GPU Nvidia GTX 1080 Ti com 12 GB de memória dedicada.
 
 \subsection{Outras Ferramentas}
 \label{subsec:otools}
@@ -53,15 +58,15 @@ As bibliotecas se encontram ordenadas por sua função na pipeline do classifica
 
 \subsubsection{OpenCV}
 
-OpenCV\cite{opencv_library} é uma biblioteca de código aberto para aplicações de Visão Computacional. Ela foi utilizada para realizar a leitura quadro a quadro dos arquivos de vídeo a serem processados pelo sistema, e para codificar em vídeo a saída do classificador.
+OpenCV\cite{opencv_library} é uma biblioteca de código aberto para aplicações de Visão Computacional. Ela foi utilizada para realizar a leitura quadro a quadro dos arquivos de vídeo a serem processados pelo sistema, e para codificar em vídeo a saída do classificador. Neste trabalho foi utilizada a biblioteca opencv-python em sua versão 4.2.0.32.
 
 \subsubsection{Matplotlib}
 
-A Matplotlib\cite{Hunter:2007} é uma biblioteca para produção de gráficos e imagens em Python. Ela foi utilizada para produzir as imagens intermediárias, através do desenho de polígonos a partir dos vértices produzidos pelo processo de detecção de marcadores facial.
+A Matplotlib\cite{hunterMatplotlib2DGraphics2007} é uma biblioteca para produção de gráficos e imagens em Python. Ela foi utilizada para produzir as imagens intermediárias, através do desenho de polígonos a partir dos vértices produzidos pelo processo de detecção de marcadores facial. Neste trabalho utilizamos a Matplotlib na versão 3.1.3 da biblioteca.
 
 \subsubsection{Pandas}
 
-Pandas\cite{mckinney-proc-scipy-2010} é uma biblioteca de processamento de dados em Python. Ela foi utilizada no pré-processamento dos dados com a finalidade de manipular os arquivos csv contendo a diarização manual dos vídeos do dataset de depoimentos.
+Pandas\cite{mckinney-proc-scipy-2010} é uma biblioteca de processamento de dados em Python. Ela foi utilizada no pré-processamento dos dados com a finalidade de manipular os arquivos csv contendo a diarização manual dos vídeos do dataset de depoimentos. A biblioteca foi utilizada em sua versão 1.0.0.
 
 \section{Preparação dos Dados}
 \label{sec:preproc}
@@ -74,9 +79,9 @@ Estes trechos foram validados para determinar se a face do depoente poderia ser 
 
 Feita essa diarização, os vídeos foram separados em conjuntos de teste e treinamento, tais que vídeos diferentes seriam utilizados para cada fase do treinamento da rede neural. Fizemos essa separação pois, como os fragmentos possuem relação temporal tanto entre si quanto com outros vídeos do mesmo depoente, seria possível que o treinamento da rede neural utilizando segmentos semelhantes aos fragmentos de teste pudesse inflar artificialmente o desempenho da mesma.
 
-Por fim, as diarizações produzidas manualmente foram utilizadas para organizar os fragmentos em uma estrutura de diretórios, tal que primeiramente estivessem separados por conjunto de teste ou treinamento, depois por vídeo de origem, e por fim por classe. Essa estrutura foi construída tal que as informações relevantes ao gerador de amostras da rede neural pudessem ser obtidas todas a partir do caminho para o mesmo.
+Por fim, as diarizações produzidas manualmente foram utilizadas para organizar os fragmentos em uma estrutura de diretórios, tal que primeiramente estivessem separados por conjunto de teste ou treinamento, depois por vídeo de origem, e por fim por classe. Essa estrutura foi construída de tal forma que as informações relevantes ao gerador de amostras da rede neural pudessem ser obtidas todas a partir do caminho para o mesmo.
 
-Para a execução de todas essas tarefas foram desenvolvidos scripts em Python e Bash, capazes de segmentar os vídeos do dataset e de validar, mover, e organizar os fragmentos que os compõem. O código referente a estes pode ser encontrado no apêndice \ref{apdx:src}.
+Para a execução de todas essas tarefas foram desenvolvidos scripts em Python e Bash, capazes de segmentar os vídeos do dataset e de validar, mover, e organizar os fragmentos extraídos destes. O código referente a estes pode ser encontrado no apêndice \ref{apdx:src}.
 
 \section{Arquitetura do Sistema}
 \label{sec:sysarch}

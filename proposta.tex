@@ -4,11 +4,9 @@
 \section{Definição do Problema}
 \label{sec:problem-desc}
 
-\section{Solução Proposta}
-\label{sec:proposed-solution}
+O problema de diarização de locutor consiste em particionar automaticamente um sinal de áudio tal que cada uma das partições geradas contenha as falas de um único locutor. Trata-se de um problema muito relevante à área de reconhecimento de voz, já que entender quem falou em cada momento de uma gravação nos permite contextualizar diversos tópicos que dependem desse tipo de informação para sua legibilidade e interpretação, tais como a geração automática de transcrições de depoimentos judiciais e relatórios médicos eletrônicos.
 
-% NOTE: em tempo real?
-A solução proposta neste trabalho consiste em construir um sistema capaz de diarizar as falas de um único locutor a partir, exclusivamente, de um vídeo frontal do mesmo. Para isso, o sistema de diarização deve ser capaz de, a partir de uma sequência de quadros extraída do vídeo original, determinar se o objeto da gravação está ou não falando. Neste trabalho iremos desconsiderar o áudio associado, já que o processamento deste foge à área de visão computacional.
+A solução proposta neste trabalho consiste em construir um sistema capaz de diarizar as falas de um único locutor em tempo real a partir de um vídeo frontal do mesmo. Para isso, o sistema de diarização deve ser capaz de, a partir de uma sequência de quadros extraída do vídeo original, determinar se o objeto da gravação está ou não falando. Neste trabalho iremos desconsiderar o áudio associado, já que o processamento deste foge à área de visão computacional.
 
 Com esta finalidade, propomos uma arquitetura em três etapas. 
 \begin{enumerate}
@@ -17,5 +15,10 @@ Com esta finalidade, propomos uma arquitetura em três etapas.
     \item Através de um modelo de aprendizado de máquina previamente treinado, o sistema deverá ser capaz de determinar se o sujeito identificado está ou não falando.
 \end{enumerate}
 
-\section{Trabalhos Relacionados}
+\section{Revisão Bibliográfica}
 \label{sec:related-work}
+
+O problema de diarização de locutor, historicamente, é abordado de duas formas distintas. A abordagem tradicional envolve a extração de vetores de características do áudio que se deseja diarizar, podendo ser estes i-vectors\cite{dehakFrontEndFactorAnalysis2011}, extraídos por meio de transformações matriciais aplicadas sobre o sinal, ou x-vectors\cite{snyderXVectorsRobustDNN2018}, obtidos através do uso de redes neurais profundas. A partir de então, estes vetores podem ser clusterizados\cite{sellSpeakerDiarizationPlda2014} quando informações referentes ao número de locutores é conhecido, ou, mais recentemente, utilizados como entrada de uma rede neural LSTM\cite{wangSpeakerDiarizationLSTM2018}.
+
+No entanto, a introdução das redes neurais convolucionais para reconhecimento de ações humanas em sinais de vídeos\cite{ji3DConvolutionalNeural2013, karpathyLargeScaleVideoClassification2014} implicou na criação de uma nova abordagem. Nesta, com o objetivo de melhorar a diarização de sinais heterogêneos, é utilizada um algoritmo de reconhecimento de ações também sobre o sinal de vídeo\cite{hersheyAudiovisualGraphicalModels2004}, que se supõe estar sincronizado ao áudio correspondente. Os reconhecimento de ações é, nesse caso, utilizado para identificar a fala do locutor, e, quando combinado com os sinais de áudio, é capaz de produzir resultados melhores do que o estado da arte no processamento exclusivo de áudio\cite{,ephratLookingListenCocktail2018}.
+
