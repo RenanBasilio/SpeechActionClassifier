@@ -13,6 +13,8 @@ import math
 import dlib
 import subprocess
 import sys
+import time
+import os
 
 classes=['Idle','Speak']
 
@@ -117,7 +119,6 @@ def diarize(path, out_path, model_path, filters=[draw_dot]):
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
             if out is None:
-                print(frame.shape)
                 out = cv2.VideoWriter(str(temppath.absolute()), cv2.VideoWriter_fourcc(*'mp4v'), capture.get(cv2.CAP_PROP_FPS), (frame.shape[1], frame.shape[0]))
             
             out.write(frame)
@@ -127,14 +128,15 @@ def diarize(path, out_path, model_path, filters=[draw_dot]):
     out.release()
 
     try:
-        cmd = [ 'ffmpeg', '-i', "\"{}\"".format(temppath.absolute()), '-i', "\"{}\"".format(path.absolute()), '-y', '-hide_banner', '-loglevel', 'panic', '-nostats', 
-                '-map', '0:0', '-map', '1:1', '-c:v', 'copy', '-c:a', 'copy', '-shortest', "\"{}\"".format(out_path.absolute())]
-        returned_output = subprocess.check_output(cmd)
+        cmd = [ 'ffmpeg', '-i', str(temppath.absolute()), '-i', str(path.absolute()), '-y', '-hide_banner', '-loglevel', 'error', '-nostats', 
+                '-map', '0:0', '-map', '1:1', '-c:v', 'copy', '-c:a', 'copy', '-shortest', str(out_path.absolute())]
+        returned_output = subprocess.call(cmd)
         temppath.unlink()
     except:
-        temppath.rename(out_path)
+        temppath.replace(out_path)
 
-    print("\rDone                                            ")
+    print("\r"+(" "*(os.get_terminal_size().columns-1)), end='\r')
+    print("Done.", end='')
 
 if __name__ == '__main__':
     if len(sys.argv) > 2:
@@ -145,14 +147,21 @@ if __name__ == '__main__':
         path = pathlib.Path(sys.argv[2]).resolve()
         print("Processing file {}...".format(path.absolute()))
 
-        out_path = outdir / (str(path.stem) + ".diarized.mp4")
-
+        start_time = time.perf_counter()
         if any(opt in sys.argv for opt in [ "-d", "--draw-face"]):
+            out_path = outdir / (str(path.stem) + ".ol.mp4")
             diarize(path, out_path, model, filters=[draw_facial_reco, draw_dot])
+
         elif any(opt in sys.argv for opt in [ "-c", "--chip-face"]):
+            out_path = outdir / (str(path.stem) + ".chip.mp4")
             diarize(path, out_path, model, filters=[draw_face_chip])
+
         else:
+            out_path = outdir / (str(path.stem) + ".diarized.mp4")
             diarize(path, out_path, model, filters=[draw_dot])
+        total_time = time.perf_counter() - start_time
+
+        print(" Took {} seconds.".format(total_time))
 
     else:
         print("Diarize a video, producing a new video with an indicator of whether the person is speaking or not.")
