@@ -1,0 +1,10 @@
+\begin{tikzpicture}[shorten >=1pt,node distance=1.0cm,on grid,auto]
+    \node[coordinate] (frames) [] {};
+    \node[state,rectangle,align=center] (facial_recog) [below=of frames, yshift=-1.5cm] {Reconhecedor \\ Facial};
+    \node[state,rectangle,align=center] (facial_lndmrk) [below=of facial_recog, yshift=-1.5cm] {Detector de \\ Marcadores \\ Faciais};
+    \node[state,rectangle,align=center] (raster) [below=of facial_lndmrk, yshift=-1.5cm] {Rasterizador};
+    \node[state,rectangle,align=center] (neural_net) [below=of raster, yshift=-1.5cm] {Rede \\ Neural \\ Convolucional};
+    \node[coordinate] (out_idle) [below=of neural_net, yshift=-1.5cm, xshift=1mm] {Idle};
+    \node[coordinate] (out_speak) [below=of neural_net, yshift=-1.5cm, xshift=-1mm] {Speak};
+    \draw [->] (facial_recog) edge (facial_lndmrk) (facial_lndmrk) edge (raster) (raster) edge (neural_net);
+\end{tikzpicture}
