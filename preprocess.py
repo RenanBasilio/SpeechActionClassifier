@@ -3,6 +3,7 @@ from datetime import date, datetime
 from pathlib import Path
 from termcolor import cprint, colored
 from loader import load_video_as_ndarray
+from utils import print_progress, write_tee
 import dlib
 import cv2 as cv2
 import shutil
@@ -19,16 +20,6 @@ log_file = open("log.txt", "w+")
 errors = ['Partial', '!! BAD', 'Inaudible', 'Maybe']
 
 face_detector = None
-
-def write_tee(file, message, verbose=True):
-    file.write(message)
-    if verbose:
-        print(message, end='')
-
-def print_progress(curr, total):
-    bars = floor((curr/total)*20)*'■'
-    dashes = colored((20 - floor((curr/total)*20))*'-', 'grey')
-    print("\r[{}{}]".format(bars, dashes), end="")
 
 def count_entries(class_files):
     total = 0

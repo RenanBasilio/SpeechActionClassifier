@@ -10,6 +10,8 @@ from imutils import face_utils
 from math import floor, ceil
 from matplotlib.colors import LinearSegmentedColormap, DivergingNorm
 
+from utils import draw_facial_landmarks
+
 # Get class names from classes.txt
 # data_dir = pathlib.Path("data/")
 cache_dir = pathlib.Path("__datacache__/")
@@ -72,7 +74,7 @@ def compute_facial_landmarks(image):
 
     faces = face_detector(image, 1)
     blank_image = np.full(image.shape, 255, np.uint8)
-    face_chip = None
+    face_chip = np.full((150, 150, 3), 255, np.uint8)
     for (i, face) in enumerate(faces):
         #shape = face_predictor(image, face.rect)
         shape = face_predictor(image, face)
@@ -81,15 +83,7 @@ def compute_facial_landmarks(image):
         #for (x, y) in shape_np:
             #cv2.circle(blank_image, (x,y), 0, (0, 0, 0))
 
-        cv2.polylines(blank_image, [shape_np[0:16]], False, (0,0,0), 0, cv2.LINE_8) # Boundaries
-        cv2.polylines(blank_image, [shape_np[17:21]], False, (0,0,0), 0, cv2.LINE_8) # Left Eyebrow
-        cv2.polylines(blank_image, [shape_np[22:26]], False, (0,0,0), 0, cv2.LINE_8) # Right Eyebrow
-        cv2.polylines(blank_image, [shape_np[27:30]], False, (0,0,0), 0, cv2.LINE_8) # Nose Bridge
-        cv2.polylines(blank_image, [shape_np[31:35]], False, (0,0,0), 0, cv2.LINE_8) # Nose
-        cv2.polylines(blank_image, [shape_np[36:41]], True, (0,0,0), 0, cv2.LINE_8) # Left Eye
-        cv2.polylines(blank_image, [shape_np[42:47]], True, (0,0,0), 0, cv2.LINE_8) # Right Eye
-        cv2.polylines(blank_image, [shape_np[48:59]], True, (0,0,0), 0, cv2.LINE_8) # Mouth Outer
-        cv2.polylines(blank_image, [shape_np[60:67]], True, (0,0,0), 0, cv2.LINE_8) # Mouth Inner
+        draw_facial_landmarks(blank_image, shape_np)
 
         face_chip = dlib.get_face_chip(blank_image, shape, 150, 0.33)
 
