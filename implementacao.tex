@@ -3,20 +3,29 @@
 
 Neste capítulo discutiremos tópicos relacionados à implementação do sistema de diarização de locutor proposto. 
 
-Na seção \ref{sec:tools} apresentamos as ferramentas principais utilizadas no desenvolvimento deste trabalho. Em seguida, na seção \ref{sec:preproc}, apresentamos o trabalho realizado para preparação e pré-processamento dos dados. Na seção \ref{sec:sysarch} discutimos a arquitetura do sistema desenvolvido, discussão esta que aprofundamos na seção \ref{sec:topology} através da demonstração da topologia da rede neural utilizada.
+Na seção \ref{sec:tools} apresentamos as ferramentas principais utilizadas no desenvolvimento deste trabalho.
+Em seguida, na seção \ref{sec:preproc}, apresentamos o trabalho realizado para preparação e pré-processamento dos dados.
+Na seção \ref{sec:sysarch} discutimos a arquitetura do sistema desenvolvido, discussão esta que aprofundamos na seção \ref{sec:topology} através da demonstração da topologia da rede neural utilizada.
 
 \section{Ferramentas}
 \label{sec:tools}
 
-Nesta seção apresentamos as principais ferramentas utilizadas durante a implementação deste trabalho. Definiremos suas principais características, assim como as funcionalidades das mesmas que foram utilizadas, e as motivações por trás de sua escolha.
+Nesta seção apresentamos as principais ferramentas utilizadas durante a implementação deste trabalho.
+Definiremos suas principais características, assim como as funcionalidades das mesmas que foram utilizadas, e as motivações por trás de sua escolha.
 
-Na seção \ref{subsec:dlib} apresentaremos a biblioteca Dlib, utilizada para propósito de identificação e demarcação facial no projeto. Em seguida, na seção \ref{subsec:tf} apresentaremos a biblioteca Tensorflow, utilizada por sua robusta implementação do modelo de rede neural convolucional. Na seção \ref{subsec:environ} apresentaremos o ambiente utilizado para treinamento do modelo, assim como seus recursos computacionais. Por fim, na seção \ref{subsec:otools}, mencionaremos brevemente as demais ferramentas utilizadas em caráter pontual no trabalho, e que, por essa razão, não receberam seções dedicadas.
+Na seção \ref{subsec:dlib} apresentaremos a biblioteca Dlib, utilizada para propósito de identificação e demarcação facial no projeto.
+Em seguida, na seção \ref{subsec:tf} apresentaremos a biblioteca Tensorflow, utilizada por sua robusta implementação do modelo de rede neural convolucional.
+Na seção \ref{subsec:environ} apresentaremos o ambiente utilizado para treinamento do modelo, assim como seus recursos computacionais.
+Por fim, na seção \ref{subsec:otools}, mencionaremos brevemente as demais ferramentas utilizadas em caráter pontual no trabalho, e que, por essa razão, não receberam seções dedicadas.
 
 \subsection{Dlib}
 \label{subsec:dlib}
-A Dlib\cite{dlib09} é uma biblioteca de código aberto desenvolvida em C++ e com interface em Python. Trata-se de uma biblioteca generalista, contendo implementações de algoritmos para processamento paralelo, grafos, entre outros. Porém, seu foco principal se encontra nas áreas de aprendizado de máquina, processamento de imagem e reconhecimento facial.
+A Dlib\cite{dlib09} é uma biblioteca de código aberto desenvolvida em C++ e com interface em Python.
+Trata-se de uma biblioteca generalista, contendo implementações de algoritmos para processamento paralelo, grafos, entre outros.
+Porém, seu foco principal se encontra nas áreas de aprendizado de máquina, processamento de imagem e reconhecimento facial.
 
-A biblioteca possui um identificador facial baseado em \textit{Histogram of Oriented Gradients} (HOG) capaz de detectar rostos frontais mesmo em imagens de baixa resolução. As características específicas deste reconhecedor foram discutidas na seção \ref{sec:faciallm}.
+A biblioteca possui um identificador facial baseado em \textit{Histogram of Oriented Gradients} (HOG) capaz de detectar rostos frontais mesmo em imagens de baixa resolução.
+As características específicas deste reconhecedor foram discutidas na seção \ref{sec:faciallm}.
 
 % FIXME: Colocar mais aprofundadamente na fundamentação teórica
 % HOG é uma técnica de visão computacional na qual são calculados gradientes para cada pixel da imagem a partir de seus vizinhos de forma a identificar as fronteiras entre os objetos da figura. Os gradientes calculados são então utilizados para computar blocos descritores de 8x8 pixels com 9 canais. Esses blocos sofrem normalização local para compensar fatores como a iluminação do ambiente, e servem como entrada para uma Máquina de Vetores de Suporte, resultando em um reconhecedor de faces rápido e robusto. Uma explicação mais aprofundada sobre esta técnica pode ser obtida em \cite{dalalHistogramsOrientedGradients2005}.
@@ -28,26 +37,34 @@ A biblioteca possui um identificador facial baseado em \textit{Histogram of Orie
     \label{fig:dlib-landmarking}
 \end{figure}
 
-Além disso, a mesma implementa um detector de marcadores faciais baseado em uma floresta de árvores de regressão, capaz de identificar (ou estimar, caso não estejam visíveis) as posições de um conjunto de pontos em um rosto, como mostra a figura \ref{fig:dlib-landmarking}. A biblioteca fornece também um modelo pré-treinado para este detector para identificação de 68 destes marcadores, sob licença que permite uso acadêmico. Esta funcionalidade foi chave para a escolha da biblioteca para a implementação do trabalho, visto que permitiu o treinamento do classificador utilizando um conjunto menor de dados, sem preocupações quanto a vieses relacionados às características físicas do locutor.
+Além disso, a mesma implementa um detector de marcadores faciais baseado em uma floresta de árvores de regressão, capaz de identificar (ou estimar, caso não estejam visíveis) as posições de um conjunto de pontos em um rosto, como mostra a figura \ref{fig:dlib-landmarking}.
+A biblioteca fornece também um modelo pré-treinado para este detector para identificação de 68 destes marcadores, sob licença que permite uso acadêmico.
+Esta funcionalidade foi chave para a escolha da biblioteca para a implementação do trabalho, visto que permitiu o treinamento do classificador utilizando um conjunto menor de dados, sem preocupações quanto a vieses relacionados às características físicas do locutor.
 
 A biblioteca Dlib foi utilizada em sua versão 19.19.0, compilada a partir do código fonte com suporte para GPU e otimizações referentes à arquitetura da CPU.
 
 \subsection{Tensorflow}
 \label{subsec:tf}
 
-Tensorflow\cite{tensorflow2015-whitepaper} é um framework de código aberto para aplicações de aprendizado de máquina. A biblioteca, construída pela empresa Google, apresenta implementações robustas de diversos algoritmos da área, além de uma API que permite a declaração de uma rede neural em função de suas camadas. A biblioteca suporta, ainda, o uso de uma ou mais GPUs para treinamento da rede neural, através da biblioteca cuDNN. No trabalho, essa foi utilizada para assistir na modelagem da rede neural, assim como seu treinamento e posterior execução como parte do sistema completo.
+Tensorflow\cite{tensorflow2015-whitepaper} é um framework de código aberto para aplicações de aprendizado de máquina.
+A biblioteca, construída pela empresa Google, apresenta implementações robustas de diversos algoritmos da área, além de uma API que permite a declaração de uma rede neural em função de suas camadas.
+A biblioteca suporta, ainda, o uso de uma ou mais GPUs para treinamento da rede neural, através da biblioteca cuDNN. No trabalho, essa foi utilizada para assistir na modelagem da rede neural, assim como seu treinamento e posterior execução como parte do sistema completo.
 
-A escolha desta biblioteca se deu devido à sua implementação de algoritmos chave para o desenvolvimento do trabalho, tais como a rede neural convolucional tridimensional, discutida na seção \ref{sec:dnn}. Além disso, suas interfaces nas linguagens de programação C++ e Python, assim como a facilidade de utilização de interface em Python para prototipagem rápida de redes neurais convolucionais com topologias diferentes foram decisivas para sua escolha para a realização do trabalho.
+A escolha desta biblioteca se deu devido à sua implementação de algoritmos chave para o desenvolvimento do trabalho, tais como a rede neural convolucional tridimensional, discutida na seção \ref{sec:dnn}.
+Além disso, suas interfaces nas linguagens de programação C++ e Python, assim como a facilidade de utilização de interface em Python para prototipagem rápida de redes neurais convolucionais com topologias diferentes foram decisivas para sua escolha para a realização do trabalho.
 
 Nesse trabalho, utilizamos a versão do Tensorflow 2.1.0, compilada a partir do código fonte com suporte para GPU e otimizações do referentes à arquitetura da CPU.
 
 \subsection{Ambiente de Desenvolvimento}
 \label{subsec:environ}
 
-No desenvolvimento deste trabalho foi utilizada em caráter primário a linguagem de programação Python. Originalmente, o trabalho seria desenvolvido em C++ devido ao mais alto desempenho desta linguagem; no entanto, a utilização de diversas bibliotecas com interface em Python assim como o mais rápido desenvolvimento e prototipagem nesta linguagem levou à decisão final de utiliza-la para a implementação do projeto.
+No desenvolvimento deste trabalho foi utilizada em caráter primário a linguagem de programação Python.
+Originalmente, o trabalho seria desenvolvido em C++ devido ao mais alto desempenho desta linguagem; no entanto, a utilização de diversas bibliotecas com interface em Python assim como o mais rápido desenvolvimento e prototipagem nesta linguagem levou à decisão final de utiliza-la para a implementação do projeto.
 
 % TODO: Remover texto em strikethrough
-A IDE utilizada no desenvolvimento foi o Visual Studio Code, ferramenta de código aberto criada pela Microsoft, e o Jupyter Notebook\cite{Kluyver:2016aa}, por sua capacidade de subdividir e visualizar o estado do programa em execução. \sout{O treinamento da rede neural foi realizado em máquina com sistema operacional Windows 10, equipada com uma CPU Intel Core i7 de quarta geração, 12 GB de memória RAM e uma GPU Nvidia GTX 980 com 4 GB de memória dedicada.} O treinamento da rede neural foi realizado em máquina com sistema operacional Ubuntu 16.04, equipada com uma CPU Intel Core i7 de primeira geração, 12 GB de memória RAM, e uma GPU Nvidia GTX 1080 Ti com 12 GB de memória dedicada.
+A IDE utilizada no desenvolvimento foi o Visual Studio Code, ferramenta de código aberto criada pela Microsoft, e o Jupyter Notebook\cite{kluyverJupyterNotebooksPublishing2016}, por sua capacidade de subdividir e visualizar o estado do programa em execução.
+\sout{O treinamento da rede neural foi realizado em máquina com sistema operacional Windows 10, equipada com uma CPU Intel Core i7 de quarta geração, 12 GB de memória RAM e uma GPU Nvidia GTX 980 com 4 GB de memória dedicada.}
+O treinamento da rede neural foi realizado em máquina com sistema operacional Ubuntu 16.04, equipada com uma CPU Intel Core i7 de primeira geração, 12 GB de memória RAM, e uma GPU Nvidia GTX 1080 Ti com 12 GB de memória dedicada.
 
 \subsection{Outras Ferramentas}
 \label{subsec:otools}
@@ -58,35 +75,50 @@ As bibliotecas se encontram ordenadas por sua função na pipeline do classifica
 
 \subsubsection{OpenCV}
 
-OpenCV\cite{opencv_library} é uma biblioteca de código aberto para aplicações de Visão Computacional. Ela foi utilizada para realizar a leitura quadro a quadro dos arquivos de vídeo a serem processados pelo sistema, e para codificar em vídeo a saída do classificador. Neste trabalho foi utilizada a biblioteca opencv-python em sua versão 4.2.0.32.
+OpenCV\cite{opencv_library} é uma biblioteca de código aberto para aplicações de Visão Computacional.
+Ela foi utilizada para realizar a leitura quadro a quadro dos arquivos de vídeo a serem processados pelo sistema, e para codificar em vídeo a saída do classificador.
+Neste trabalho foi utilizada a biblioteca opencv-python em sua versão 4.2.0.32.
 
 \subsubsection{Matplotlib}
 
-A Matplotlib\cite{hunterMatplotlib2DGraphics2007} é uma biblioteca para produção de gráficos e imagens em Python. Ela foi utilizada para produzir as imagens intermediárias, através do desenho de polígonos a partir dos vértices produzidos pelo processo de detecção de marcadores facial. Neste trabalho utilizamos a Matplotlib na versão 3.1.3 da biblioteca.
+A Matplotlib\cite{hunterMatplotlib2DGraphics2007} é uma biblioteca para produção de gráficos e imagens em Python.
+Ela foi utilizada para produzir as imagens intermediárias, através do desenho de polígonos a partir dos vértices produzidos pelo processo de detecção de marcadores facial.
+Neste trabalho utilizamos a Matplotlib na versão 3.1.3 da biblioteca.
 
 \subsubsection{Pandas}
 
-Pandas\cite{mckinney-proc-scipy-2010} é uma biblioteca de processamento de dados em Python. Ela foi utilizada no pré-processamento dos dados com a finalidade de manipular os arquivos csv contendo a diarização manual dos vídeos do dataset de depoimentos. A biblioteca foi utilizada em sua versão 1.0.0.
+Pandas\cite{mckinney-proc-scipy-2010} é uma biblioteca de processamento de dados em Python.
+Ela foi utilizada no pré-processamento dos dados com a finalidade de manipular os arquivos csv contendo a diarização manual dos vídeos do dataset de depoimentos.
+A biblioteca foi utilizada em sua versão 1.0.0.
 
 \section{Preparação dos Dados}
 \label{sec:preproc}
 
-Originalmente, foi fornecido pela Defensoria Pública do Estado do Rio de Janeiro um dataset contendo 29 vídeos, totalizando cerca de 5 horas de vídeo, referente a depoimentos prestados por diferentes participantes. Os vídeos fornecidos apresentam resolução de $320\times240$ pixels, a uma taxa de 30 quadros por segundo. O conjunto de dados não apresentava nenhuma anotação referente à fala dos depoentes.
+Originalmente, foi fornecido pela Defensoria Pública do Estado do Rio de Janeiro um dataset contendo 29 vídeos, totalizando cerca de 5 horas de vídeo, referente a depoimentos prestados por diferentes participantes.
+Os vídeos fornecidos apresentam resolução de $320\times240$ pixels, a uma taxa de 30 quadros por segundo.
+O conjunto de dados não apresentava nenhuma anotação referente à fala dos depoentes.
 
-Primeiramente, segmentamos os vídeos em fragmentos de 15 quadros, ou meio segundo. A motivação para a segmentação do vídeo de entrada em trechos deste comprimento foi a estipulação de que o tempo necessário para a fala da primeira sílaba em uma frase, por uma pessoa normal, no português do Brasil, é de 252 milissegundos\cite{barbosaSyllabletimingBrazilianPortuguese2000}. Sendo assim, ao dobrar este tempo, adquirimos a capacidade de detectar por completo o movimento do locutor quando referente a frases curtas, tais como interjeições.
+Primeiramente, segmentamos os vídeos em fragmentos de 15 quadros, ou meio segundo.
+A motivação para a segmentação do vídeo de entrada em trechos deste comprimento foi a estipulação de que o tempo necessário para a fala da primeira sílaba em uma frase, por uma pessoa normal, no português do Brasil, é de 252 milissegundos\cite{barbosaSyllabletimingBrazilianPortuguese2000}.
+Sendo assim, ao dobrar este tempo, adquirimos a capacidade de detectar por completo o movimento do locutor quando referente a frases curtas, tais como interjeições.
 
-Estes trechos foram validados para determinar se a face do depoente poderia ser reconhecida, com finalidade de descartar fragmentos nos quais este não olhava em direção à câmera, ou nas quais o detector HOG não poderia identifica-los. Cada trecho foi então manualmente classificado quanto à ocorrência de fala pelo depoente, produzindo uma tabela que associava o identificador de cada arquivo à classe correspondente ao mesmo.
+Estes trechos foram validados para determinar se a face do depoente poderia ser reconhecida, com finalidade de descartar fragmentos nos quais este não olhava em direção à câmera, ou nas quais o detector HOG não poderia identifica-los.
+Cada trecho foi então manualmente classificado quanto à ocorrência de fala pelo depoente, produzindo uma tabela que associava o identificador de cada arquivo à classe correspondente ao mesmo.
 
-Feita essa diarização, os vídeos foram separados em conjuntos de teste e treinamento, tais que vídeos diferentes seriam utilizados para cada fase do treinamento da rede neural. Fizemos essa separação pois, como os fragmentos possuem relação temporal tanto entre si quanto com outros vídeos do mesmo depoente, seria possível que o treinamento da rede neural utilizando segmentos semelhantes aos fragmentos de teste pudesse inflar artificialmente o desempenho da mesma.
+Feita essa diarização, os vídeos foram separados em conjuntos de teste e treinamento, tais que vídeos diferentes seriam utilizados para cada fase do treinamento da rede neural.
+Fizemos essa separação pois, como os fragmentos possuem relação temporal tanto entre si quanto com outros vídeos do mesmo depoente, seria possível que o treinamento da rede neural utilizando segmentos semelhantes aos fragmentos de teste pudesse inflar artificialmente o desempenho da mesma.
 
-Por fim, as diarizações produzidas manualmente foram utilizadas para organizar os fragmentos em uma estrutura de diretórios, tal que primeiramente estivessem separados por conjunto de teste ou treinamento, depois por vídeo de origem, e por fim por classe. Essa estrutura foi construída de tal forma que as informações relevantes ao gerador de amostras da rede neural pudessem ser obtidas todas a partir do caminho para o mesmo.
+Por fim, as diarizações produzidas manualmente foram utilizadas para organizar os fragmentos em uma estrutura de diretórios, tal que primeiramente estivessem separados por conjunto de teste ou treinamento, depois por vídeo de origem, e por fim por classe.
+Essa estrutura foi construída de tal forma que as informações relevantes ao gerador de amostras da rede neural pudessem ser obtidas todas a partir do caminho para o mesmo no sistema de arquivos.
 
-Para a execução de todas essas tarefas foram desenvolvidos scripts em Python e Bash, capazes de segmentar os vídeos do dataset e de validar, mover, e organizar os fragmentos extraídos destes. O código referente a estes pode ser encontrado no apêndice \ref{apdx:src}.
+Para a execução de todas essas tarefas foram desenvolvidos scripts em Python e Bash, capazes de segmentar os vídeos do dataset e de validar, mover, e organizar os fragmentos extraídos destes.
+O código referente a estes pode ser encontrado no apêndice \ref{apdx:src}.
 
 \section{Arquitetura do Sistema}
 \label{sec:sysarch}
 
-Foram desenvolvidos dois conjuntos scripts distintos para este trabalho; um sistema para treinamento da rede neural convolucional, e outro para a diarização de locutor em um vídeo com as características definidas anteriormente. Sendo assim, discutiremos a arquitetura utilizada para treinamento do modelo na seção \ref{subsec:train}, e a utilizada no processamento de uma mídia de entrada na seção \ref{subsec:application}.
+Foram desenvolvidos dois conjuntos scripts distintos para este trabalho; um sistema para treinamento da rede neural convolucional, e outro para a diarização de locutor em um vídeo com as características definidas anteriormente.
+Sendo assim, discutiremos a arquitetura utilizada para treinamento do modelo na seção \ref{subsec:train}, e a utilizada no processamento de uma mídia de entrada na seção \ref{subsec:application}.
 
 \subsection{Treinamento}
 \label{subsec:train}
@@ -95,7 +127,8 @@ A arquitetura do sistema de treinamento consiste em um gerador de dados e um mod
 
 % \input{figures/arch-train}
 
-A função primária do gerador de dados é carregar dinamicamente os vídeos a serem alimentados ao modelo em cada etapa de seu treinamento. Para isto, ele é inicializado com uma lista dos arquivos a serem carregados, assim como uma série de parâmetros que definem aspectos de sua operação, tais como o tamanho da batelada ou o pré-processamento a ser aplicado aos quadros.
+A função primária do gerador de dados é carregar dinamicamente os vídeos a serem alimentados ao modelo em cada etapa de seu treinamento.
+Para isto, ele é inicializado com uma lista dos arquivos a serem carregados, assim como uma série de parâmetros que definem aspectos de sua operação, tais como o tamanho da batelada ou o pré-processamento a ser aplicado aos quadros.
 
 O gerador de dados possui 3 modos distintos de operação. Estes são:
 \begin{itemize}
@@ -129,17 +162,22 @@ Em nossa implementação final, utilizamos o modo de \textit{landmarks}. Esse mo
 
 Em seguida, o modelo da rede neural é configurado. Os detalhes e decisões referentes à configuração deste podem ser encontradas na seção \ref{sec:topology}. 
 
-O treinamento é então realizado em um loop. Para prevenção de \textit{overfitting} na rede neural quanto ao conjunto de treinamento, paramos o mesmo quando o valor da função custo no conjunto de validação não for reduzido em até de três épocas.
+O treinamento é então realizado em um loop.
+Para prevenção de \textit{overfitting} na rede neural quanto ao conjunto de treinamento, paramos o mesmo quando o valor da função custo no conjunto de validação não fosse reduzido em até de 10 épocas e restauramos os pesos com melhor desempenho no conjunto de validação.
 
-Como função de custo, dado que estamos lidando com um problema de classificação, utilizamos a função de entropia categórica cruzada, ou \textit{custo softmax} (equação \ref{eq:categorical_crossentropy}). Nessa equação, $\hat{y}$ é o vetor das probabilidades das categorias, e $y$ é a categoria real, codificada \textit{one-hot}.
+Como função de custo, dado que estamos lidando com um problema de classificação, utilizamos a função de entropia categórica cruzada, ou \textit{custo softmax} (equação \ref{eq:categorical_crossentropy}).
+Nessa equação, $\hat{y}$ é o vetor das probabilidades das categorias, e $y$ é a categoria real, codificada \textit{one-hot}.
 
 \begin{equation} \label{eq:categorical_crossentropy}
     L(y,\hat{y})=-\sum\limits_{j=0}^M\sum\limits_{i=0}^N(y_{ij}*log(\hat{y}_{ij}))
 \end{equation}
 
-Visto que trata-se um problema de classificação binária, seria possível utilizar a função de entropia cruzada binária. Porém, considerando a possibilidade de expansão futura do modelo para detecção de outras ações conversacionais, tais como gestos com a cabeça, decidimos utilizar uma função custo mais escalável para adição de novas classes.
+Visto que trata-se um problema de classificação binária, seria possível utilizar a função de entropia cruzada binária. 
+Porém, considerando a possibilidade de expansão futura do modelo para detecção de outras ações conversacionais, tais como gestos com a cabeça, decidimos utilizar uma função custo mais escalável para adição de novas classes.
 
-Em cada época, o modelo chama o gerador de dados de treinamento, que lhe retorna um número fixo de amostras (batelada). Cada uma dessas amostras é, como discutido anteriormente, um segmento de 15 quadros consecutivos, extraído de um vídeo e pré-processado pelo gerador. Essas amostras são alimentadas através do modelo, que faz predições quanto às mesmas e, através do algoritmo de retro propagação, ajusta seus pesos em função da corretude destas.
+Em cada época, o modelo chama o gerador de dados de treinamento, que lhe retorna um número fixo de amostras (batelada).
+Cada uma dessas amostras é, como discutido anteriormente, um segmento de 15 quadros consecutivos, extraído de um vídeo e pré-processado pelo gerador.
+Essas amostras são alimentadas através do modelo, que faz predições quanto às mesmas e, através do algoritmo de retro propagação, ajusta seus pesos em função da corretude destas.
 
 \begin{figure}[ht]
     \centering
@@ -148,7 +186,9 @@ Em cada época, o modelo chama o gerador de dados de treinamento, que lhe retorn
     \label{fig:train_metrics_evo}
 \end{figure}
 
-Ao esgotarem as amostras de teste, o modelo chama, então, o gerador de dados de validação, realizando predições sem retro propagação sobre as entradas retornadas, e calculando o valor da função custo para os resultados. Por fim, ao se esgotarem também essas amostras, dá-se o final de uma época do treinamento, e os geradores tem suas listas de arquivos embaralhadas de forma a garantir aleatoriedade na ordem da próxima época. Caso o valor da função custo não tenha sido reduzido nas últimas três épocas, o treinamento chega ao seu fim, e os pesos correspondentes ao melhor desempenho obtido no conjunto de validação são restaurados.
+Ao esgotarem as amostras de teste, o modelo chama, então, o gerador de dados de validação, realizando predições sem retro propagação sobre as entradas retornadas, e calculando o valor da função custo para os resultados.
+Por fim, ao se esgotarem também essas amostras, dá-se o final de uma época do treinamento, e os geradores tem suas listas de arquivos embaralhadas de forma a garantir aleatoriedade na ordem da próxima época.
+Caso o valor da função custo não tenha sido reduzido nas últimas três épocas, o treinamento chega ao seu fim, e os pesos correspondentes ao melhor desempenho obtido no conjunto de validação são restaurados.
 
 Como mostra a figura \ref{fig:train_metrics_evo}, que representa a evolução das métricas de desempenho durante o treinamento do modelo, o processo teve duração de 15 épocas.
 
