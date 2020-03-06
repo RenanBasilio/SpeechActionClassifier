@@ -1,0 +1,70 @@
+\begin{tikzpicture}[]
+    \node[coordinate] (input) [] {};
+    \node[state, circle, align=center] (input1) at (input) [] {$x_2$};
+    \node[state, circle, align=center] (input2) [above=of input1, yshift=-0.3cm] {$x_1$};
+    \node[state, circle, align=center] (input3) [below=of input1, yshift=0.3cm] {$x_3$};
+    \node[draw=none, fill=none] [below=of input3, yshift=-0.3cm] (inputs_label) {Entrada};
+
+    \node[coordinate] (hidden1) [right=of input, xshift=1.5cm] {};
+    \node[state, circle, align=center] (hidden11) at (hidden1) [] {};
+        \draw [->, color=gray] (input1) -- (hidden11);
+        \draw [->, color=gray] (input2) -- (hidden11);
+        \draw [->, color=gray] (input3) -- (hidden11);
+    \node[state, circle, align=center] (hidden12) [above=of hidden11, yshift=-0.7cm] {};
+        \draw [->, color=gray] (input1) -- (hidden12);
+        \draw [->, color=gray] (input2) -- (hidden12);
+        \draw [->, color=gray] (input3) -- (hidden12);
+    \node[state, circle, align=center] (hidden13) [above=of hidden12, yshift=-0.7cm] {};
+        \draw [->, color=gray] (input1) -- (hidden13);
+        \draw [->, color=gray] (input2) -- (hidden13);
+        \draw [->, color=gray] (input3) -- (hidden13);
+    \node[state, circle, align=center] (hidden14) [below=of hidden11, yshift=0.7cm] {};
+        \draw [->, color=gray] (input1) -- (hidden14);
+        \draw [->, color=gray] (input2) -- (hidden14);
+        \draw [->, color=gray] (input3) -- (hidden14);
+    \node[state, circle, align=center] (hidden15) [below=of hidden14, yshift=0.7cm] {};
+        \draw [->, color=gray] (input1) -- (hidden15);
+        \draw [->, color=gray] (input2) -- (hidden15);
+        \draw [->, color=gray] (input3) -- (hidden15);
+
+    \node[coordinate] (hidden2) [right=of hidden1, xshift=1.5cm] {};
+    \node[state, circle, align=center] (hidden21) [above=of hidden2, yshift=-0.7cm] {};
+        \draw [->, color=gray] (hidden11) -- (hidden21);
+        \draw [->, color=gray] (hidden12) -- (hidden21);
+        \draw [->, color=gray] (hidden13) -- (hidden21);
+        \draw [->, color=gray] (hidden14) -- (hidden21);
+        \draw [->, color=gray] (hidden15) -- (hidden21);
+    \node[state, circle, align=center] (hidden22) [above=of hidden21, yshift=-0.7cm] {};
+        \draw [->, color=gray] (hidden11) -- (hidden22);
+        \draw [->, color=gray] (hidden12) -- (hidden22);
+        \draw [->, color=gray] (hidden13) -- (hidden22);
+        \draw [->, color=gray] (hidden14) -- (hidden22);
+        \draw [->, color=gray] (hidden15) -- (hidden22);
+    \node[state, circle, align=center] (hidden23) [below=of hidden2, yshift=0.7cm] {};
+        \draw [->, color=gray] (hidden11) -- (hidden23);
+        \draw [->, color=gray] (hidden12) -- (hidden23);
+        \draw [->, color=gray] (hidden13) -- (hidden23);
+        \draw [->, color=gray] (hidden14) -- (hidden23);
+        \draw [->, color=gray] (hidden15) -- (hidden23);
+    \node[state, circle, align=center] (hidden24) [below=of hidden23, yshift=0.7cm] {};
+        \draw [->, color=gray] (hidden11) -- (hidden24);
+        \draw [->, color=gray] (hidden12) -- (hidden24);
+        \draw [->, color=gray] (hidden13) -- (hidden24);
+        \draw [->, color=gray] (hidden14) -- (hidden24);
+        \draw [->, color=gray] (hidden15) -- (hidden24);
+    \node[draw=none, fill=none] [right=of inputs_label, xshift=0.25cm] (hidden_label) {Camadas Ocultas};
+
+    \node[coordinate] (output) [right=of hidden2, xshift=1.5cm] {};
+    \node[state, circle, align=center] (output1) [above=of output, yshift=-0.75cm] {$y_1$};
+        \draw [->, color=gray] (hidden21) -- (output1);
+        \draw [->, color=gray] (hidden22) -- (output1);
+        \draw [->, color=gray] (hidden23) -- (output1);
+        \draw [->, color=gray] (hidden24) -- (output1);
+    \node[state, circle, align=center] (output2) [below=of output, yshift=0.75cm] {$y_2$};
+        \draw [->, color=gray] (hidden21) -- (output2);
+        \draw [->, color=gray] (hidden22) -- (output2);
+        \draw [->, color=gray] (hidden23) -- (output2);
+        \draw [->, color=gray] (hidden24) -- (output2);
+    \node[draw=none, fill=none] [right=of hidden_label, xshift=0.25cm] (output_label) {Saída};
+
+\end{tikzpicture}

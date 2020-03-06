@@ -1,21 +1,73 @@
 \chapter{Fundamentação Teórica}
 
+\section{Redes Neurais Artificiais}
+\label{sec:dnn}
+
+% TODO: Melhorar essa introdução.
+
+Redes Neurais Artificiais são um conjunto de algoritmos inspirados pelo funcionamento do cérebro humano, introduzidos pela primeira vez em 1943 quando Warren McCulloch e Walter Pitts modelaram o funcionamento de neurônios através de circuitos elétricos simples\cite{mccullochLogicalCalculusIdeas1943}.
+
+Esse modelo continuou evoluindo ao longo dos anos, culminando no desenvolvimento do \textit{Perceptron} por Rosenblatt em 1958 \cite{rosenblattPerceptronProbabilisticModel1958} (figura \ref{fig:perceptron}), um algoritmo de classificação binária semelhante a uma rede neural composta por um único neurônio.
+
+No entanto, devido à falta de capacidade computacional e ao volume de dados necessários para o treinamento de redes neurais, estas permaneceram apenas um conceito acadêmico durante vários anos.
+Somente em 2006, Geoffrey Hinton proporia pela primeira vez o conceito de Redes Neurais Profundas \cite{hintonFastLearningAlgorithm2006}, um tipo de rede neural composto por múltiplas camadas de neurônios.
+
+\begin{figure}[ht]
+    \centering
+    \input{figures/dnn.tikz}
+    \caption{Ilustração de uma rede neural profunda com 3 camadas.}
+    \label{fig:dnn}
+\end{figure}
+
+Recentemente, com a consolidação da GPU (do Inglês \textit{Graphics Processing Unit}), assim como o grande volume de dados disponível, o tópico de redes neurais vem rapidamente ganhando popularidade.
+Algoritmos desse tipo são utilizados em diversas áreas da ciência, incluindo aplicações em medicina \cite{hannunCardiologistLevelArrhythmiaDetection2019,phamPredictingHealthcareTrajectories2017,houDeepSFDeepConvolutional2018}, previsão do tempo \cite{akramSequenceSequenceWeather2016}, veículos autônomos \cite{bojarskiEndEndLearning2016,yudinObjectDetectionDeep2019}, entre outras \cite{abiodunStateoftheartArtificialNeural2018}.
+
+\subsection{Neurônios Artificiais}
+
+Biologicamente, quando o potencial elétrico na base do axônio de um neurônio chega a um valor pré-determinado através do acúmulo de sinais de entrada recebidos pelos dendritos, este gera um pulso elétrico que é propagado até as sinapses, terminais nos quais o neurônio conecta com os demais.
+Trata-se de um sinal binário; o neurônio pode ou não estar ativado a cada instante. No entanto, a frequência relativa das ativações pode conter informação \cite{behnkeHierarchicalNeuralNetworks2003}.
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=0.7\textwidth]{neurono-ido.svg}
+    \caption{A estrutura de um neurônio biológico. Imagem adaptada de \cite{dhp1080IdoSkemoPri2016}.}
+    \label{fig:bio_neuron}
+\end{figure}
+
+Funções de Ativação, também conhecidas como neurônios artificiais quando aplicadas no contexto de redes neurais, buscam modelar de forma simplificada esses aspectos biológicos.
+Elas recebem como entrada os valores resultantes das camadas imediatamente anteriores, ponderados por pesos específicos a cada conexão, e os transformam em uma única saída.
+Dessa forma, a soma ponderada dos valores de entrada agem como os dendritos do neurônio biológico, enquanto a função de ativação age como o axônio.
+
+\begin{figure}[ht]
+    \centering
+    \input{figures/perceptron.tikz}
+    \caption{O \textit{Perceptron}, uma rede neural com um único neurônio.}
+    \label{fig:perceptron}
+\end{figure}
+
+Geralmente, a função de ativação é constante e independente do processo de treinamento da rede neural; o ajuste é feito sobre os pesos, através algoritmo de retropropagação.
+Comumente, são utilizadas como função de ativação as funções ReLU (\textit{Rectified Linear Unit}), tangente hiperbólica, sigmóide, e Heaviside, em função do intervalo de saída e comportamento desejado.
+
+\begin{equation}\label{eq:relu}
+    f(x) = \left\{
+        \begin{array}{ll}
+            0, & x \le 0\\
+            x, & x > 0
+        \end{array}
+    \right.
+\end{equation}
+
+A função ReLU (equação \ref{eq:relu}), utilizada neste trabalho, tem comportamento tal que sua ativação ocorre sempre que $x>0$, com o valor resultante sendo o próprio valor de $x$. 
+Essa função é ideal para aplicações em redes neurais profundas pois o gradiente é preservado após cada camada da rede, o que não ocorre com as funções sigmóide e tangente hiperbólica, nas quais o valor do gradiente tende a valores infinitesimalmente pequenos em chamadas sucessivas, dificultando o uso de algoritmos de retropropagação.
+Além disso, o treinamento de redes neurais profundas que utilizam a função ReLU é mais rápido que o das outras funções de ativação devido à sua simplicidade \cite{krizhevskyImageNetClassificationDeep2017}.
+
+\subsection{Redes Neurais Convolucionais}
+\label{sec:convnet}
+
+Redes Neurais Convolucionais são redes neurais compostas por uma ou mais camadas de convolução.
+
 \section{Reconhecimento Facial}
 \label{sec:facialrecog}
 
 \section{Detecção de Marcadores Faciais}
 \label{sec:faciallm}
-
-\section{Redes Neurais Profundas}
-\label{sec:dnn}
-
-Redes Neurais Artificiais são um conjunto de algoritmos inspirados pelo funcionamento do cérebro humano, introduzidos pela primeira vez no ano de 1943 quando Warren McCulloch e Walter Pitts modelaram o funcionamento de neurônios através de circuitos elétricos\cite{mccullochLogicalCalculusIdeas1943}.
-Esse modelo continuou evoluindo ao longo dos anos, culminando no desenvolvimento do \textit{Perceptron} por Rosenblatt em 1958\cite{rosenblattPerceptronProbabilisticModel1958}, um tipo de algoritmo de classificação binária baseado em uma rede de neurônios artificiais com uma única camada densamente conectada.
-No entanto, devido à capacidade computacional e ao volume de dados necessários para o treinamento de redes neurais, essas permaneceram apenas um conceito acadêmico durante vários anos; somente no ano de 2006, Geoffrey Hinton proporia pela primeira vez o conceito de Redes Neurais Profundas\cite{hintonFastLearningAlgorithm2006}, um tipo de rede neural composto por múltiplas camadas de neurônios.
-
-% Figure, Deep Neural Networks
-
-
-
-\subsection{Redes Neurais Convolucionais}
-\label{sec:convnet}
