@@ -6,8 +6,8 @@
 Redes Neurais Artificiais são um conjunto de algoritmos inspirados pelo funcionamento do cérebro humano, introduzidos pela primeira vez em 1943 quando Warren McCulloch e Walter Pitts modelaram o funcionamento de neurônios através de circuitos elétricos simples\cite{mccullochLogicalCalculusIdeas1943}. 
 Esse modelo continuou evoluindo ao longo dos anos, culminando no desenvolvimento do \textit{Perceptron} por Rosenblatt em 1958 \cite{rosenblattPerceptronProbabilisticModel1958} (figura \ref{fig:perceptron}), um algoritmo de classificação binária semelhante a uma rede neural composta por um único neurônio.
 
-No entanto, devido à falta de capacidade computacional e ao volume de dados necessários para o treinamento de redes neurais, estes algoritmos permaneceram apenas um conceito acadêmico durante vários anos.
-Somente em 2006, Geoffrey Hinton proporia formalmente o conceito de Rede Neural Profunda \cite{hintonFastLearningAlgorithm2006}, um tipo de rede neural composto por múltiplas camadas de neurônios.
+No entanto, devido à falta de capacidade computacional e ao grande volume de dados necessários para o treinamento de redes neurais, estes algoritmos permaneceram apenas um conceito acadêmico durante vários anos.
+Somente em 2006, Geoffrey Hinton proporia formalmente o conceito de rede neural profunda \cite{hintonFastLearningAlgorithm2006}, um tipo de rede neural composto por múltiplas camadas de neurônios.
 
 \begin{figure}[ht]
     \centering
@@ -16,14 +16,14 @@ Somente em 2006, Geoffrey Hinton proporia formalmente o conceito de Rede Neural 
     \label{fig:dnn}
 \end{figure}
 
-Recentemente, com o desenvolvimento de algoritmos para o treinamento de redes neurais em GPU (do Inglês \textit{Graphics Processing Unit}), que possibilitou o treinamento mais rápido e eficiente de redes neurais de múltiplas camadas, assim como o crescente volume de dados disponível para treinamento destes, o tópico de redes neurais vem rapidamente ganhando popularidade.
-
+Recentemente, com o desenvolvimento de algoritmos para o treinamento de redes neurais em GPU (do Inglês \textit{Graphics Processing Unit}), que possibilitaram o treinamento mais rápido e eficiente de redes neurais de múltiplas camadas, assim como o crescente volume de dados disponível para treinamento, o tópico de redes neurais vem rapidamente ganhando popularidade.
 Algoritmos desse tipo já são utilizados em diversas áreas da ciência, incluindo aplicações em medicina \cite{hannunCardiologistLevelArrhythmiaDetection2019,phamPredictingHealthcareTrajectories2017,houDeepSFDeepConvolutional2018}, previsão do tempo \cite{akramSequenceSequenceWeather2016}, veículos autônomos \cite{bojarskiEndEndLearning2016,yudinObjectDetectionDeep2019}, entre outras \cite{abiodunStateoftheartArtificialNeural2018}.
+
 Tratam-se de algoritmos próprios para problemas que envolvem o reconhecimento de padrões, e a capacidade de treina-los a partir de dados existentes os torna eficazes para aplicação em tópicos nos quais as relações entre os dados de entrada não sejam totalmente conhecidas.
 
 \subsection{Neurônios Artificiais}
 
-Biologicamente, quando o potencial elétrico na base do axônio de um neurônio chega a um valor pré-determinado através do acúmulo de sinais de entrada recebidos pelos dendritos, este gera um pulso elétrico que é propagado até as sinapses, terminais nos quais o neurônio conecta com os demais.
+Biologicamente, quando o potencial elétrico na base do axônio de um neurônio chega a um valor pré-determinado, por meio do acúmulo de sinais de entrada recebidos pelos dendritos, um pulso elétrico é gerado e propagado até as sinapses, terminais nos quais o neurônio conecta com os demais.
 Trata-se de um sinal binário; o neurônio pode ou não estar ativado a cada instante. No entanto, a frequência relativa das ativações pode conter informação \cite{behnkeHierarchicalNeuralNetworks2003}.
 
 \begin{figure}[H]
@@ -34,8 +34,7 @@ Trata-se de um sinal binário; o neurônio pode ou não estar ativado a cada ins
 \end{figure}
 
 Funções de Ativação, também conhecidas como funções de propagação ou neurônios artificiais quando aplicadas no contexto de redes neurais, buscam modelar de forma simplificada esses aspectos biológicos.
-Elas recebem como entrada os valores resultantes das camadas imediatamente anteriores, ponderados por pesos específicos a cada conexão, e os transformam em uma única saída.
-Dessa forma, a soma ponderada dos valores de entrada agem como os dendritos do neurônio biológico, enquanto a função de ativação age como o axônio.
+Elas recebem como entrada os valores resultantes das camadas anteriores, ponderados por pesos específicos a cada conexão, e, quando estes valores atingem um limiar de excitação pré-determinado, os transformam em uma única saída.
 
 \begin{figure}[H]
     \centering
@@ -44,11 +43,14 @@ Dessa forma, a soma ponderada dos valores de entrada agem como os dendritos do n
     \label{fig:perceptron}
 \end{figure}
 
-Geralmente, a função de ativação é constante e independente do processo de treinamento da rede neural; o ajuste é feito sobre os pesos, através algoritmo de retropropagação.
+Geralmente, a função de ativação é constante e independente do processo de treinamento da rede neural; o ajuste é feito sobre os pesos das conexões, através algoritmo de retropropagação \cite{dreyfusArtificialNeuralNetworks1990}.
+O algoritmo é capaz de, a partir do resultado de uma camada, calcular o efeito de cada peso sobre o gradiente da função.
+Assim, ele possibilita a utilização de algoritmos tradicionais de otimização para encontrar os pesos locais de cada conexão, mesmo em redes com múltiplas camadas de centenas de neurônios, em função do efeito global destes.
+
 Comumente, são utilizadas como função de ativação as funções ReLU (\textit{Rectified Linear Unit}), tangente hiperbólica, sigmoide, e Heaviside, em função do intervalo de saída e comportamento desejado.
 
 \begin{equation}\label{eq:relu}
-    f(x) = \left\{
+    \phi(x) = \left\{
         \begin{array}{ll}
             0, & x \le 0\\
             x, & x > 0
@@ -57,8 +59,9 @@ Comumente, são utilizadas como função de ativação as funções ReLU (\texti
 \end{equation}
 
 A função ReLU (equação \ref{eq:relu}), utilizada neste trabalho, tem comportamento tal que sua ativação ocorre sempre que $x>0$, com o valor resultante sendo o próprio valor de $x$. 
-Essa função é ideal para aplicações em redes neurais profundas pois o gradiente é preservado após cada camada da rede, o que não ocorre com as funções sigmoide e tangente hiperbólica, nas quais o valor do gradiente tende a valores infinitesimalmente pequenos em chamadas sucessivas, dificultando o uso de algoritmos de retropropagação.
-Além disso, o treinamento de redes neurais profundas que utilizam a função ReLU é mais rápido que o das outras funções de ativação devido à sua simplicidade \cite{krizhevskyImageNetClassificationDeep2017}.
+Essa função é ideal para aplicações em redes neurais profundas pois o gradiente é preservado após cada camada da rede, o que não ocorre com as funções sigmoide e tangente hiperbólica.
+Nessas, o gradiente tende a valores infinitesimalmente pequenos após camadas sucessivas, dificultando o uso do algoritmo de retropropagação.
+Além disso, o treinamento de redes neurais profundas que utilizam a função ReLU é mais rápido do que o das outras funções de ativação, devido à sua simplicidade \cite{krizhevskyImageNetClassificationDeep2017}.
 
 \subsection{Redes Neurais Convolucionais}
 \label{sec:convnet}

@@ -4,10 +4,10 @@
 \section{Descrição do Problema}
 \label{sec:desc}
 
-A diarização de locutor consiste no processo de identificar os diferentes locutores em um conteúdo multimídia, de forma a separa-los temporalmente, definindo quando quem falou, e produzindo um tipo de roteiro para o mesmo.
+A diarização de locutor consiste no processo de identificar os diferentes locutores em um conteúdo multimídia de forma a separa-los temporalmente, definindo quando quem falou, e produzir um tipo de roteiro para o mesmo.
 
 Tradicionalmente, tenta-se resolver esse problema através da análise exclusiva do áudio, por meio da extração de \textit{features} na forma de vetores denominados \textit{I-vectors}, e subsequente clusterização destes.
-Porém, trata-se de um problema difícil; o timbre, principal característica sonora responsável pela identificação do locutor pelo ser humano, é de caráter neurológico \cite{oxenhamPitchPerception2012}, produzido pela decomposição da onda de áudio em seus harmônicos pelo trato auditivo.
+Porém, trata-se de um problema difícil; o timbre, principal característica sonora responsável pela identificação do locutor pelo ser humano, é de caráter neurológico \cite{oxenhamPitchPerception2012}, produzido pela decomposição da onda sonora em seus harmônicos pelo trato auditivo.
 E, ainda, como propriedade intrínseca da etapa de clusterização, a utilização desses algoritmos depende do conhecimento prévio do número de locutores que participam do áudio.
 
 Dadas essas limitações, temos que o desempenho dos algoritmos considerados estado da arte é insuficiente, com taxa de erro de diarização (a partir daqui chamada de DER, do inglês \textit{Diarization Error Rate}) de cerca de 20\% \cite{zewoudieUseLongtermFeatures2018} nas bases tradicionais.
@@ -17,19 +17,19 @@ Portanto, a busca de outras técnicas capazes de prover um melhor desempenho nos
 \label{sec:motiv}
 
 Em muitas situações, no processo de transcrição de áudio e vídeo, é interessante obter também a informação de quem está falando.
-Com essa informação seria possível roteirizar a mídia, viabilizando uma melhor formatação do texto transcrito.
+Com essa informação seria possível roteirizar a mídia, viabilizando um melhor entendimento e formatação do texto transcrito.
 Além disso, essa informação adicional permite viabilizar novos critérios de busca sobre o texto transcrito, tornando possível filtrar os resultados por locutor.
 
 \section{Revisão Bibliográfica}
 \label{sec:related-work}
 
-O problema de diarização de locutor, historicamente, é abordado de duas formas distintas.
-A abordagem tradicional envolve a extração de vetores de características do áudio que se deseja diarizar, podendo ser estes i-vectors\cite{dehakFrontEndFactorAnalysis2011}, extraídos por meio de transformações matriciais aplicadas sobre o sinal, ou x-vectors\cite{snyderXVectorsRobustDNN2018}, obtidos através do uso de redes neurais profundas.
-A partir de então, estes vetores podem ser clusterizados\cite{sellSpeakerDiarizationPlda2014} quando informações referentes ao número de locutores é conhecido, ou, mais recentemente, utilizados como entrada de uma rede neural LSTM\cite{wangSpeakerDiarizationLSTM2018}.
+O problema de diarização de locutor é historicamente abordado de duas maneiras distintas.
+A abordagem tradicional envolve a extração de vetores de características do áudio que se deseja diarizar, podendo ser estes \textit{I-Vectors} \cite{dehakFrontEndFactorAnalysis2011}, extraídos por meio de transformações matriciais aplicadas sobre o sinal, ou \textit{X-Vectors} \cite{snyderXVectorsRobustDNN2018}, obtidos através do uso de redes neurais profundas.
+A partir de então, estes vetores podem ser clusterizados \cite{sellSpeakerDiarizationPlda2014} quando informações referentes ao número de locutores é conhecido, ou, mais recentemente, utilizados como entrada de uma rede neural LSTM \cite{wangSpeakerDiarizationLSTM2018}.
 
-No entanto, a introdução das redes neurais convolucionais para reconhecimento de ações humanas em sinais de vídeos\cite{ji3DConvolutionalNeural2013, karpathyLargeScaleVideoClassification2014} implicou na concepção de uma nova abordagem.
-Nesta, com o objetivo de melhorar a diarização de sinais heterogêneos, é utilizada um algoritmo de reconhecimento de ações também sobre o sinal de vídeo\cite{hersheyAudiovisualGraphicalModels2004}, que se supõe estar sincronizado ao áudio correspondente.
-O reconhecimento de ações é, nesse caso, utilizado para identificar a fala do locutor, e, quando combinado com os sinais de áudio, é capaz de produzir resultados melhores do que o estado da arte no processamento exclusivo de áudio\cite{ephratLookingListenCocktail2018}.
+No entanto, a introdução das redes neurais convolucionais para reconhecimento de ações humanas em sinais de vídeos \cite{ji3DConvolutionalNeural2013, karpathyLargeScaleVideoClassification2014} implicou na concepção de uma nova abordagem.
+Nesta, com o objetivo de melhorar a diarização de sinais heterogêneos, é utilizado um algoritmo de reconhecimento de ações também sobre o sinal de vídeo \cite{hersheyAudiovisualGraphicalModels2004}, que se supõe estar sincronizado ao áudio correspondente.
+O reconhecimento de ações é, nesse caso, utilizado para identificar a fala do locutor e, quando combinado com os sinais de áudio, é capaz de produzir resultados melhores do que o estado da arte no processamento exclusivo de áudio \cite{ephratLookingListenCocktail2018}.
 
 \section{Definição do Problema}
 \label{sec:problem-desc}
@@ -40,7 +40,7 @@ Trata-se de um problema muito relevante à área de reconhecimento de voz, já q
 A solução proposta neste trabalho consiste em construir um sistema capaz de diarizar as falas de um único locutor em tempo real a partir de um vídeo frontal do mesmo.
 Para isso, o sistema de diarização deve ser capaz de, a partir de uma sequência de quadros extraída do vídeo original, determinar se o objeto da gravação está ou não falando. Neste trabalho iremos desconsiderar o áudio associado, já que o processamento deste foge à área de visão computacional.
 
-Com esta finalidade, propomos uma arquitetura em três etapas. 
+Com esta finalidade, propomos uma arquitetura em três etapas:
 \begin{enumerate}
     \item Com o uso de um identificador facial, o sistema identificará rostos nas imagens que lhe forem fornecidas. 
     \item Pontos de referência relevantes serão extraídos dos rostos identificados. 
@@ -51,11 +51,11 @@ Com esta finalidade, propomos uma arquitetura em três etapas.
 \label{sec:scope}
 
 De forma geral, gostaríamos de identificar as falas de todos os oradores do texto.
-No entanto, muitas vezes é suficiente identificar apenas um destes, por exemplo, no caso de audiências e depoimentos do Tribunal de Justiça.
-Nesse caso especificamente, desejamos identificar com maior precisão os trechos falados pelo depoente, independentemente do número de participantes da audiência, de forma a distinguir futuramente o que foi dito pelo mesmo em seu depoimento.
+No entanto, muitas vezes é suficiente identificar apenas um destes, por exemplo no caso de audiências e depoimentos do Tribunal de Justiça.
+Nesse caso específico desejamos identificar com maior precisão os trechos falados pelo depoente, independentemente do número de participantes da audiência, de forma a distinguir futuramente o que foi dito pelo mesmo em seu depoimento.
 
 Para esta finalidade, assumimos que esteja disponível um vídeo frontal da face do locutor (depoente), além do áudio combinado de todos os participantes, em canal monoaural.
-Esta suposição é feita tendo em vista as características dos dados reais, sob o conhecimento de que caso o áudio estivesse separado em canais correspondentes a cada locutor o problema se tornaria trivial.
+Esta suposição é feita tendo em vista as características dos dados reais, tendo o conhecimento de que caso o áudio estivesse separado em canais correspondentes a cada locutor o problema se tornaria trivial.
 Assim, este trabalho ficará limitado a tratar de casos nos quais estas informações estejam disponíveis, e com a determinação de que o vídeo deve ser de boa qualidade.
 
 \section{Estrutura do Trabalho}
@@ -63,16 +63,15 @@ Assim, este trabalho ficará limitado a tratar de casos nos quais estas informa�
 
 Este trabalho se encontra organizado da seguinte maneira:
 
-% TODO: Rework into current chapter layout 
+No capítulo 2 apresentamos a fundamentação teórica referente às técnicas e tecnologias utilizadas na implementação de cada uma das etapas propostas nesse trabalho.
+Em primeiro momento, fazemos uma revisão de tópicos relacionados a redes neurais convolucionais, seguida por uma análise dos algoritmos de histograma de gradientes orientados e de floresta de regressão, utilizados para identificação e detecção de marcadores faciais, respectivamente.
 
-No capítulo 2 definimos mais a fundo o problema, contextualizando nossa proposta em função das particularidades e limitações de nosso caso.
-Realizamos também uma revisão bibliográfica, visitando algumas das técnicas atualmente utilizadas para a diarização de locutor, suas vantagens e desvantagens.
+No capítulo 3 apresentamos a nossa implementação do sistema proposto. 
+Abordamos tópicos como as ferramentas utilizadas, pré-processamento dos dados de treinamento, e a arquitetura proposta para a rede neural convolucional.
+Por fim, discutimos a implementação da aplicação final, para lidar com dados não tratados previamente.
 
-No capítulo 3 apresentamos formalmente a nossa proposta, discutindo sua fundamentação teórica e apresentando as técnicas e tecnologias utilizadas em sua implementação.
-Vemos também o pré-processamento que e feito sobre os dados originais, assim como a arquitetura proposta para a rede neural de reconhecimento.
+No capítulo 4 demonstramos os resultados de nosso método quando aplicado sobre dataset fornecido pela Defensoria Pública do Estado do Rio de Janeiro, \sout{além do dataset AMI Meeting Corpus \cite{mccowanAMIMeetingCorpus2005},} que contém vídeos dos participantes individuais\sout{, em alta resolução e} com as características desejadas.
 
-No capítulo 4 demonstramos os resultados de nosso método quando aplicado sobre dataset fornecido pela Defensoria Pública do Estado do Rio de Janeiro, além do dataset AMI Meeting Corpus \cite{mccowanAMIMeetingCorpus2005}, que contém vídeos dos participantes individuais, em alta resolução e com as características desejadas.
-
-Por fim, no capítulo 5, resumimos e apresentamos nossas conclusões sobre o trabalho realizado, discutindo os resultados obtidos e os fatores que contribuíram para estes, e enumeramos trabalhos futuros a serem realizados sobre o mesmo tema.
+Por fim, no capítulo 5, resumimos e apresentamos nossas conclusões quanto ao trabalho realizado, discutindo os resultados obtidos e os fatores que contribuíram para estes, e enumeramos trabalhos futuros a serem realizados sobre o mesmo tema.
 
 No apêndice, apresentamos o código fonte desenvolvido para este trabalho.
