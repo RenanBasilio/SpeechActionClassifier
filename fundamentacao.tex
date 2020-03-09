@@ -45,7 +45,7 @@ Dessa forma, a soma ponderada dos valores de entrada agem como os dendritos do n
 \end{figure}
 
 Geralmente, a função de ativação é constante e independente do processo de treinamento da rede neural; o ajuste é feito sobre os pesos, através algoritmo de retropropagação.
-Comumente, são utilizadas como função de ativação as funções ReLU (\textit{Rectified Linear Unit}), tangente hiperbólica, sigmóide, e Heaviside, em função do intervalo de saída e comportamento desejado.
+Comumente, são utilizadas como função de ativação as funções ReLU (\textit{Rectified Linear Unit}), tangente hiperbólica, sigmoide, e Heaviside, em função do intervalo de saída e comportamento desejado.
 
 \begin{equation}\label{eq:relu}
     f(x) = \left\{
@@ -57,7 +57,7 @@ Comumente, são utilizadas como função de ativação as funções ReLU (\texti
 \end{equation}
 
 A função ReLU (equação \ref{eq:relu}), utilizada neste trabalho, tem comportamento tal que sua ativação ocorre sempre que $x>0$, com o valor resultante sendo o próprio valor de $x$. 
-Essa função é ideal para aplicações em redes neurais profundas pois o gradiente é preservado após cada camada da rede, o que não ocorre com as funções sigmóide e tangente hiperbólica, nas quais o valor do gradiente tende a valores infinitesimalmente pequenos em chamadas sucessivas, dificultando o uso de algoritmos de retropropagação.
+Essa função é ideal para aplicações em redes neurais profundas pois o gradiente é preservado após cada camada da rede, o que não ocorre com as funções sigmoide e tangente hiperbólica, nas quais o valor do gradiente tende a valores infinitesimalmente pequenos em chamadas sucessivas, dificultando o uso de algoritmos de retropropagação.
 Além disso, o treinamento de redes neurais profundas que utilizam a função ReLU é mais rápido que o das outras funções de ativação devido à sua simplicidade \cite{krizhevskyImageNetClassificationDeep2017}.
 
 \subsection{Redes Neurais Convolucionais}
