@@ -28,7 +28,7 @@
         \draw [->, color=gray] (input3) -- (hidden15);
 
     \node[coordinate] (hidden2) [right=of hidden1, xshift=1.5cm] {};
-    \node[state, circle, align=center] (hidden21) [above=of hidden2, yshift=-0.7cm] {};
+    \node[state, circle, align=center] (hidden21) [above=of hidden2, yshift=-0.85cm] {};
         \draw [->, color=gray] (hidden11) -- (hidden21);
         \draw [->, color=gray] (hidden12) -- (hidden21);
         \draw [->, color=gray] (hidden13) -- (hidden21);
@@ -40,7 +40,7 @@
         \draw [->, color=gray] (hidden13) -- (hidden22);
         \draw [->, color=gray] (hidden14) -- (hidden22);
         \draw [->, color=gray] (hidden15) -- (hidden22);
-    \node[state, circle, align=center] (hidden23) [below=of hidden2, yshift=0.7cm] {};
+    \node[state, circle, align=center] (hidden23) [below=of hidden2, yshift=0.85cm] {};
         \draw [->, color=gray] (hidden11) -- (hidden23);
         \draw [->, color=gray] (hidden12) -- (hidden23);
         \draw [->, color=gray] (hidden13) -- (hidden23);
@@ -55,12 +55,12 @@
     \node[draw=none, fill=none] [right=of inputs_label, xshift=0.25cm] (hidden_label) {Camadas Ocultas};
 
     \node[coordinate] (output) [right=of hidden2, xshift=1.5cm] {};
-    \node[state, circle, align=center] (output1) [above=of output, yshift=-0.75cm] {$y_1$};
+    \node[state, circle, align=center] (output1) [above=of output, yshift=-0.85cm] {$y_1$};
         \draw [->, color=gray] (hidden21) -- (output1);
         \draw [->, color=gray] (hidden22) -- (output1);
         \draw [->, color=gray] (hidden23) -- (output1);
         \draw [->, color=gray] (hidden24) -- (output1);
-    \node[state, circle, align=center] (output2) [below=of output, yshift=0.75cm] {$y_2$};
+    \node[state, circle, align=center] (output2) [below=of output, yshift=0.85cm] {$y_2$};
         \draw [->, color=gray] (hidden21) -- (output2);
         \draw [->, color=gray] (hidden22) -- (output2);
         \draw [->, color=gray] (hidden23) -- (output2);

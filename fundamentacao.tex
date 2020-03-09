@@ -3,14 +3,11 @@
 \section{Redes Neurais Artificiais}
 \label{sec:dnn}
 
-% TODO: Melhorar essa introdução.
-
-Redes Neurais Artificiais são um conjunto de algoritmos inspirados pelo funcionamento do cérebro humano, introduzidos pela primeira vez em 1943 quando Warren McCulloch e Walter Pitts modelaram o funcionamento de neurônios através de circuitos elétricos simples\cite{mccullochLogicalCalculusIdeas1943}.
-
+Redes Neurais Artificiais são um conjunto de algoritmos inspirados pelo funcionamento do cérebro humano, introduzidos pela primeira vez em 1943 quando Warren McCulloch e Walter Pitts modelaram o funcionamento de neurônios através de circuitos elétricos simples\cite{mccullochLogicalCalculusIdeas1943}. 
 Esse modelo continuou evoluindo ao longo dos anos, culminando no desenvolvimento do \textit{Perceptron} por Rosenblatt em 1958 \cite{rosenblattPerceptronProbabilisticModel1958} (figura \ref{fig:perceptron}), um algoritmo de classificação binária semelhante a uma rede neural composta por um único neurônio.
 
-No entanto, devido à falta de capacidade computacional e ao volume de dados necessários para o treinamento de redes neurais, estas permaneceram apenas um conceito acadêmico durante vários anos.
-Somente em 2006, Geoffrey Hinton proporia pela primeira vez o conceito de Redes Neurais Profundas \cite{hintonFastLearningAlgorithm2006}, um tipo de rede neural composto por múltiplas camadas de neurônios.
+No entanto, devido à falta de capacidade computacional e ao volume de dados necessários para o treinamento de redes neurais, estes algoritmos permaneceram apenas um conceito acadêmico durante vários anos.
+Somente em 2006, Geoffrey Hinton proporia formalmente o conceito de Rede Neural Profunda \cite{hintonFastLearningAlgorithm2006}, um tipo de rede neural composto por múltiplas camadas de neurônios.
 
 \begin{figure}[ht]
     \centering
@@ -19,8 +16,10 @@ Somente em 2006, Geoffrey Hinton proporia pela primeira vez o conceito de Redes 
     \label{fig:dnn}
 \end{figure}
 
-Recentemente, com a consolidação da GPU (do Inglês \textit{Graphics Processing Unit}), assim como o grande volume de dados disponível, o tópico de redes neurais vem rapidamente ganhando popularidade.
-Algoritmos desse tipo são utilizados em diversas áreas da ciência, incluindo aplicações em medicina \cite{hannunCardiologistLevelArrhythmiaDetection2019,phamPredictingHealthcareTrajectories2017,houDeepSFDeepConvolutional2018}, previsão do tempo \cite{akramSequenceSequenceWeather2016}, veículos autônomos \cite{bojarskiEndEndLearning2016,yudinObjectDetectionDeep2019}, entre outras \cite{abiodunStateoftheartArtificialNeural2018}.
+Recentemente, com o desenvolvimento de algoritmos para o treinamento de redes neurais em GPU (do Inglês \textit{Graphics Processing Unit}), que possibilitou o treinamento mais rápido e eficiente de redes neurais de múltiplas camadas, assim como o crescente volume de dados disponível para treinamento destes, o tópico de redes neurais vem rapidamente ganhando popularidade.
+
+Algoritmos desse tipo já são utilizados em diversas áreas da ciência, incluindo aplicações em medicina \cite{hannunCardiologistLevelArrhythmiaDetection2019,phamPredictingHealthcareTrajectories2017,houDeepSFDeepConvolutional2018}, previsão do tempo \cite{akramSequenceSequenceWeather2016}, veículos autônomos \cite{bojarskiEndEndLearning2016,yudinObjectDetectionDeep2019}, entre outras \cite{abiodunStateoftheartArtificialNeural2018}.
+Tratam-se de algoritmos próprios para problemas que envolvem o reconhecimento de padrões, e a capacidade de treina-los a partir de dados existentes os torna eficazes para aplicação em tópicos nos quais as relações entre os dados de entrada não sejam totalmente conhecidas.
 
 \subsection{Neurônios Artificiais}
 
@@ -34,7 +33,7 @@ Trata-se de um sinal binário; o neurônio pode ou não estar ativado a cada ins
     \label{fig:bio_neuron}
 \end{figure}
 
-Funções de Ativação, também conhecidas como neurônios artificiais quando aplicadas no contexto de redes neurais, buscam modelar de forma simplificada esses aspectos biológicos.
+Funções de Ativação, também conhecidas como funções de propagação ou neurônios artificiais quando aplicadas no contexto de redes neurais, buscam modelar de forma simplificada esses aspectos biológicos.
 Elas recebem como entrada os valores resultantes das camadas imediatamente anteriores, ponderados por pesos específicos a cada conexão, e os transformam em uma única saída.
 Dessa forma, a soma ponderada dos valores de entrada agem como os dendritos do neurônio biológico, enquanto a função de ativação age como o axônio.
 

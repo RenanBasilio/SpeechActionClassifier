@@ -27,7 +27,7 @@ O problema de diarização de locutor, historicamente, é abordado de duas forma
 A abordagem tradicional envolve a extração de vetores de características do áudio que se deseja diarizar, podendo ser estes i-vectors\cite{dehakFrontEndFactorAnalysis2011}, extraídos por meio de transformações matriciais aplicadas sobre o sinal, ou x-vectors\cite{snyderXVectorsRobustDNN2018}, obtidos através do uso de redes neurais profundas.
 A partir de então, estes vetores podem ser clusterizados\cite{sellSpeakerDiarizationPlda2014} quando informações referentes ao número de locutores é conhecido, ou, mais recentemente, utilizados como entrada de uma rede neural LSTM\cite{wangSpeakerDiarizationLSTM2018}.
 
-No entanto, a introdução das redes neurais convolucionais para reconhecimento de ações humanas em sinais de vídeos\cite{ji3DConvolutionalNeural2013, karpathyLargeScaleVideoClassification2014} implicou na criação de uma nova abordagem.
+No entanto, a introdução das redes neurais convolucionais para reconhecimento de ações humanas em sinais de vídeos\cite{ji3DConvolutionalNeural2013, karpathyLargeScaleVideoClassification2014} implicou na concepção de uma nova abordagem.
 Nesta, com o objetivo de melhorar a diarização de sinais heterogêneos, é utilizada um algoritmo de reconhecimento de ações também sobre o sinal de vídeo\cite{hersheyAudiovisualGraphicalModels2004}, que se supõe estar sincronizado ao áudio correspondente.
 O reconhecimento de ações é, nesse caso, utilizado para identificar a fala do locutor, e, quando combinado com os sinais de áudio, é capaz de produzir resultados melhores do que o estado da arte no processamento exclusivo de áudio\cite{ephratLookingListenCocktail2018}.
 
