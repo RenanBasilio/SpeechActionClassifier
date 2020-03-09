@@ -125,8 +125,6 @@ Sendo assim, discutiremos a arquitetura utilizada para treinamento do modelo na 
 
 A arquitetura do sistema de treinamento consiste em um gerador de dados e um modelo de rede neural convolucional a ser treinado.
 
-% \input{figures/arch-train}
-
 A função primária do gerador de dados é carregar dinamicamente os vídeos a serem alimentados ao modelo em cada etapa de seu treinamento.
 Para isto, ele é inicializado com uma lista dos arquivos a serem carregados, assim como uma série de parâmetros que definem aspectos de sua operação, tais como o tamanho da batelada ou o pré-processamento a ser aplicado aos quadros.
 
@@ -161,6 +159,13 @@ Em nossa implementação final, utilizamos o modo de \textit{landmarks}. Esse mo
 \end{enumerate}
 
 Em seguida, o modelo da rede neural é configurado. Os detalhes e decisões referentes à configuração deste podem ser encontradas na seção \ref{sec:topology}. 
+
+\begin{figure}[ht]
+    \centering
+    \includesvg[width=0.85\textwidth]{architecture.svg}
+    \caption{A arquitetura do sistema de treinamento.}
+    \label{fig:arch_train}
+\end{figure}
 
 O treinamento é então realizado em um loop.
 Para prevenção de \textit{overfitting} na rede neural quanto ao conjunto de treinamento, paramos o mesmo quando o valor da função custo no conjunto de validação não fosse reduzido em até de 10 épocas e restauramos os pesos com melhor desempenho no conjunto de validação.
