@@ -1,0 +1,19 @@
+\begin{tikzpicture}
+    \node[inner sep=0pt] (pre_conv)
+        {\includegraphics[width=0.3\textwidth]{photo_conv_1.png}};
+    \node[state, rectangle, align=center] (kernel) [right=of pre_conv] 
+        {
+            $
+                \begin{bmatrix}
+                    0 & -1 & 1 \\
+                    0 & -1 & 1 \\
+                    0 & -1 & 1
+                \end{bmatrix}
+            $\\
+            \textit{Kernel}
+        };
+        \draw [->] (pre_conv) -- (kernel);
+    \node[inner sep=0pt] (post_conv) [right=of kernel]
+        {\includegraphics[width=0.3\textwidth]{photo_conv_2.png}};
+        \draw [->] (kernel) -- (post_conv);
+\end{tikzpicture}

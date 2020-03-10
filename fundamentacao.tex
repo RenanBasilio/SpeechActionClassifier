@@ -17,7 +17,7 @@ Somente em 2006, Geoffrey Hinton proporia formalmente o conceito de rede neural 
 \end{figure}
 
 Recentemente, com o desenvolvimento de algoritmos para o treinamento de redes neurais em GPU (do Inglês \textit{Graphics Processing Unit}), que possibilitaram o treinamento mais rápido e eficiente de redes neurais de múltiplas camadas, assim como o crescente volume de dados disponível para treinamento, o tópico de redes neurais vem rapidamente ganhando popularidade.
-Algoritmos desse tipo já são utilizados em diversas áreas da ciência, incluindo aplicações em medicina \cite{hannunCardiologistLevelArrhythmiaDetection2019,phamPredictingHealthcareTrajectories2017,houDeepSFDeepConvolutional2018}, previsão do tempo \cite{akramSequenceSequenceWeather2016}, veículos autônomos \cite{bojarskiEndEndLearning2016,yudinObjectDetectionDeep2019}, entre outras \cite{abiodunStateoftheartArtificialNeural2018}.
+Algoritmos desse tipo já são utilizados em diversas áreas da ciência, incluindo aplicações em medicina \cite{hannunCardiologistLevelArrhythmiaDetection2019,phamPredictingHealthcareTrajectories2017,houDeepSFDeepConvolutional2018}, previsão do tempo \cite{akramSequenceSequenceWeather2016}, veículos autônomos \cite{bojarskiEndEndLearning2016,peddagollaLaneDetectionAutonomous}, entre outras \cite{abiodunStateoftheartArtificialNeural2018}.
 
 Tratam-se de algoritmos próprios para problemas que envolvem o reconhecimento de padrões, e a capacidade de treina-los a partir de dados existentes os torna eficazes para aplicação em tópicos nos quais as relações entre os dados de entrada não sejam totalmente conhecidas.
 
@@ -67,6 +67,41 @@ Além disso, o treinamento de redes neurais profundas que utilizam a função Re
 \label{sec:convnet}
 
 Redes Neurais Convolucionais são redes neurais compostas por uma ou mais camadas de convolução.
+São ideais para o tratamento de dados matriciais, como por exemplo imagens, que constituem em uma matriz bi-dimensional de pixels, ou vídeos, matrizes tridimensionais de imagens.
+Essas redes são capazes de identificar relações entre os elementos adjacentes de uma matriz, e, através da técnica de Max Pooling, focar somente nos pontos mais relevantes, mesmo em conjuntos de dados muito grandes.
+
+\subsubsection{Convolução e Filtros}
+\label{sec:convolution}
+
+A convolução é uma técnica matemática que consiste na aplicação de uma matriz, denominada matriz de convolução ou \textit{filtro} quando utilizada no contexto de processamento de imagens, sobre cada elemento de uma outra matriz.
+Esse processo produz uma nova matriz na qual o valor de cada elemento corresponde ao seu valor e o valor de seus vizinhos, ponderados pelos valores da matriz de convolução, denominados \kernel\ da convolução.
+
+Para dados bi-dimensionais, a operação de convolução pode ser descrita da seguinte forma:
+
+\begin{equation}
+    g(x,y) = \omega * f(x,y) = \sum\limits_{s=-a}^a\sum\limits_{t=-b}^b\omega(s,t)f(x-s, y-t)
+\end{equation}
+
+Essa técnica é frequentemente utilizada em áreas que trabalham com imagens, como na área de veículos autônomos, onde é capaz de identificar as faixas pintadas sobre o asfalto \cite{peddagollaLaneDetectionAutonomous}, assim como outros veículos e pedestres na rua.
+Com a aplicação dessa, é possível remover características da imagem de entrada irrelevantes para o problema que se deseja resolver, como mostra a figura \ref{fig:conv}, diminuindo a complexidade do problema a cada camada.
+
+\begin{figure}[ht]
+    \centering
+    \input{figures/convolution.tikz}
+    \caption{O resultado de aplicação de um \kernel\ simples para detecção de bordas verticais a uma foto. O \kernel\ é aplicado a cada pixel da imagem, substituindo o valor deste pela soma de sua vizinhança ponderada pelos valores da matriz. Foto original obtida de \cite{diliffEnglishLookingEast2015}.}
+    \label{fig:conv}
+\end{figure}
+
+No contexto de redes neurais convolucionais, isso consiste em neurônios cuja coleção de dados realiza uma convolução sobre os dados de entrada.
+O \kernel\ da matriz de convolução é treinado de forma a identificar os aspectos da entrada mais relevantes para o problema, através do algoritmo de retropropagação.
+
+\subsubsection{Pooling}
+\label{sec:maxpool}
+
+Um outro tipo de camada tradicional nas redes neurais convolucionais é a camada de \textit{pooling}, ou ``agrupamento''.
+Esse tipo de camada tem como função reduzir o número e complexidade dos dados de entrada e promover uma melhor generalização dos dados espaciais.
+
+
 
 \section{Reconhecimento Facial}
 \label{sec:facialrecog}
