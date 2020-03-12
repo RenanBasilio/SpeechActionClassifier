@@ -1,13 +1,26 @@
-\chapter{Fundamentação Teórica}
+\chapter{Revisão Bibliográfica}
 
-\section{Redes Neurais Artificiais}
-\label{sec:dnn}
+\section{Trabalhos Correlatos}
+\label{sec:related-work}
+
+O problema de diarização de locutor é historicamente abordado de duas maneiras distintas.
+A abordagem tradicional envolve a extração de vetores de características do áudio que se deseja diarizar, podendo ser estes \textit{I-Vectors} \cite{dehakFrontEndFactorAnalysis2011}, extraídos por meio de transformações matriciais aplicadas sobre o sinal, ou \textit{X-Vectors} \cite{snyderXVectorsRobustDNN2018}, obtidos através do uso de redes neurais profundas.
+A partir de então, estes vetores podem ser clusterizados \cite{sellSpeakerDiarizationPlda2014} quando informações referentes ao número de locutores é conhecido, ou, mais recentemente, utilizados como entrada de uma rede neural LSTM \cite{wangSpeakerDiarizationLSTM2018}.
+
+No entanto, a introdução das redes neurais convolucionais para reconhecimento de ações humanas em sinais de vídeos \cite{ji3DConvolutionalNeural2013, karpathyLargeScaleVideoClassification2014} implicou na concepção de uma nova abordagem.
+Nesta, com o objetivo de melhorar a diarização de sinais heterogêneos, é utilizado um algoritmo de reconhecimento de ações também sobre o sinal de vídeo \cite{hersheyAudiovisualGraphicalModels2004}, que se supõe estar sincronizado ao áudio correspondente.
+O reconhecimento de ações é, nesse caso, utilizado para identificar a fala do locutor e, quando combinado com os sinais de áudio, é capaz de produzir resultados melhores do que o estado da arte no processamento exclusivo de áudio \cite{ephratLookingListenCocktail2018}.
+
+\section{Fundamentação Teórica}
+
+\subsection{Redes Neurais Artificiais}
+\label{sec:ann}
 
 Redes Neurais Artificiais são um conjunto de algoritmos inspirados pelo funcionamento do cérebro humano, introduzidos pela primeira vez em 1943 quando Warren McCulloch e Walter Pitts modelaram o funcionamento de neurônios através de circuitos elétricos simples\cite{mccullochLogicalCalculusIdeas1943}. 
 Esse modelo continuou evoluindo ao longo dos anos, culminando no desenvolvimento do \textit{Perceptron} por Rosenblatt em 1958 \cite{rosenblattPerceptronProbabilisticModel1958} (figura \ref{fig:perceptron}), um algoritmo de classificação binária semelhante a uma rede neural composta por um único neurônio.
 
 No entanto, devido à falta de capacidade computacional e ao grande volume de dados necessários para o treinamento de redes neurais, estes algoritmos permaneceram apenas um conceito acadêmico durante vários anos.
-Somente em 2006, Geoffrey Hinton proporia formalmente o conceito de rede neural profunda \cite{hintonFastLearningAlgorithm2006}, um tipo de rede neural composto por múltiplas camadas de neurônios.
+Somente em 2006, Geoffrey Hinton proporia formalmente o conceito de rede neural profunda \cite{hintonFastLearningAlgorithm2006}, um tipo de rede neural composto por múltiplas camadas de neurônios totalmente conectadas.
 
 \begin{figure}[ht]
     \centering
@@ -21,7 +34,7 @@ Algoritmos desse tipo já são utilizados em diversas áreas da ciência, inclui
 
 Tratam-se de algoritmos próprios para problemas que envolvem o reconhecimento de padrões, e a capacidade de treina-los a partir de dados existentes os torna eficazes para aplicação em tópicos nos quais as relações entre os dados de entrada não sejam totalmente conhecidas.
 
-\subsection{Neurônios Artificiais}
+\subsubsection{Neurônios Artificiais}
 
 Biologicamente, quando o potencial elétrico na base do axônio de um neurônio chega a um valor pré-determinado, por meio do acúmulo de sinais de entrada recebidos pelos dendritos, um pulso elétrico é gerado e propagado até as sinapses, terminais nos quais o neurônio conecta com os demais.
 Trata-se de um sinal binário; o neurônio pode ou não estar ativado a cada instante. No entanto, a frequência relativa das ativações pode conter informação \cite{behnkeHierarchicalNeuralNetworks2003}.
@@ -63,14 +76,14 @@ Essa função é ideal para aplicações em redes neurais profundas pois o gradi
 Nessas, o gradiente tende a valores infinitesimalmente pequenos após camadas sucessivas, dificultando o uso do algoritmo de retropropagação.
 Além disso, o treinamento de redes neurais profundas que utilizam a função ReLU é mais rápido do que o das outras funções de ativação, devido à sua simplicidade \cite{krizhevskyImageNetClassificationDeep2017}.
 
-\subsection{Redes Neurais Convolucionais}
+\subsubsection{Redes Neurais Convolucionais}
 \label{sec:convnet}
 
 Redes Neurais Convolucionais são redes neurais compostas por uma ou mais camadas de convolução.
 São ideais para o tratamento de dados matriciais, como por exemplo imagens, que constituem em uma matriz bi-dimensional de pixels, ou vídeos, matrizes tridimensionais de imagens.
 Essas redes são capazes de identificar relações entre os elementos adjacentes de uma matriz, e, através da técnica de Max Pooling, focar somente nos pontos mais relevantes, mesmo em conjuntos de dados muito grandes.
 
-\subsubsection{Convolução e Filtros}
+\paragraph{Convolução e Filtros}
 \label{sec:convolution}
 
 A convolução é uma técnica matemática que consiste na aplicação de uma matriz, denominada matriz de convolução ou \textit{filtro} quando utilizada no contexto de processamento de imagens, sobre cada elemento de uma outra matriz.
@@ -88,23 +101,54 @@ Com a aplicação dessa, é possível remover características da imagem de entr
 \begin{figure}[ht]
     \centering
     \input{figures/convolution.tikz}
-    \caption{O resultado de aplicação de um \kernel\ simples para detecção de bordas verticais a uma foto. O \kernel\ é aplicado a cada pixel da imagem, substituindo o valor deste pela soma de sua vizinhança ponderada pelos valores da matriz. Foto original obtida de \cite{diliffEnglishLookingEast2015}.}
+    \caption{O resultado da aplicação de um \kernel\ simples para detecção de bordas verticais a uma foto. 
+    O \kernel\ é aplicado a cada pixel da imagem, substituindo o valor deste pela soma de sua vizinhança ponderada pelos valores da matriz. 
+    Foto original obtida de \cite{diliffEnglishLookingEast2015}.}
     \label{fig:conv}
 \end{figure}
 
-No contexto de redes neurais convolucionais, isso consiste em neurônios cuja coleção de dados realiza uma convolução sobre os dados de entrada.
+No contexto de redes neurais convolucionais, isso consiste em neurônios que realizam uma operação de convolução sobre os dados de entrada.
 O \kernel\ da matriz de convolução é treinado de forma a identificar os aspectos da entrada mais relevantes para o problema, através do algoritmo de retropropagação.
 
-\subsubsection{Pooling}
-\label{sec:maxpool}
+\paragraph{Pooling}
+\label{sec:pooling}
 
 Um outro tipo de camada tradicional nas redes neurais convolucionais é a camada de \textit{pooling}, ou ``agrupamento''.
 Esse tipo de camada tem como função reduzir o número e complexidade dos dados de entrada e promover uma melhor generalização dos dados espaciais.
+Isso é necessários pois as camadas convolucionais tendem a manter a localização espacial das características detectadas na matriz de entrada, informação que na maioria dos casos não é relevante para o problema que se deseja resolver.
 
+A operação consiste em subdividir a matriz de entrada em conjuntos de valores e, segundo um critério especificado, escolher entre estes um único valor resultante.
 
+\begin{figure}[ht]
+    \centering
+    \input{figures/max_pool.tikz}
+    \caption{O resultado da operação de \textit{Max Pooling} com dimensão $2\times2$ sobre uma matriz de entrada.}
+    \label{fig:maxpool}
+\end{figure}
 
-\section{Reconhecimento Facial}
+No contexto de redes neurais convolucionais, no entanto, dado que os valores resultantes da camada convolucional teriam sido filtrados por uma função de ativação não-linear, como a ReLU (equação \ref{eq:relu}), temos que os valores obtidos correspondem à intensidade da ativação dos neurônios.
+Assim, devido ao fato de que valores maiores devem corresponder a características de maior importância na matriz de entrada, temos dois critérios mais usados para a operação:
+
+\begin{description}
+    \itemsep0em 
+    \item \textit{\textbf{Max Pooling}}: Para cada grupo, calcula o valor máximo (figura \ref{fig:maxpool}).
+    \item \textit{\textbf{Average Pooling}}: Para cada grupo, calcula a média dos valores.
+\end{description}
+
+A escolha entre esses critérios é feita em função do propósito da camada anterior; se esta for, por exemplo, um detector de bordas em imagens, temos que a técnica de \textit{Max Pooling} será preferível, visto que as bordas serão sempre o maior valor do grupo, enquanto os demais elementos terão valor zero.
+Já no caso de se tratar de um reconhecedor de variação temporal, a técnica de \textit{Average Pooling} pode ser preferível, já que será capaz de manter informações sobre o valor médio dos elementos no instante que está sendo comprimido.
+
+\subsection{Histograma de Gradientes Orientados}
 \label{sec:facialrecog}
 
-\section{Detecção de Marcadores Faciais}
+Histograma de Gradientes Orientados, ou HOG, do inglês \textit{Histogram of Oriented Gradients}, é uma técnica de visão computacional utilizada para detecção de objetos em imagens.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.30\textwidth]{face_fhog_filters.png}
+    \caption{HOG para identificação facial frontal. Imagem retirada de \cite{kingDlib18Released}.}
+    \label{fig:dlib_hog}
+\end{figure}
+
+\subsection{Detecção de Marcadores Faciais}
 \label{sec:faciallm}
