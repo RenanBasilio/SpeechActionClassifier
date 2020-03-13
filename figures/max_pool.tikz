@@ -22,16 +22,17 @@
     \node at (+0.25, -0.75) {2};
     \node at (+0.75, -0.75) {8};
 
-    \filldraw[fill=red!20!white] (3, 0.5) rectangle (3.5, 0);
-    \filldraw[fill=green!20!white] (3.5, 0.5) rectangle (4, 0);
-    \filldraw[fill=blue!20!white] (3, 0) rectangle (3.5, -0.5);
-    \filldraw[fill=yellow!20!white] (3.5, 0) rectangle (4, -0.5);
-    \draw[step=0.5cm, color=gray] (3-0.001, -0.5) grid (4, 0.5);
-    \node[coordinate] (post_pool) at (3, 0) {};
-    \node at (3.25, +0.25) {4};
-    \node at (3.25, -0.25) {7};
-    \node at (3.75, +0.25) {9};
-    \node at (3.75, -0.25) {8};
+    \filldraw[fill=red!20!white] (4, 0.5) rectangle (4.5, 0);
+    \filldraw[fill=green!20!white] (4.5, 0.5) rectangle (5, 0);
+    \filldraw[fill=blue!20!white] (4, 0) rectangle (4.5, -0.5);
+    \filldraw[fill=yellow!20!white] (4.5, 0) rectangle (5, -0.5);
+    \draw[step=0.5cm, color=gray] (4-0.001, -0.5) grid (5, 0.5);
+    \node[coordinate] (post_pool) at (4, 0) {};
+    \node at (4.25, +0.25) {4};
+    \node at (4.25, -0.25) {7};
+    \node at (4.75, +0.25) {9};
+    \node at (4.75, -0.25) {8};
 
     \draw[->] (pre_pool) -- (post_pool);
+    \path [] (pre_pool) -- node [midway, above] {Max Pooling} node [midway, below] {$2\times2$} (post_pool);
 \end{tikzpicture}
