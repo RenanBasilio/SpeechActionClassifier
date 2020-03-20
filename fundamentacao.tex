@@ -143,25 +143,15 @@ Já no caso de se tratar de um reconhecedor de variação temporal, a técnica d
 \subsection{Histograma de Gradientes Orientados}
 \label{sec:facialrecog}
 
-Histograma de Gradientes Orientados ou HOG, do inglês \textit{Histogram of Oriented Gradients}, é uma técnica de visão computacional utilizada para detecção de objetos em imagens, introduzida pela primeira vez em 1982 por Robert McConnel \cite{mcconnellMethodApparatusPattern1986}, e formalizada em 1994 por Freeman e Roth \cite{freemanOrientationHistogramsHand}.
+Histograma de Gradientes Orientados, ou HOG, do inglês \textit{Histogram of Oriented Gradients}, é uma técnica de visão computacional utilizada para detecção de objetos em imagens, introduzida pela primeira vez em 1982 por Robert McConnel \cite{mcconnellMethodApparatusPattern1986}, e formalizada em 1994 por Freeman e Roth \cite{freemanOrientationHistogramsHand}.
 Trata-se do treinamento de um histograma de blocos descritivos dos gradientes que se espera observar em cada um dos pontos que se deseja conhecer, e posterior comparação deste com os gradientes de áreas ou células da imagem de entrada.
 
-% NOTE: Reescrever? "Uma dessas técnicas é a F-HOG \cite{felzenszwalbObjectDetectionDiscriminatively}..."
-\{Devo falar isso assim?\} A implementação de Histograma de Gradientes Orientados aqui discutida é aquela adotada pela biblioteca Dlib (seção \ref{subsec:dlib}), a F-HOG, baseada no artigo de Pedro F. Felzenszwalb, \textit{et al}. \cite{felzenszwalbObjectDetectionDiscriminatively}.
+Neste trabalho utilizaremos a F-HOG\footnote{F-HOG é uma implementação de detector HOG proposta por Felzenszwalb em seu artigo \cite{felzenszwalbObjectDetectionDiscriminatively}. O identificador facial frontal da biblioteca Dlib (seção \ref{subsec:dlib}), utilizado neste trabalho, adota essa implementação.}, uma técnica de HOG que consiste na composição de histograma com 36 descritores por célula utilizado para o treinamento de um classificador SVM (\textit{Support Vector Machine}).
+Essa técnica consiste em, primeiramente, calcular os gradientes de cada ponto da imagem, normalizada quanto à cor através de sua conversão a escala de cinza, a partir da aplicação de um vetor de diferenciação $[-1, 0, +1]$ e seu transposto a cada pixel desta.
+Através desse processo é calculado um ângulo $\theta$ e intensidade $r$, representando o gradiente local de cada um dos pontos aos quais é aplicado.
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.30\textwidth]{face_fhog_filters.png}
-    \caption{Um exemplo de detector HOG para identificação facial frontal. Imagem retirada de \cite{kingDlib18Released}.}
-    \label{fig:dlib_hog}
-\end{figure}
-
-A técnica consiste em, primeiramente, calcular os gradientes de cada ponto da imagem, normalizada quanto à cor através de sua conversão a escala de cinza, a partir da aplicação de um vetor de diferenciação $[-1, 0, +1]$ e seu transposto a cada pixel desta.
-Esse processo calcula um ângulo $\theta$ e intensidade $r$, representando o gradiente local de cada um dos pontos aos quais é aplicado.
-Os gradiente são, então, discretizados para uma de 18 direções pré-definidas.
-
-Uma vez calculados os gradientes em todos os pontos da figura, estes são agrupados em regiões espaciais densas e retangulares, passando a compor as células do histograma, no processo chamado de ``agrupamento espacial'' (\textit{spatial/orientation binning}).
-A orientação final de cada bloco é, então, calculada a partir dos gradientes da região espacial que integram, através da soma de suas orientações.
+A magnitude de cada gradiente é, então, discretizada conforme a direção entre $p$ direções pré-definidas e adicionada às 4 células adjacentes do histograma, por meio de interpolação bilinear.
+A orientação final de cada bloco é, então, calculada a partir dos gradientes da região espacial que o integram, através da soma de suas componentes.
 Isso garante a invariância do reconhecedor a pequenas alterações nas bordas, além de diminuir o tamanho deste, já que em geral o valor resultante das células tenderá ao mesmo valor quando agrupadas.
 
 \begin{equation}\label{eq:hog_energy}
@@ -185,11 +175,20 @@ Isso garante a invariância do reconhecedor a pequenas alterações nas bordas, 
     \end{matrix}\right)
 \end{equation}
 
-É feita, então, a normalização dos blocos descritores. 
-Primeiramente, é calculada a energia de cada bloco de 4 células do histograma, segundo a equação \ref{eq:hog_energy}. 
-Depois, o valor de cada uma delas é normalizado em relação a sua vizinhança, e cada um de seus componentes é truncado em relação a um fator de truncamento $\alpha = 0.2$, através da equação \ref{eq:hog_norm}.
+É feita, então, a normalização dos blocos descritores.
+As componentes de cada célula são normalizadas em relação à energia de sua vizinhança (calculada através da equação \ref{eq:hog_energy}), e truncadas em um valor $\alpha=0.2$, conforme a equação \ref{eq:hog_norm}.
+Isso produz uma matriz $H(i,j)$, de dimensão $p\times4$, correspondente a cada célula do histograma.
+Os histogramas obtidos a partir dessa técnica são utilizados para treinamento de um classificador SVM.
 
-% TODO: Continue writing this section.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.27\textwidth]{face_fhog_filters.png}
+    \caption{Um exemplo de HOG gerado a partir da imagem de um rosto. Imagem retirada de \cite{kingDlib18Released}.}
+    \label{fig:dlib_hog}
+\end{figure}
+
+Para a detecção de objetos por meio desta técnica o processo de extração de descritores é repetido, produzindo um histograma para a imagem alvo como um todo.
+O classificador visita cada região do histograma em diferentes resoluções por meio de uma \textit{sliding window} piramidal \cite{dalalHistogramsOrientedGradients2005}, detectando as regiões desta que contém as mesmas características dos histogramas com os quais foi treinado.
 
 \subsection{Detecção de Marcadores Faciais}
 \label{sec:faciallm}
