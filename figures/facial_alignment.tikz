@@ -1,0 +1,26 @@
+\begin{tikzpicture}
+    \node[inner sep=0pt] (iter0) []
+        {\includegraphics[width=0.20\textwidth]{faciallm_iter0.jpg}};
+        \node[draw=none, fill=none, outer sep=0, inner sep=0] [below=of iter0, yshift=0.9cm] (output_label) {Inicial};
+    \node[inner sep=0pt] (iter1) [right=of iter0]
+        {\includegraphics[width=0.20\textwidth]{faciallm_iter1.jpg}};
+        \node[draw=none, fill=none, outer sep=0, inner sep=0] [below=of iter1, yshift=0.9cm] (output_label) {(1)};
+    \node[inner sep=0pt] (iter2) [right=of iter1]
+        {\includegraphics[width=0.20\textwidth]{faciallm_iter2.jpg}};
+        \node[draw=none, fill=none, outer sep=0, inner sep=0] [below=of iter2, yshift=0.9cm] (output_label) {(2)};
+    \node[inner sep=0pt] (iter3) [right=of iter2]
+        {\includegraphics[width=0.20\textwidth]{faciallm_iter3.jpg}};
+        \node[draw=none, fill=none, outer sep=0, inner sep=0] [below=of iter3, yshift=0.9cm] (output_label) {(3)};
+    \node[inner sep=0pt] (iter4) [below=of iter0, yshift=0.2cm]
+        {\includegraphics[width=0.20\textwidth]{faciallm_iter4.jpg}};
+        \node[draw=none, fill=none, outer sep=0, inner sep=0] [below=of iter4, yshift=0.9cm] (output_label) {(4)};
+    \node[inner sep=0pt] (iter5) [right=of iter4]
+        {\includegraphics[width=0.20\textwidth]{faciallm_iter5.jpg}};
+        \node[draw=none, fill=none, outer sep=0, inner sep=0] [below=of iter5, yshift=0.9cm] (output_label) {(5)};
+    \node[inner sep=0pt] (iter6) [right=of iter5]
+        {\includegraphics[width=0.20\textwidth]{faciallm_iter6.jpg}};
+        \node[draw=none, fill=none, outer sep=0, inner sep=0] [below=of iter6, yshift=0.9cm] (output_label) {(6)};
+    \node[inner sep=0pt] (iter7) [right=of iter6]
+        {\includegraphics[width=0.20\textwidth]{faciallm_iter7.jpg}};
+        \node[draw=none, fill=none, outer sep=0, inner sep=0] [below=of iter7, yshift=0.9cm] (output_label) {(7)};
+\end{tikzpicture}
