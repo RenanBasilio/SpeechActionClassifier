@@ -81,6 +81,22 @@ Publication Title: Lecture Notes in Computer Science}
   primaryClass = {cs}
 }
 
+@article{caoFaceAlignmentExplicit2014,
+  title = {Face {{Alignment}} by {{Explicit Shape Regression}}},
+  author = {Cao, Xudong and Wei, Yichen and Wen, Fang and Sun, Jian},
+  year = {2014},
+  month = apr,
+  volume = {107},
+  pages = {177--190},
+  issn = {0920-5691, 1573-1405},
+  doi = {10.1007/s11263-013-0667-3},
+  abstract = {We present a very efficient, highly accurate, ``Explicit Shape Regression'' approach for face alignment. Unlike previous regression-based approaches, we directly learn a vectorial regression function to infer the whole facial shape (a set of facial landmarks) from the image and explicitly minimize the alignment errors over the training data. The inherent shape constraint is naturally encoded into the regressor in a cascaded learning framework and applied from coarse to fine during the test, without using a fixed parametric shape model as in most previous methods. To make the regression more effective and efficient, we design a two-level boosted regression, shape indexed features and a correlation-based feature selection method. This combination enables us to learn accurate models from large training data in a short time (20 min for 2,000 training images), and run regression extremely fast in test (15 ms for a 87 landmarks shape). Experiments on challenging data show that our approach significantly outperforms the state-of-the-art in terms of both accuracy and efficiency.},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\EE54IZAB\\Cao et al. - 2014 - Face Alignment by Explicit Shape Regression.pdf},
+  journal = {International Journal of Computer Vision},
+  language = {en},
+  number = {2}
+}
+
 @inproceedings{dalalHistogramsOrientedGradients2005,
   title = {Histograms of {{Oriented Gradients}} for {{Human Detection}}},
   booktitle = {2005 {{IEEE Computer Society Conference}} on {{Computer Vision}} and {{Pattern Recognition}} ({{CVPR}}'05)},
@@ -95,6 +111,20 @@ Publication Title: Lecture Notes in Computer Science}
   file = {C\:\\Users\\renan\\Zotero\\storage\\7I8IHMMA\\Dalal and Triggs - 2005 - Histograms of Oriented Gradients for Human Detecti.pdf},
   isbn = {978-0-7695-2372-9},
   language = {en}
+}
+
+@inproceedings{dantoneRealtimeFacialFeature2012,
+  title = {Real-Time Facial Feature Detection Using Conditional Regression Forests},
+  booktitle = {2012 {{IEEE Conference}} on {{Computer Vision}} and {{Pattern Recognition}}},
+  author = {Dantone, Matthias and Gall, Juergen and Fanelli, Gabriele and Van Gool, Luc},
+  year = {2012},
+  month = jun,
+  pages = {2578--2585},
+  issn = {1063-6919},
+  doi = {10.1109/CVPR.2012.6247976},
+  abstract = {Although facial feature detection from 2D images is a well-studied field, there is a lack of real-time methods that estimate feature points even on low quality images. Here we propose conditional regression forest for this task. While regression forest learn the relations between facial image patches and the location of feature points from the entire set of faces, conditional regression forest learn the relations conditional to global face properties. In our experiments, we use the head pose as a global property and demonstrate that conditional regression forests outperform regression forests for facial feature detection. We have evaluated the method on the challenging Labeled Faces in the Wild [20] database where close-to-human accuracy is achieved while processing images in real-time.},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\SSEZRXET\\6247976.html},
+  keywords = {2D images,Accuracy,conditional regression forests,Databases,Facial features,facial image,feature extraction,global face properties,Head,head pose,Real time systems,real-time facial feature detection,regression analysis,Training,trees (mathematics),Vegetation}
 }
 
 @article{dehakFrontEndFactorAnalysis2011,
@@ -330,6 +360,18 @@ Publication Title: Lecture Notes in Computer Science}
   language = {en}
 }
 
+@inproceedings{kazemiFaceAlignmentPartBased2011,
+  title = {Face {{Alignment}} with {{Part}}-{{Based Modeling}}},
+  booktitle = {{{BMVC}} 2011 - {{Proceedings}} of the {{British Machine Vision Conference}} 2011},
+  author = {Kazemi, Vahid and Sullivan, Josephine},
+  year = {2011},
+  month = sep,
+  pages = {27.1-27.10},
+  doi = {10.5244/C.25.27},
+  abstract = {We propose a new method for face alignment with part-based modeling. This method is competitive in terms of precision with existing methods such as Active Appearance Models, but is more robust and has a superior generalization ability due to its part-based nature. A variation of the Histogram of Oriented Gradients descriptor is used to model the appearance of each part and the shape information is represented with a set of landmark points around the major facial features. Multiple linear regression models are learnt to estimate the position of the landmarks from the appearance of each part. We verify our algorithm with a set of experiments on human faces and these show the competitive performance of our method compared to existing methods.},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\7FR946AR\\Kazemi and Sullivan - 2011 - Face Alignment with Part-Based Modeling.pdf}
+}
+
 @inproceedings{kazemiOneMillisecondFace2014,
   title = {One Millisecond Face Alignment with an Ensemble of Regression Trees},
   booktitle = {2014 {{IEEE Conference}} on {{Computer Vision}} and {{Pattern Recognition}}},
@@ -394,6 +436,24 @@ Publication Title: Lecture Notes in Computer Science}
   doi = {10.1109/ICASSP.2016.7472741},
   abstract = {This paper investigates single and cross-show diarization based on an unsupervised i-vector framework, on French TV and Radio corpora. This framework uses speaker clustering as a way to automatically select data from unlabeled corpora to train i-vector PLDA models. Performances between supervised and unsupervised models are compared. The experimental results on two distinct test corpora (one TV, one Radio) show that unsupervised models perform as good as supervised models for both tasks. Such results indicate that performing an effective cross-show diarization on new language or new domain data in the future should not depend on the availability of manually annotated data.},
   file = {C\:\\Users\\renan\\Zotero\\storage\\WDAI2TCA\\Le Lan et al. - 2016 - Speaker Diarization With Unsupervised Training Fra.pdf}
+}
+
+@incollection{liangFaceAlignmentComponentBased2008,
+  title = {Face {{Alignment Via Component}}-{{Based Discriminative Search}}},
+  booktitle = {Computer {{Vision}} \textendash{} {{ECCV}} 2008},
+  author = {Liang, Lin and Xiao, Rong and Wen, Fang and Sun, Jian},
+  editor = {Forsyth, David and Torr, Philip and Zisserman, Andrew},
+  year = {2008},
+  volume = {5303},
+  pages = {72--85},
+  publisher = {{Springer Berlin Heidelberg}},
+  address = {{Berlin, Heidelberg}},
+  doi = {10.1007/978-3-540-88688-4_6},
+  abstract = {In this paper, we propose a component-based discriminative approach for face alignment without requiring initialization1. Unlike many approaches which locally optimize in a small range, our approach searches the face shape in a large range at the component level by a discriminative search algorithm. Specifically, a set of direction classifiers guide the search of the configurations of facial components among multiple detected modes of facial components. The direction classifiers are learned using a large number of aligned local patches and misaligned local patches from the training data. The discriminative search is extremely effective and able to find very good alignment results only in a few (2{$\sim$}3) search iterations. As the new approach gives excellent alignment results on the commonly used datasets (e.g., AR [18], FERET [21]) created under-controlled conditions, we evaluate our approach on a more challenging dataset containing over 1,700 well-labeled facial images with a large range of variations in pose, lighting, expression, and background. The experimental results show the superiority of our approach on both accuracy and efficiency.},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\2L5R6TH7\\Liang et al. - 2008 - Face Alignment Via Component-Based Discriminative .pdf},
+  isbn = {978-3-540-88685-3 978-3-540-88688-4},
+  language = {en},
+  note = {Series Title: Lecture Notes in Computer Science}
 }
 
 @patent{mcconnellMethodApparatusPattern1986,
@@ -600,6 +660,22 @@ Publication Title: Lecture Notes in Computer Science}
   number = {9}
 }
 
+@inproceedings{xiangxinzhuFaceDetectionPose2012,
+  title = {Face Detection, Pose Estimation, and Landmark Localization in the Wild},
+  booktitle = {2012 {{IEEE Conference}} on {{Computer Vision}} and {{Pattern Recognition}}},
+  author = {{Xiangxin Zhu} and Ramanan, D.},
+  year = {2012},
+  month = jun,
+  pages = {2879--2886},
+  publisher = {{IEEE}},
+  address = {{Providence, RI}},
+  doi = {10.1109/CVPR.2012.6248014},
+  abstract = {We present a unified model for face detection, pose estimation, and landmark estimation in real-world, cluttered images. Our model is based on a mixtures of trees with a shared pool of parts; we model every facial landmark as a part and use global mixtures to capture topological changes due to viewpoint. We show that tree-structured models are surprisingly effective at capturing global elastic deformation, while being easy to optimize unlike dense graph structures. We present extensive results on standard face benchmarks, as well as a new ``in the wild'' annotated dataset, that suggests our system advances the state-of-theart, sometimes considerably, for all three tasks. Though our model is modestly trained with hundreds of faces, it compares favorably to commercial systems trained with billions of examples (such as Google Picasa and face.com).},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\YQPHERVB\\Xiangxin Zhu and Ramanan - 2012 - Face detection, pose estimation, and landmark loca.pdf},
+  isbn = {978-1-4673-1228-8 978-1-4673-1226-4 978-1-4673-1227-1},
+  language = {en}
+}
+
 @article{yudinObjectDetectionDeep2019,
   title = {Object {{Detection}} with {{Deep Neural Networks}} for {{Reinforcement Learning}} in the {{Task}} of {{Autonomous Vehicles Path Planning}} at the {{Intersection}}},
   author = {Yudin, D. A. and Skrynnik, A. and Krishtopik, A. and Belkin, I. and Panov, A. I.},
@@ -614,6 +690,28 @@ Publication Title: Lecture Notes in Computer Science}
   journal = {Optical Memory and Neural Networks},
   language = {en},
   number = {4}
+}
+
+@article{yuilleFeatureExtractionFaces1992,
+  title = {Feature Extraction from Faces Using Deformable Templates},
+  author = {Yuille, Alan L. and Hallinan, Peter W. and Cohen, David S.},
+  year = {1992},
+  month = aug,
+  volume = {8},
+  pages = {99--111},
+  publisher = {{Kluwer Academic Publishers}},
+  issn = {1573-1405},
+  doi = {10.1007/BF00127169},
+  abstract = {We propose a method for detecting and describing features of faces using deformable templates. The feature of interest, an eye for example, is described by a parameterized template. An energy function is defined which links edges, peaks, and valleys in the image intensity to corresponding properties of the template. The template then interacts dynamically with the image by altering its parameter values to minimize the energy function, thereby deforming itself to find the best fit. The final parametr values can be used as descriptors for the feature. We illustrate this method by showing deformable templates detecting eyes and mouths in real images. We demonstrate their ability for tracking features.},
+  copyright = {1992 Kluwer Academic Publishers},
+  file = {C\:\\Users\\renan\\Zotero\\storage\\ZC2Q32BN\\Yuille et al. - 1992 - Feature extraction from faces using deformable tem.pdf;C\:\\Users\\renan\\Zotero\\storage\\S7GJM99Y\\10.html},
+  journal = {International Journal of Computer Vision},
+  language = {en},
+  note = {Company: Springer
+Distributor: Springer
+Institution: Springer
+Label: Springer},
+  number = {2}
 }
 
 @article{zewoudieUseLongtermFeatures2018,

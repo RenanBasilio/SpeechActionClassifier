@@ -190,5 +190,23 @@ Os histogramas obtidos a partir dessa técnica são utilizados para treinamento 
 Para a detecção de objetos por meio desta técnica o processo de extração de descritores é repetido, produzindo um histograma para a imagem alvo como um todo.
 O classificador visita cada região do histograma em diferentes resoluções por meio de uma \textit{sliding window} piramidal \cite{dalalHistogramsOrientedGradients2005}, detectando as regiões desta que contém as mesmas características dos histogramas com os quais foi treinado.
 
-\subsection{Detecção de Marcadores Faciais}
+\subsection{Alinhamento Facial}
 \label{sec:faciallm}
+
+Alinhamento facial é uma técnica que vêm sendo bastante estudada nos últimos anos, com diversos métodos propostos para sua execução \cite{caoFaceAlignmentExplicit2014, liangFaceAlignmentComponentBased2008, dantoneRealtimeFacialFeature2012, xiangxinzhuFaceDetectionPose2012}.
+Originalmente introduzida em \cite{yuilleFeatureExtractionFaces1992} por Yuille et al, a técnica busca a identificação de pontos representantes do contorno geométrico de diversas características de rostos em imagens, tais como os olhos, lábios, nariz, e sobrancelhas.
+
+Neste trabalho discutiremos o método proposto por Kazemi e Sullivan \cite{kazemiOneMillisecondFace2014}, que consiste em ajustar iterativamente um conjunto de pontos iniciais obtidos a partir dos dados de treinamento.
+Esse ajuste é feito através da aplicação de uma cascata de florestas de árvores regressoras, treinadas utilizando a técnica de \textit{gradient boosting}, que operam sobre características da figura locais aos pontos da iteração anterior buscando a convergência.
+
+\begin{figure}[ht]
+    \centering
+    % TODO: Generate figure from dump.txt and Tom_Cruise_avp_2014_4.jpg
+    \caption{Estado do vetor de marcadores faciais em cada iteração do algoritmo de alinhamento facial.}
+    \label{fig:faciallm_iters}
+\end{figure}
+
+As árvores de regressão utilizam intensidade de pares de pixels na vizinhança dos pontos encontrados pela iteração anterior a fim de determinar a direção do gradiente na região e o comprimento do vetor de correção.
+Dessa forma, conseguem detectar em tempo real os pontos relevantes mesmo em imagens de baixa resolução.
+
+% TODO: Árvore de Regressores
