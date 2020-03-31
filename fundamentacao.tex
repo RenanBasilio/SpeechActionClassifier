@@ -13,7 +13,7 @@ O reconhecimento de ações é, nesse caso, utilizado para identificar a fala do
 
 \section{Fundamentação Teórica}
 
-Nesta seção discutiremos a fundamentação teórica das várias tecnologias utilizadas na execução do trabalho. Primeiramente, na seção \ref{sec:ann}, apresentaremos o conceito de redes neurais artificiais, utilizadas para construção do identificador de fala. Depois, na seção \ref{sec:facialrecog}, discutiremos a técnica de \textit{histograma de gradientes orientados}, utilizada pelo identificador frontal de rostos. Por fim, na seção \ref{sec:faciallm}, apresentaremos o conceito de floresta de regressão, utilizado para a detecção de marcadores faciais.
+Nesta seção discutiremos a fundamentação teórica das várias tecnologias utilizadas na execução do trabalho. Primeiramente, na seção \ref{sec:ann}, apresentaremos o conceito de redes neurais artificiais, utilizadas para construção do identificador de fala. Depois, na seção \ref{sec:facialrecog}, discutiremos a técnica de \textit{histograma de gradientes orientados}, utilizada pelo identificador de rostos frontais. Por fim, na seção \ref{sec:faciallm}, falaremos sobre a técnica de alinhamento facial, utilizada para a detecção dos marcadores faciais.
 
 \subsection{Redes Neurais Artificiais}
 \label{sec:ann}
@@ -21,8 +21,8 @@ Nesta seção discutiremos a fundamentação teórica das várias tecnologias ut
 Redes Neurais Artificiais são um conjunto de algoritmos inspirados pelo funcionamento do cérebro humano, introduzidos pela primeira vez em 1943 quando Warren McCulloch e Walter Pitts modelaram o funcionamento de neurônios através de circuitos elétricos simples\cite{mccullochLogicalCalculusIdeas1943}. 
 Esse modelo continuou evoluindo ao longo dos anos, culminando no desenvolvimento do \textit{Perceptron} por Rosenblatt em 1958 \cite{rosenblattPerceptronProbabilisticModel1958} (figura \ref{fig:perceptron}), um algoritmo de classificação binária semelhante a uma rede neural composta por um único neurônio.
 
-No entanto, devido à falta de capacidade computacional e ao grande volume de dados necessários para o treinamento de redes neurais, estes algoritmos permaneceram apenas um conceito acadêmico durante vários anos.
-Somente em 2006, Geoffrey Hinton proporia formalmente o conceito de rede neural profunda \cite{hintonFastLearningAlgorithm2006}, um tipo de rede neural composto por múltiplas camadas de neurônios totalmente conectadas.
+No entanto, devido à falta de capacidade computacional e ao grande volume de dados necessários para o treinamento das redes neurais, estes algoritmos permaneceram apenas um conceito acadêmico durante vários anos.
+Somente em 2006, Geoffrey Hinton proporia formalmente o conceito de rede neural profunda \cite{hintonFastLearningAlgorithm2006}, um tipo de rede neural composto por múltiplas camadas de neurônios densamente conectadas.
 
 \begin{figure}[ht]
     \centering
@@ -31,14 +31,14 @@ Somente em 2006, Geoffrey Hinton proporia formalmente o conceito de rede neural 
     \label{fig:dnn}
 \end{figure}
 
-Recentemente, com o desenvolvimento de algoritmos para o treinamento de redes neurais em GPU (do Inglês \textit{Graphics Processing Unit}), que possibilitaram o treinamento mais rápido e eficiente de redes neurais de múltiplas camadas, assim como o crescente volume de dados disponível para treinamento, o tópico de redes neurais vem rapidamente ganhando popularidade.
+Recentemente, com o desenvolvimento de algoritmos para o treinamento de redes neurais em GPU (do Inglês \textit{Graphics Processing Unit}) que possibilitaram o treinamento mais rápido e eficiente de redes neurais de múltiplas camadas, assim como o crescente volume de dados disponível para treinamento, o tópico de redes neurais vem rapidamente ganhando popularidade.
 Algoritmos desse tipo já são utilizados em diversas áreas da ciência, incluindo aplicações em medicina \cite{hannunCardiologistLevelArrhythmiaDetection2019,phamPredictingHealthcareTrajectories2017,houDeepSFDeepConvolutional2018}, previsão do tempo \cite{akramSequenceSequenceWeather2016}, veículos autônomos \cite{bojarskiEndEndLearning2016,peddagollaLaneDetectionAutonomous}, entre outras \cite{abiodunStateoftheartArtificialNeural2018}.
 
 Tratam-se de algoritmos próprios para problemas que envolvem o reconhecimento de padrões, e a capacidade de treina-los a partir de dados existentes os torna eficazes para aplicação em tópicos nos quais as relações entre os dados de entrada não sejam totalmente conhecidas.
 
 \subsubsection{Neurônios Artificiais}
 
-Biologicamente, quando o potencial elétrico na base do axônio de um neurônio chega a um valor pré-determinado, por meio do acúmulo de sinais de entrada recebidos pelos dendritos, um pulso elétrico é gerado e propagado até as sinapses, terminais nos quais o neurônio conecta com os demais.
+Biologicamente, quando o potencial elétrico na base do axônio de um neurônio atinge um limiar pré-determinado através do acúmulo de sinais de entrada recebidos pelos dendritos, um pulso elétrico é gerado e propagado até as sinapses, terminais nos quais o neurônio se conecta com os demais.
 Trata-se de um sinal binário; o neurônio pode ou não estar ativado a cada instante. No entanto, a frequência relativa das ativações pode conter informação \cite{behnkeHierarchicalNeuralNetworks2003}.
 
 \begin{figure}[H]
@@ -58,9 +58,9 @@ Elas recebem como entrada os valores resultantes das camadas anteriores, pondera
     \label{fig:perceptron}
 \end{figure}
 
-Geralmente, a função de ativação é constante e independente do processo de treinamento da rede neural; o ajuste é feito sobre os pesos das conexões, através algoritmo de retropropagação \cite{dreyfusArtificialNeuralNetworks1990}.
+Geralmente, a função de ativação é constante e independente do processo de treinamento da rede neural; o ajuste é feito sobre os pesos das conexões, através do algoritmo de retropropagação \cite{dreyfusArtificialNeuralNetworks1990}.
 O algoritmo é capaz de, a partir do resultado de uma camada, calcular o efeito de cada peso sobre o gradiente da função.
-Assim, ele possibilita a utilização de algoritmos tradicionais de otimização para encontrar os pesos locais de cada conexão, mesmo em redes com múltiplas camadas de centenas de neurônios, em função do efeito global destes.
+Assim, ele possibilita a utilização de algoritmos tradicionais de otimização para encontrar os pesos locais de cada conexão em função do efeito global destes, mesmo em redes com múltiplas camadas de centenas de neurônios.
 
 Comumente, são utilizadas como função de ativação as funções ReLU (\textit{Rectified Linear Unit}), tangente hiperbólica, sigmoide, e Heaviside, em função do intervalo de saída e comportamento desejado.
 
@@ -82,14 +82,14 @@ Além disso, o treinamento de redes neurais profundas que utilizam a função Re
 \label{sec:convnet}
 
 Redes Neurais Convolucionais são redes neurais compostas por uma ou mais camadas de convolução.
-São ideais para o tratamento de dados matriciais, como por exemplo imagens, que constituem em uma matriz bi-dimensional de pixels, ou vídeos, matrizes tridimensionais de imagens.
-Essas redes são capazes de identificar relações entre os elementos adjacentes de uma matriz, e, através da técnica de Max Pooling, focar somente nos pontos mais relevantes, mesmo em conjuntos de dados muito grandes.
+São ideais para o tratamento de dados matriciais, como por exemplo imagens, que constituem em uma matriz bi-dimensional de pixels, ou vídeos, matrizes tridimensionais compostas por múltiplas imagens dispostas segundo sua relação temporal.
+Essas redes são capazes de identificar relações entre os elementos vizinhos de uma matriz e, através da técnica de Max Pooling, focar somente nas regiões mais relevantes da entrada, reduzindo a complexidade do problema quando aplicadas a conjuntos de dados muito grandes.
 
 \paragraph{Convolução e Filtros}
 \label{sec:convolution}
 
 A convolução é uma técnica matemática que consiste na aplicação de uma matriz, denominada matriz de convolução ou \textit{filtro} quando utilizada no contexto de processamento de imagens, sobre cada elemento de uma outra matriz.
-Esse processo produz uma nova matriz na qual o valor de cada elemento corresponde ao seu valor e o valor de seus vizinhos, ponderados pelos valores da matriz de convolução, denominados \kernel\ da convolução.
+Esse processo produz uma nova matriz na qual o valor de cada elemento corresponde ao seu valor original combinado com o de seus vizinhos, e ponderados pelos valores da matriz de convolução (denominados \kernel\ da convolução).
 
 Para dados bi-dimensionais, a operação de convolução pode ser descrita da seguinte forma:
 
@@ -98,7 +98,7 @@ Para dados bi-dimensionais, a operação de convolução pode ser descrita da se
 \end{equation}
 
 Essa técnica é frequentemente utilizada em áreas que trabalham com imagens, como na área de veículos autônomos, onde é capaz de identificar as faixas pintadas sobre o asfalto \cite{peddagollaLaneDetectionAutonomous}, assim como outros veículos e pedestres na rua.
-Com a aplicação dessa, é possível remover características da imagem de entrada irrelevantes para o problema que se deseja resolver, como mostra a figura \ref{fig:conv}, diminuindo a complexidade do problema a cada camada.
+Através do uso dessa técnica, é possível remover características da imagem de entrada irrelevantes e enfatizar características mais relevantes para o problema que se deseja resolver, como mostra a figura \ref{fig:conv}.
 
 \begin{figure}[ht]
     \centering
@@ -116,8 +116,8 @@ O \kernel\ da matriz de convolução é treinado de forma a identificar os aspec
 \label{sec:pooling}
 
 Um outro tipo de camada tradicional nas redes neurais convolucionais é a camada de \textit{pooling}, ou ``agrupamento''.
-Esse tipo de camada tem como função reduzir o número e complexidade dos dados de entrada e promover uma melhor generalização dos dados espaciais.
-Isso é necessários pois as camadas convolucionais tendem a manter a localização espacial das características detectadas na matriz de entrada, informação que na maioria dos casos não é relevante para o problema que se deseja resolver.
+Esse tipo de camada tem como função reduzir o número e complexidade dos dados de entrada e promover uma melhor generalização espacial dos dados.
+Isso é necessários pois as camadas convolucionais tendem a manter a localização espacial das características detectadas na matriz de entrada, informação essa que na maioria dos casos não é relevante para o problema que se deseja resolver.
 
 A operação consiste em subdividir a matriz de entrada em conjuntos de valores e, segundo um critério especificado, escolher entre estes um único valor resultante.
 
@@ -128,7 +128,7 @@ A operação consiste em subdividir a matriz de entrada em conjuntos de valores 
     \label{fig:maxpool}
 \end{figure}
 
-No contexto de redes neurais convolucionais, no entanto, dado que os valores resultantes da camada convolucional teriam sido filtrados por uma função de ativação não-linear, como a ReLU (equação \ref{eq:relu}), temos que os valores obtidos correspondem à intensidade da ativação dos neurônios.
+No contexto de redes neurais convolucionais, no entanto, tendo em mente que os valores resultantes da camada convolucional teriam sido filtrados por uma função de ativação não-linear, como a ReLU (equação \ref{eq:relu}), temos que os valores obtidos correspondem à intensidade da ativação dos neurônios.
 Assim, devido ao fato de que valores maiores devem corresponder a características de maior importância na matriz de entrada, temos dois critérios mais usados para a operação:
 
 \begin{description}
@@ -137,22 +137,23 @@ Assim, devido ao fato de que valores maiores devem corresponder a característic
     \item \textit{\textbf{Average Pooling}}: Para cada grupo, calcula a média dos valores.
 \end{description}
 
-A escolha entre esses critérios é feita em função do propósito da camada anterior; se esta for, por exemplo, um detector de bordas em imagens, temos que a técnica de \textit{Max Pooling} será preferível, visto que as bordas serão sempre o maior valor do grupo, enquanto os demais elementos terão valor zero.
+A escolha entre esses critérios é feita em função do propósito da camada anterior; se esta for, por exemplo, um detector de bordas em imagens, temos que a técnica de \textit{Max Pooling} será preferível, visto que as bordas serão sempre os elementos de maior valor do grupo, enquanto os demais terão valor igual a zero.
 Já no caso de se tratar de um reconhecedor de variação temporal, a técnica de \textit{Average Pooling} pode ser preferível, já que será capaz de manter informações sobre o valor médio dos elementos no instante que está sendo comprimido.
 
 \subsection{Histograma de Gradientes Orientados}
 \label{sec:facialrecog}
 
 Histograma de Gradientes Orientados, ou HOG, do inglês \textit{Histogram of Oriented Gradients}, é uma técnica de visão computacional utilizada para detecção de objetos em imagens, introduzida pela primeira vez em 1982 por Robert McConnel \cite{mcconnellMethodApparatusPattern1986}, e formalizada em 1994 por Freeman e Roth \cite{freemanOrientationHistogramsHand}.
-Trata-se do treinamento de um histograma de blocos descritivos dos gradientes que se espera observar em cada um dos pontos que se deseja conhecer, e posterior comparação deste com os gradientes de áreas ou células da imagem de entrada.
+Trata-se do treinamento de um histograma de blocos descritivos dos gradientes que se espera observar em cada uma das regiões que se deseja reconhecer, e posterior comparação deste com os gradientes de áreas ou células da imagem de entrada.
 
 Neste trabalho utilizaremos a F-HOG\footnote{F-HOG é uma implementação de detector HOG proposta por Felzenszwalb em seu artigo \cite{felzenszwalbObjectDetectionDiscriminatively}. O identificador facial frontal da biblioteca Dlib (seção \ref{subsec:dlib}), utilizado neste trabalho, adota essa implementação.}, uma técnica de HOG que consiste na composição de histograma com 36 descritores por célula utilizado para o treinamento de um classificador SVM (\textit{Support Vector Machine}).
-Essa técnica consiste em, primeiramente, calcular os gradientes de cada ponto da imagem, normalizada quanto à cor através de sua conversão a escala de cinza, a partir da aplicação de um vetor de diferenciação $[-1, 0, +1]$ e seu transposto a cada pixel desta.
-Através desse processo é calculado um ângulo $\theta$ e intensidade $r$, representando o gradiente local de cada um dos pontos aos quais é aplicado.
+Essa técnica consiste em, primeiramente, calcular os gradientes de cada ponto da imagem, normalizada quanto à cor através de sua conversão a escala de cinza.
+Esse cálculo é feito a partir da aplicação de um vetor de diferenciação $[-1, 0, +1]$ e seu transposto a cada pixel da imagem.
+O processo calcula um ângulo $\theta$ e intensidade $r$ representativos do gradiente local em cada um dos pontos aos quais é aplicado.
 
-A magnitude de cada gradiente é, então, discretizada conforme a direção entre $p$ direções pré-definidas e adicionada às 4 células adjacentes do histograma, por meio de interpolação bilinear.
-A orientação final de cada bloco é, então, calculada a partir dos gradientes da região espacial que o integram, através da soma de suas componentes.
-Isso garante a invariância do reconhecedor a pequenas alterações nas bordas, além de diminuir o tamanho deste, já que em geral o valor resultante das células tenderá ao mesmo valor quando agrupadas.
+A magnitude de cada gradiente é, então, discretizada conforme a direção entre $p$ direções pré-definidas e adicionada às 4 células adjacentes do histograma, através de sua interpolação bilinear.
+A orientação final de cada bloco é então calculada a partir dos gradientes da região espacial que o compõem, por meio da soma de suas componentes.
+Isso garante a invariância do reconhecedor a pequenas alterações nas bordas, além de diminuir o tamanho deste, já que em geral o valor resultante das células tenderá a permanecer constante quando agrupadas.
 
 \begin{equation}\label{eq:hog_energy}
     \begin{split}
@@ -177,7 +178,8 @@ Isso garante a invariância do reconhecedor a pequenas alterações nas bordas, 
 
 É feita, então, a normalização dos blocos descritores.
 As componentes de cada célula são normalizadas em relação à energia de sua vizinhança (calculada através da equação \ref{eq:hog_energy}), e truncadas em um valor $\alpha=0.2$, conforme a equação \ref{eq:hog_norm}.
-Isso produz uma matriz $H(i,j)$, de dimensão $p\times4$, correspondente a cada célula do histograma.
+Isso produz uma matriz $H(i,j)$ de dimensão $p\times4$ correspondente a cada célula do histograma, na qual cada elemento representa a normalização da intensidade do gradiente em uma das direções pré-definidas segundo os 4 critérios discutidos.
+
 Os histogramas obtidos a partir dessa técnica são utilizados para treinamento de um classificador SVM.
 
 \begin{figure}[ht]
@@ -189,15 +191,13 @@ Os histogramas obtidos a partir dessa técnica são utilizados para treinamento 
 
 Para a detecção de objetos por meio desta técnica o processo de extração de descritores é repetido, produzindo um histograma para a imagem alvo como um todo.
 O classificador visita cada região do histograma em diferentes resoluções por meio de uma \textit{sliding window} piramidal \cite{dalalHistogramsOrientedGradients2005}, detectando as regiões desta que contém as mesmas características dos histogramas com os quais foi treinado.
+A implementação em forma de pirâmide da janela de reconhecimento permite que os objetos desejados sejam detectados de maneira independente de suas dimensões na imagem a partir de um único histograma treinado.
 
 \subsection{Alinhamento Facial}
 \label{sec:faciallm}
 
 Alinhamento facial é uma técnica que vêm sendo bastante estudada nos últimos anos, com diversos métodos propostos para sua execução \cite{caoFaceAlignmentExplicit2014, liangFaceAlignmentComponentBased2008, dantoneRealtimeFacialFeature2012, xiangxinzhuFaceDetectionPose2012}.
 Originalmente introduzida em \cite{yuilleFeatureExtractionFaces1992} por Yuille et al, a técnica busca a identificação de pontos representantes do contorno geométrico de diversas características de rostos em imagens, tais como os olhos, lábios, nariz, e sobrancelhas.
-
-Neste trabalho discutiremos o método proposto por Kazemi e Sullivan \cite{kazemiOneMillisecondFace2014}, que consiste em ajustar iterativamente um conjunto de pontos iniciais obtidos a partir dos dados de treinamento.
-Esse ajuste é feito através da aplicação de uma cascata de florestas de árvores regressoras, treinadas utilizando a técnica de \textit{gradient boosting}, que operam sobre características da figura locais aos pontos da iteração anterior buscando a convergência.
 
 \begin{figure}[ht]
     \centering
@@ -206,7 +206,25 @@ Esse ajuste é feito através da aplicação de uma cascata de florestas de árv
     \label{fig:faciallm_iters}
 \end{figure}
 
-As árvores de regressão utilizam intensidade de pares de pixels na vizinhança dos pontos encontrados pela iteração anterior a fim de determinar a direção do gradiente na região e o comprimento do vetor de correção.
-Dessa forma, conseguem detectar em tempo real os pontos relevantes mesmo em imagens de baixa resolução.
+Neste trabalho discutiremos o método proposto por Kazemi e Sullivan \cite{kazemiOneMillisecondFace2014}, que consiste em ajustar iterativamente um conjunto de pontos iniciais obtidos a partir dos dados de treinamento.
+Esse ajuste, modelado pela equação \ref{eq:regression}, é feito através da aplicação de uma cascata de florestas de árvores regressoras sobre a imagem de entrada, como mostra a figura \ref{fig:faciallm_iters}.
 
-% TODO: Árvore de Regressores
+\begin{equation}\label{eq:regression}
+    \hat{S}^{\left( t+1 \right)} = \hat{S}^{\left( t \right)} + r_t(I, \hat{S}^{\left( t \right)})
+\end{equation}
+
+Cada regressor consiste em uma árvore de decisão que, a partir da diferença de intensidade entre pares de pixels da imagem, é capaz de escolher um vetor de atualização a ser aplicado sobre o ponto resultante da iteração anterior.
+Esses vetores são pré-definidos e constantes, e são atribuídos às folhas da árvore.
+Nas primeiras iterações, estes são de maior magnitude, permitindo atualizações maiores nos pontos.
+Com cada iteração subsequente, são utilizados vetores de atualização menores, resultando em ajustes finos nos pontos.
+
+As árvores são treinadas utilizando da técnica de \textit{gradient boosting}.
+Os pixels a serem considerados como entrada de cada nível da cascata são escolhidos aleatoriamente durante o treinamento, com o único critério sendo a função exponencial de custo definida na equação \ref{eq:prior}.
+A aleatoriedade da seleção dessas características de entrada serve para tornar o algoritmo menos sensível a alterações na iluminação.
+
+\begin{equation}\label{eq:prior}
+    P(u,v) \propto e^{ -\lambda \left\Vert u-v \right\Vert }
+\end{equation}
+
+Essa implementação permite a localização de marcadores faciais em tempo real mesmo em imagens de baixa resolução, visto que estes não são propriamente identificados mas sim meramente posicionados sobre a imagem de entrada.
+A principal limitação deste algoritmo é que o mesmo só se aplica a imagens com composição semelhante às utilizadas durante o treinamento da cascata, devido à necessidade de escolha dos pontos a serem utilizados na decisão durante essa etapa.
