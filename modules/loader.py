@@ -10,7 +10,7 @@ from imutils import face_utils
 from math import floor, ceil
 from matplotlib.colors import LinearSegmentedColormap, DivergingNorm
 
-from utils import draw_facial_landmarks
+from modules.utils import draw_facial_landmarks
 
 # Get class names from classes.txt
 # data_dir = pathlib.Path("data/")

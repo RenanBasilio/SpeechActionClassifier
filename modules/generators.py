@@ -1,4 +1,4 @@
-from loader import load_video_as_ndarray, get_label
+from modules.loader import load_video_as_ndarray, get_label
 import numpy as np
 import tensorflow as tf
 

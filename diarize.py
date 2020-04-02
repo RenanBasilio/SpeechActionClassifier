@@ -4,7 +4,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from loader import compute_facial_landmarks
 from termcolor import cprint
 from imutils import face_utils
-from utils import draw_facial_landmarks, print_progress
+from modules.utils import print_progress
+from modules.filters import draw_dot, draw_face_chip, draw_facial_reco
 import numpy as np
 import cv2 as cv2
 import tensorflow as tf
@@ -21,35 +22,7 @@ classes=['Idle','Speak']
 face_predictor = None
 face_detector = None
 
-def draw_facial_reco(image, color):
-    global face_predictor
-    global face_detector
-
-    if face_predictor is None:
-        face_detector = dlib.get_frontal_face_detector()
-        face_predictor = dlib.shape_predictor("resources/shape_predictor_68_face_landmarks.dat")
-
-    faces = face_detector(image, 1)
-
-    for (i, face) in enumerate(faces):
-        #shape = face_predictor(image, face.rect)
-        shape = face_predictor(image, face)
-        shape_np = face_utils.shape_to_np(shape)
-
-        draw_facial_landmarks(image, shape_np, color=(0, 255, 0))
-
-    return image
-
-def draw_face_chip(image, color):
-    return compute_facial_landmarks(image)
-
-def draw_dot(image, color):
-    cx, cy = math.floor(image.shape[1] * 0.95), math.floor(image.shape[1] * 0.05)
-    rad = math.floor(image.shape[0] * 0.025)
-    y, x = np.ogrid[-rad:rad, -rad:rad]
-    image[cy-rad:cy+rad, cx-rad:cx+rad][x**2 + y**2 <= rad**2] = color
-    return image
-
+# Diarizes the input of file at 'path', producing an output video at 'out_path' with filters applied.
 def diarize(path, out_path, model_path, filters=[draw_dot]):
     model = tf.keras.models.load_model(model_path)
 
@@ -137,6 +110,9 @@ def diarize(path, out_path, model_path, filters=[draw_dot]):
 
     print("\r"+(" "*(os.get_terminal_size().columns-1)), end='\r')
     print("Done.", end='')
+
+def diarize2():
+    pass
 
 if __name__ == '__main__':
     if len(sys.argv) > 2:

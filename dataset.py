@@ -2,8 +2,8 @@ from math import floor, ceil
 from datetime import date, datetime
 from pathlib import Path
 from termcolor import cprint, colored
-from loader import load_video_as_ndarray
-from utils import print_progress, write_tee
+from modules.loader import load_video_as_ndarray
+from modules.utils import print_progress, write_tee
 import dlib
 import cv2 as cv2
 import shutil
@@ -289,7 +289,7 @@ def update_changelog(data_dir):
         return True
 
 def print_usage():
-    print("Script for dataset preprocessing.\n")
+    print("Script for dataset management.")
     print("Usage: ")
     print("   preprocess_dataset.py <command> <dataset_directory> [<options>]")
     print("")
@@ -301,7 +301,7 @@ def print_usage():
     print("   clean      Removes all folders created by sort from the output directory")
     print("")
     print("Options:")
-    print("   --force-revalidate  Forces validation to run again for files already validated")
+    print("   -f, --force-revalidate  Forces validation to run again for files already validated")
 
 if __name__ == '__main__':
     if len(sys.argv) > 2:
@@ -336,7 +336,7 @@ if __name__ == '__main__':
                 cprint("Packaging dataset without adding a changelog message.", 'red')
 
             print("Validating new files...")
-            validate(data_dir, verbose=False)
+            validate(data_dir, revalidate=(any(opt in sys.argv for opt in [ "-f", "--force-revalidate"])), verbose=False)
 
             print("Updating dataset information...")
             update_info(data_dir, verbose=False)
@@ -358,10 +358,7 @@ if __name__ == '__main__':
             update_changelog(data_dir)
 
         elif sys.argv[1] == "validate":
-            if "--force-revalidate" in sys.argv:
-                validate(data_dir, revalidate=True)
-            else:
-                validate(data_dir)
+            validate(data_dir, revalidate=(any(opt in sys.argv for opt in [ "-f", "--force-revalidate"])))
         
         elif sys.argv[1] == "clean":
             splits = get_splits(splits_file)
