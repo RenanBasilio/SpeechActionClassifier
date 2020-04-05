@@ -1,7 +1,7 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
-from loader import compute_facial_landmarks
+from modules.loader import compute_facial_landmarks
 from termcolor import cprint
 from imutils import face_utils
 from modules.utils import print_progress
@@ -44,7 +44,6 @@ def diarize(path, out_path, model_path, filters=[draw_dot]):
         prediction_window = []
         c = 0
         print_progress(curr, length)
-        print(" {0:.1f}%                            ".format((curr / (length - 1)) * 100) ,end='')
 
         while c < 15:
             ret, frame = capture.read()

@@ -1,11 +1,14 @@
 import cv2 as cv2
+import os
 from termcolor import colored
 from math import floor
 
 def print_progress(curr, total):
     bars = floor((curr/total)*20)*'■'
     dashes = colored((20 - floor((curr/total)*20))*'-', 'grey')
-    print("\r[{}{}]".format(bars, dashes), end="")
+    progress = "[{}{}] {:.1f}%".format(bars, dashes, (curr / (total - 1)) * 100)
+    blanks = " " * ( os.get_terminal_size().columns - len(progress) - 1 )
+    print("{}{}\r".format(progress, blanks), end="")
 
 
 def write_tee(file, message, verbose=True):

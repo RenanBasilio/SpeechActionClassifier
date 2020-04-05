@@ -266,7 +266,6 @@ def package_dataset(out_file, data_dir):
     for idx, name in enumerate(files):
         tar.add(Path(name), arcname=Path(name).relative_to(data_dir))
         print_progress(idx, len(files) - 1)
-        print(" {0:.1f}%                            ".format((idx / (len(files) - 1)) * 100) ,end='')
     
     tar.close()
 
