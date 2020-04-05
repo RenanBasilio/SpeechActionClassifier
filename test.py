@@ -18,4 +18,4 @@ if __name__ == "__main__":
         for item in segments:
             f.write("%s\n" % item)
 
-    print("--- Took %s ---" % time.strftime("%-H hrs %-M min %-S sec", datetime.timedelta(seconds=(time.time() - start_time))))
+    print("--- Took {} s ---".format(time.time() - start_time))

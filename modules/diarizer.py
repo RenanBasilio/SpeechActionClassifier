@@ -68,6 +68,7 @@ class Diarizer():
                     else:
                         # If a frame failed to load or preprocess, commit the ones before it if possible
                         segments = self.__commit_results(segments, predictions)
+                        segments.append(-1)
                         predictions.clear()
                         window.clear()
                 else:
