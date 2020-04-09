@@ -3,12 +3,11 @@ import os
 from termcolor import colored
 from math import floor
 
-def print_progress(curr, total):
+def print_progress(curr, total, end="\r"):
     bars = floor((curr/total)*20)*'■'
     dashes = colored((20 - floor((curr/total)*20))*'-', 'grey')
     progress = "[{}{}] {:.1f}%".format(bars, dashes, (curr / (total - 1)) * 100)
-    blanks = " " * ( os.get_terminal_size().columns - len(progress) - 1 )
-    print("{}{}\r".format(progress, blanks), end="")
+    print(progress, end=end)
 
 
 def write_tee(file, message, verbose=True):

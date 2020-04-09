@@ -74,8 +74,9 @@ def compute_facial_landmarks(image):
 
     faces = face_detector(image, 1)
     blank_image = np.full(image.shape, 255, np.uint8)
-    face_chip = np.full((150, 150, 3), 255, np.uint8)
+    face_chip = None
     for (i, face) in enumerate(faces):
+        face_chip = np.full((150, 150, 3), 255, np.uint8)
         #shape = face_predictor(image, face.rect)
         shape = face_predictor(image, face)
         shape_np = face_utils.shape_to_np(shape)
@@ -86,8 +87,8 @@ def compute_facial_landmarks(image):
         draw_facial_landmarks(blank_image, shape_np)
 
         face_chip = dlib.get_face_chip(blank_image, shape, 150, 0.33)
-
-    face_chip = cv2.cvtColor(face_chip, cv2.COLOR_RGB2GRAY)
+        face_chip = cv2.cvtColor(face_chip, cv2.COLOR_RGB2GRAY)
+        
     return face_chip
 
 # Código adaptado a partir de em https://github.com/ferreirafabio/video2tfrecord

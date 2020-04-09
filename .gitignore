@@ -12,5 +12,6 @@ data/
 
 # generated files
 export/
+models/
 log.txt
 *.tar.gz

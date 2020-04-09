@@ -78,14 +78,12 @@ def sort_dataset(splits, classes, unsorted_dir, out_dir):
             # For each row of the manual classification file
             for index, row in enumerate(data.itertuples()):
                 infile = seg_dir / "{:06d}.mp4".format(row.id)
-                outfile = out_dir / row.tag / "{:06d}.mp4".format(row.id)
 
-                print_progress(count, total)
+                print_progress(count, total, end="")
 
                 # If second row contains an error type, skip
                 if pd.notnull(row.notes) and any([x in row.notes for x in errors]):
-                    print("", end="\r")
-                    cprint(" Skipped ({:06d}, {}, {})             ".format(row.id, row.tag, row.notes, row.validated), 'red', end="", flush=True)
+                    cprint(" Skipped ({:06d}, {}, {})             ".format(row.id, row.tag, row.notes, row.validated), 'red', end="\r", flush=True)
                     log_file.write("Skipped copying file {} with entry ({:06d}, {}, {}). Reason: Matched a known error subclass.\n".format(infile, row.id, row.tag, row.notes))
                     skipped += 1
 
@@ -104,20 +102,21 @@ def sort_dataset(splits, classes, unsorted_dir, out_dir):
 
                 # If validation failed, skip
                 elif pd.isnull(row.validated) or row.validated == False:
-                    print("", end="\r")
-                    cprint(" Skipped ({:06d}, {}, {})             ".format(row.id, row.tag, row.notes, row.validated), 'red', end="", flush=True)
+                    cprint(" Skipped ({:06d}, {}, {})             ".format(row.id, row.tag, row.notes, row.validated), 'red', end="\r", flush=True)
                     log_file.write("Skipped copying file {} with entry ({:06d}, {}, {}). Reason: Validation failure.\n".format(infile, row.id, row.tag, row.notes))
                     skipped += 1
 
                 # If second row is not null, show a message but copy anyways
                 elif pd.notnull(row.notes):
-                    cprint(" Copying ({:06d}, {}, {})             ".format(row.id, row.tag, row.notes, row.validated), 'yellow', end="", flush=True)
+                    cprint(" Copying ({:06d}, {}, {})             ".format(row.id, row.tag, row.notes, row.validated), 'yellow', end="\r", flush=True)
+                    outfile = out_dir / row.tag / "{:06d}.mp4".format(row.id)
                     shutil.copy(str(infile), str(outfile))
                     copied += 1
 
                 # If first row is a valid class name, copy file to output directory
                 elif row.tag in classes:
-                    print(" Copying ({:06d}, {})...               ".format(row.id, row.tag), end="", flush=True)
+                    print(" Copying ({:06d}, {})...               ".format(row.id, row.tag), end="\r", flush=True)
+                    outfile = out_dir / row.tag / "{:06d}.mp4".format(row.id)
                     shutil.copy(str(infile), str(outfile))
                     copied += 1
 

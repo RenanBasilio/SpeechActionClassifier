@@ -8,21 +8,33 @@ gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 
+# This commit strategy takes the sum of the elements for each column in the input array
+# and chooses the column with the highest total, or -1 if both are equal.
 def strat_sum(array):
-    sum_v = np.sum(array, axis=0)
-    if sum_v[0][0] == sum_v[0][1]:
-        return -1
-    else:
-        return np.argmax(sum_v[0])
+    if len(array) > 0:
+        sum_v = np.sum(array, axis=0)
+        if sum_v[0][0] == sum_v[0][1]:
+            return -1
+        else:
+            return np.argmax(sum_v[0])
 
-def strat_maxc(array):
-    argc = np.zeros(len(array[0][0]))
-    for e in array:
-        argc[np.argmax(e)] += 1
-    if argc[0] == argc[1]:
-        return -1
-    else:
-        return np.argmax(argc)
+# This commit strategy takes the frequency with which each class in the input array would
+# be selected and chooses the most frequent class, or -1 if both are equal.
+def strat_freq(array):
+    if len(array) > 0:
+        argc = np.zeros(len(array[0][0]))
+        for e in array:
+            argc[np.argmax(e)] += 1
+        if argc[0] == argc[1]:
+            return -1
+        else:
+            return np.argmax(argc)
+
+# This commit strategy takes the frequency with which each class in the input array would
+# be selected, weighted using a gaussian distribution, and chooses the most frequent class, 
+# or -1 if both are equal.
+def strat_gaussf(array):
+    pass
 
 class Diarizer():
     def __init__(self, model, commit_strategy="sum", shift=1):
@@ -31,12 +43,14 @@ class Diarizer():
 
         if commit_strategy is "sum":
             self.__commit_strategy = strat_sum
-        elif commit_strategy is "maxc":
-            self.__commit_strategy = strat_maxc
+        elif commit_strategy is "freq":
+            self.__commit_strategy = strat_freq
+        elif commit_strategy is "gaussf":
+            self.__commit_strategy = strat_gaussf
         elif callable(commit_strategy):
             self.__commit_strategy = commit_strategy
         else:
-            raise TypeError("commit_strategy can only be either a string in ['sum', 'maxc'] or a callable method.")
+            raise TypeError("commit_strategy can only be either a string in ['sum', 'freq', 'gaussf'] or a callable method taking a numpy 2d array and returning the integer index of the class.")
 
     def diarize(self, video, progress_callback=None):
         capture = cv2.VideoCapture(video)
@@ -100,12 +114,11 @@ class Diarizer():
         return transcription
 
     def __preprocess_frame(self, frame):
-        try:
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame = np.asarray(frame)
-            frame = compute_facial_landmarks(frame)
+        #frame = cv2.resize(frame, (320, 240))
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame = np.asarray(frame)
+        frame = compute_facial_landmarks(frame)
+        if frame is not None:
             frame = np.expand_dims(frame, axis=2)
-            return frame
-        except:
-            return None
+        return frame
             

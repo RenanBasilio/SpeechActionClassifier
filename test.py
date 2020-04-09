@@ -8,7 +8,7 @@ import sys
 import time
 import datetime
 
-diarizer = Diarizer(pathlib.Path("export/model_2020-2-19-2230.h5").absolute(), commit_strategy="maxc", shift=1)
+diarizer = Diarizer(pathlib.Path("models/2020-04-05-1754_model.h5").absolute(), commit_strategy="sum", shift=1)
 
 if __name__ == "__main__":
     start_time = time.time()
@@ -18,4 +18,4 @@ if __name__ == "__main__":
         for item in segments:
             f.write("%s\n" % item)
 
-    print("--- Took {} s ---".format(time.time() - start_time))
+    print("--- Took {} s ---            ".format(time.time() - start_time))
