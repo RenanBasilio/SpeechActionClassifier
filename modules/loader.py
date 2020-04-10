@@ -119,12 +119,12 @@ def compute_dense_optical_flow(prev_image, current_image):
     return of
 
 # Loads the video file in the provided path as an array of frames
-def load_video_as_ndarray(path, color_mode='rgb', optical_flow=False, warnings=True, enable_cache=True):
+def load_video_as_ndarray(path, color_mode='rgb', mirror=False, optical_flow=False, warnings=True, enable_cache=True):
     path = pathlib.Path(path)
 
     cache_file_path = None
     if enable_cache:
-        cache_file_path = cache_dir / color_mode / str(optical_flow) / path.with_suffix('.npy')
+        cache_file_path = cache_dir / color_mode  / str(optical_flow) / path.with_name(path.stem + ( "m" if mirror else "" )).with_suffix(".npy")
         if cache_file_path.is_file():
             return np.load(cache_file_path)
 
@@ -159,6 +159,9 @@ def load_video_as_ndarray(path, color_mode='rgb', optical_flow=False, warnings=T
 
                 if optical_flow:
                     frame = np.concatenate((frame, np.expand_dims(flow, axis=2)), axis=2)
+
+                if mirror:
+                    frame = np.fliplr(frame)
 
                 frames.append(frame)
             else:
