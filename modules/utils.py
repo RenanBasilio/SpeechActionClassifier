@@ -26,3 +26,8 @@ def draw_facial_landmarks(canvas, shape, color=(0,0,0)):
     cv2.polylines(canvas, [shape[48:59]], True, color, 0, cv2.LINE_8) # Mouth Outer
     cv2.polylines(canvas, [shape[60:67]], True, color, 0, cv2.LINE_8) # Mouth Inner
     return canvas
+
+class Entry(object):
+    def __init__(self, filename, classname):
+        self.filename = filename
+        self.classname = classname

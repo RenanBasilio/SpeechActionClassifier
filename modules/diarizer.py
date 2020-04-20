@@ -8,6 +8,10 @@ gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 
+gauss_weights = np.array([
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+])
+
 # This commit strategy takes the sum of the elements for each column in the input array
 # and chooses the column with the highest total, or -1 if both are equal.
 def strat_sum(array):

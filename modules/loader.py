@@ -1,16 +1,22 @@
+import pathlib
+import hashlib
+import pickle
+from collections import namedtuple
+
+import dlib
 import cv2 as cv2
 import numpy as np
-import pathlib
-import dlib
 import matplotlib.pyplot as plt
-from enum import Enum
+import pandas as pd
 
 from termcolor import cprint
 from imutils import face_utils
 from math import floor, ceil
 from matplotlib.colors import LinearSegmentedColormap, DivergingNorm
 
-from modules.utils import draw_facial_landmarks
+from modules.utils import draw_facial_landmarks, Entry
+
+errors = ['Partial', '!! BAD', 'Inaudible', 'Maybe']
 
 # Get class names from classes.txt
 # data_dir = pathlib.Path("data/")
@@ -32,6 +38,49 @@ def get_classes(path):
     with open(path) as classes_file:
         class_names = classes_file.read().splitlines()
     return class_names
+
+def get_splits(splits_file):
+    splits = {}
+    with open(splits_file) as splits_file:
+        for line in splits_file.read().splitlines():
+            name, members = line.split(maxsplit=1)
+            members = members.split(" ")
+            splits[name] = members
+    return splits
+
+def get_files_list(path):
+    path = pathlib.Path(path).resolve()
+    
+    splits_file = path / "splits.txt"
+    if not splits_file.exists():
+        raise FileNotFoundError("No splits.txt in dataset root.")
+    classes_file = path / "classes.txt"
+    if not classes_file.exists():
+        raise FileNotFoundError("No classes.txt in dataset root.")
+
+    splits = get_splits(splits_file)
+    classes = get_classes(classes_file)
+
+    files = {}
+
+    for split in splits.keys():
+        files[split] = []
+        for fileset in splits[split]:
+            data_path = path / "unsorted" / fileset
+            manual_classes = data_path / "_classes.csv"
+            segments_path = data_path / "segments"
+
+            classes_ds = pd.read_csv(manual_classes, dtype={'id': np.int32})
+
+            for index, row in enumerate(classes_ds.itertuples()):
+                if row.tag in classes \
+                    and (pd.isnull(row.notes) or (not any([x in row.notes for x in errors]) and not "Speaker Change" in row.notes)) \
+                    and (pd.notnull(row.validated) and row.validated):
+                    file_path = segments_path / "{:06d}.mp4".format(row.id)
+                    if file_path.exists():
+                        files[split].append(Entry(file_path, row.tag))
+
+    return files
 
 # Gets the label of a file from the path
 def get_label(path):
@@ -119,14 +168,30 @@ def compute_dense_optical_flow(prev_image, current_image):
     return of
 
 # Loads the video file in the provided path as an array of frames
+loader_version = 1
 def load_video_as_ndarray(path, color_mode='rgb', mirror=False, optical_flow=False, warnings=True, enable_cache=True):
     path = pathlib.Path(path)
 
     cache_file_path = None
+    overwrite = True
     if enable_cache:
-        cache_file_path = cache_dir / color_mode  / str(optical_flow) / path.with_name(path.stem + ( "m" if mirror else "" )).with_suffix(".npy")
+        cache_file_name = hashlib.sha1((str(path) + color_mode + ("opticalflow" if optical_flow else "") + ("mirror" if mirror else "")).encode()).hexdigest()
+        cache_file_path = (cache_dir / cache_file_name).with_suffix(".cache")
         if cache_file_path.is_file():
-            return np.load(cache_file_path)
+            with open(cache_file_path, mode='rb') as cache_file:
+                file_data = pickle.load(cache_file)
+                try:
+                    if file_data['version'] != loader_version:
+                        raise AssertionError("VersionMismatch")
+                    path_t = str(path.absolute())
+                    if file_data['filename'] == str(path.absolute()):
+                        return file_data['data']
+                    else:
+                        cprint("WARNING: Filename specified in cached data does not match current filename. Perhaps a hash collision occurred?", 'yellow')
+                        overwrite = False
+                except AssertionError:
+                    cprint("WARNING: Cached version not created by this API version. Regenerating cache...")
+                    
 
     if path.is_file():
         #print("Loading file {}...".format(path))
@@ -134,11 +199,11 @@ def load_video_as_ndarray(path, color_mode='rgb', mirror=False, optical_flow=Fal
         n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
         if n_frames > 15 and warnings != False:
-            cprint("\nWARNING: Video file {} contains more than 15 frames (was: {}). Extra frames will be ignored.".format(path, n_frames), 'yellow')
+            cprint("WARNING: Video file {} contains more than 15 frames (was: {}). Extra frames will be ignored.".format(path, n_frames), 'yellow')
             if warnings is 'except':
                 raise Exception("Invalid video data.") 
         elif n_frames < 15 and warnings:
-            cprint("\nWARNING: Video file {} contains less than 15 frames (was: {}). Last frame will be duplicated.".format(path, n_frames), 'yellow')
+            cprint("WARNING: Video file {} contains less than 15 frames (was: {}). Last frame will be duplicated.".format(path, n_frames), 'yellow')
             if warnings is 'except':
                 raise Exception("Invalid video data.") 
 
@@ -168,9 +233,15 @@ def load_video_as_ndarray(path, color_mode='rgb', mirror=False, optical_flow=Fal
                 frames.append(frames[i-1])
 
         frames = np.asarray(frames)
-        if enable_cache:
+        if enable_cache and overwrite:
             cache_file_path.parent.mkdir(parents=True, exist_ok=True)
-            np.save(cache_file_path, frames)
+            file_data = {
+                "filename": str(path.absolute()),
+                "version": loader_version,
+                "data" : frames
+            }
+            with open(cache_file_path, mode='wb') as cache_file:
+                pickle.dump(file_data, cache_file)
 
         return frames
     else:

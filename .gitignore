@@ -11,6 +11,7 @@ Pipfile.lock
 data/
 
 # generated files
+__datacache__/
 export/
 models/
 log.txt
