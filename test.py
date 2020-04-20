@@ -14,7 +14,7 @@ if __name__ == "__main__":
     start_time = time.time()
 
     segments = diarizer.diarize(sys.argv[1], progress_callback=print_progress)
-    with open('export/output.txt', 'w') as f:
+    with open(sys.argv[1] + '.diar', 'w') as f:
         for item in segments:
             f.write("%s\n" % item)
 

@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
         try:
             cmd = [ 'ffmpeg', '-i', tempfile, '-i', sys.argv[1], '-y', '-hide_banner', '-loglevel', 'error', '-nostats', 
-                    '-map', '0:0', '-map', '1:1', '-c:v', 'copy', '-c:a', 'copy', '-shortest', sys.argv[3] ]
+                    '-map', '0:0', '-map', '1:1?', '-c:v', 'copy', '-c:a', 'copy', '-shortest', sys.argv[3] ]
             returned_output = subprocess.call(cmd)
             os.remove(tempfile)
         except:
