@@ -205,7 +205,7 @@ def validate_face(file):
         #face_detector = dlib.cnn_face_detection_model_v1("resources/mmod_human_face_detector.dat")
 
     try:
-        video = load_video_as_ndarray(file, color_mode='raw', optical_flow=False, enable_cache=False, warnings='except')
+        video = load_video_as_ndarray(file, color_mode='raw', optical_flow=False, warnings='except')
 
         for frame in video:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)

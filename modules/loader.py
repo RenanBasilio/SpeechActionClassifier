@@ -1,7 +1,4 @@
 import pathlib
-import hashlib
-import pickle
-from collections import namedtuple
 
 import dlib
 import cv2 as cv2
@@ -20,8 +17,6 @@ errors = ['Partial', '!! BAD', 'Inaudible', 'Maybe']
 
 # Get class names from classes.txt
 # data_dir = pathlib.Path("data/")
-cache_dir = pathlib.Path("__datacache__/")
-cache_dir.mkdir(parents=True, exist_ok=True)
 
 face_detector = None
 face_predictor = None
@@ -168,30 +163,8 @@ def compute_dense_optical_flow(prev_image, current_image):
     return of
 
 # Loads the video file in the provided path as an array of frames
-loader_version = 1
-def load_video_as_ndarray(path, color_mode='rgb', mirror=False, optical_flow=False, warnings=True, enable_cache=True):
+def load_video_as_ndarray(path, color_mode='rgb', mirror=True, optical_flow=False, warnings=True):
     path = pathlib.Path(path)
-
-    cache_file_path = None
-    overwrite = True
-    if enable_cache:
-        cache_file_name = hashlib.sha1((str(path) + color_mode + ("opticalflow" if optical_flow else "") + ("mirror" if mirror else "")).encode()).hexdigest()
-        cache_file_path = (cache_dir / cache_file_name).with_suffix(".cache")
-        if cache_file_path.is_file():
-            with open(cache_file_path, mode='rb') as cache_file:
-                file_data = pickle.load(cache_file)
-                try:
-                    if file_data['version'] != loader_version:
-                        raise AssertionError("VersionMismatch")
-                    path_t = str(path.absolute())
-                    if file_data['filename'] == str(path.absolute()):
-                        return file_data['data']
-                    else:
-                        cprint("WARNING: Filename specified in cached data does not match current filename. Perhaps a hash collision occurred?", 'yellow')
-                        overwrite = False
-                except AssertionError:
-                    cprint("WARNING: Cached version not created by this API version. Regenerating cache...")
-                    
 
     if path.is_file():
         #print("Loading file {}...".format(path))
@@ -233,15 +206,6 @@ def load_video_as_ndarray(path, color_mode='rgb', mirror=False, optical_flow=Fal
                 frames.append(frames[i-1])
 
         frames = np.asarray(frames)
-        if enable_cache and overwrite:
-            cache_file_path.parent.mkdir(parents=True, exist_ok=True)
-            file_data = {
-                "filename": str(path.absolute()),
-                "version": loader_version,
-                "data" : frames
-            }
-            with open(cache_file_path, mode='wb') as cache_file:
-                pickle.dump(file_data, cache_file)
 
         return frames
     else:
