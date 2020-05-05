@@ -1,11 +1,13 @@
-from modules.loader import load_video_as_ndarray
 import numpy as np
 import multiprocessing
 import pathlib
 import hashlib
 import pickle
+
 from termcolor import cprint
 from tensorflow.keras.utils import Sequence, to_categorical
+
+from modules.loader import load_video_as_ndarray
 
 cache_dir = pathlib.Path("__datacache__/")
 cache_dir.mkdir(parents=True, exist_ok=True)
@@ -15,7 +17,7 @@ cache_dir.mkdir(parents=True, exist_ok=True)
 # Código adaptado a partir de https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly (https://github.com/afshinea/keras-data-generator)
 class VideoDataGenerator(Sequence):
     def __init__(self, list_Entries, max_processes=6, batch_size=4, color_mode='rgb', optical_flow=False, classes=[], shuffle=True, enable_cache=True):
-        self.version = 2
+        self.version = 3
         self.batch_size = batch_size
         self.entries = []
         for i in list_Entries:
@@ -31,7 +33,10 @@ class VideoDataGenerator(Sequence):
         self.n_classes = len(classes)
         self.shuffle = shuffle
         self.enable_cache = enable_cache
-        self.procpool = multiprocessing.Pool(processes=max_processes)
+        self.procpool = None
+        if max_processes > 1:
+            cprint("Create Pool", color="blue")
+            self.procpool = multiprocessing.Pool(processes=max_processes)
         self.on_epoch_end()
 
     def on_epoch_end(self):
@@ -57,10 +62,20 @@ class VideoDataGenerator(Sequence):
 
             y[i] = self.classes.index(entry[0].classname)
 
-        results = self.procpool.starmap(load_video_as_ndarray, jobs[1])
-        
+        results=[]
+        if self.procpool is not None:
+            try:
+                results = self.procpool.starmap_async(load_video_as_ndarray, jobs[1]).get(0xFFFF)
+            except:
+                raise
+        else:
+            for j in jobs[1]:
+                results.append(load_video_as_ndarray(j[0], j[1], j[2], j[3], j[4]))
+
         j = 0
         for i in jobs[0]:
+            if results[j] is None:
+                raise Exception
             X[i,] = results[j]
             if self.enable_cache:
                 self.__write_cache(self.__make_cache_path(entries_temp[i][0].filename.absolute(), entries_temp[i][1]), str(entries_temp[i][0].filename.absolute()), results[j])

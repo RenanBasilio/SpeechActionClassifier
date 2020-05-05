@@ -11,7 +11,7 @@ from imutils import face_utils
 from math import floor, ceil
 from matplotlib.colors import LinearSegmentedColormap, DivergingNorm
 
-from modules.utils import draw_facial_landmarks, Entry
+from modules.utils import draw_facial_landmarks
 
 errors = ['Partial', '!! BAD', 'Inaudible', 'Maybe']
 
@@ -27,6 +27,11 @@ color_array[128:256,-1] = np.linspace(0.0,1.0,128)
 
 map_object = LinearSegmentedColormap.from_list(name='seismic_alpha',colors=color_array)
 plt.register_cmap(cmap=map_object)
+
+class Entry(object):
+    def __init__(self, filename, classname):
+        self.filename = filename
+        self.classname = classname
 
 def get_classes(path):
     class_names = []
@@ -164,74 +169,53 @@ def compute_dense_optical_flow(prev_image, current_image):
 
 # Loads the video file in the provided path as an array of frames
 def load_video_as_ndarray(path, color_mode='rgb', mirror=True, optical_flow=False, warnings=True):
-    path = pathlib.Path(path)
+    try:
+        path = pathlib.Path(path)
 
-    if path.is_file():
-        #print("Loading file {}...".format(path))
-        cap = cv2.VideoCapture(str(path.absolute()))
-        n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        if path.is_file():
+            #print("Loading file {}...".format(path))
+            cap = cv2.VideoCapture(str(path.absolute()))
+            n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-        if n_frames > 15 and warnings != False:
-            cprint("WARNING: Video file {} contains more than 15 frames (was: {}). Extra frames will be ignored.".format(path, n_frames), 'yellow')
-            if warnings is 'except':
-                raise Exception("Invalid video data.") 
-        elif n_frames < 15 and warnings:
-            cprint("WARNING: Video file {} contains less than 15 frames (was: {}). Last frame will be duplicated.".format(path, n_frames), 'yellow')
-            if warnings is 'except':
-                raise Exception("Invalid video data.") 
+            if n_frames > 15 and warnings != False:
+                cprint("WARNING: Video file {} contains more than 15 frames (was: {}). Extra frames will be ignored.".format(path, n_frames), 'yellow')
+                if warnings is 'except':
+                    raise Exception("Invalid video data.") 
+            elif n_frames < 15 and warnings:
+                cprint("WARNING: Video file {} contains less than 15 frames (was: {}). Last frame will be duplicated.".format(path, n_frames), 'yellow')
+                if warnings is 'except':
+                    raise Exception("Invalid video data.") 
 
-        frames = []
-        last_frame = None
-        for i in range(15):
-            frame = load_frame_as_ndarray(cap, color_mode)
-            if frame is not None:
-                if optical_flow:
-                    if last_frame is not None:
-                        flow = compute_dense_optical_flow(last_frame, frame)
-                    else:
-                        flow = np.zeros((frame.shape[0], frame.shape[1]), dtype=np.float32)
-                    last_frame = frame
+            frames = []
+            last_frame = None
+            for i in range(15):
+                frame = load_frame_as_ndarray(cap, color_mode)
+                if frame is not None:
+                    if optical_flow:
+                        if last_frame is not None:
+                            flow = compute_dense_optical_flow(last_frame, frame)
+                        else:
+                            flow = np.zeros((frame.shape[0], frame.shape[1]), dtype=np.float32)
+                        last_frame = frame
 
-                if len(frame.shape) < 3:
-                    frame = np.expand_dims(frame, axis=2)
+                    if len(frame.shape) < 3:
+                        frame = np.expand_dims(frame, axis=2)
 
-                if optical_flow:
-                    frame = np.concatenate((frame, np.expand_dims(flow, axis=2)), axis=2)
+                    if optical_flow:
+                        frame = np.concatenate((frame, np.expand_dims(flow, axis=2)), axis=2)
 
-                if mirror:
-                    frame = np.fliplr(frame)
+                    if mirror:
+                        frame = np.fliplr(frame)
 
-                frames.append(frame)
-            else:
-                frames.append(frames[i-1])
+                    frames.append(frame)
+                else:
+                    frames.append(frames[i-1])
 
-        frames = np.asarray(frames)
+            frames = np.asarray(frames)
 
-        return frames
-    else:
-        cprint("ERROR: File does not exist '{}'".format(path), 'red')
-        return None
-
-def print_video_frames(video, step=2):
-    f, axarr = plt.subplots(1, floor((len(video)) / step), sharey=True)
-    f.set_figwidth(4 * floor((len(video)) / step))
-    f.set_figheight(4)
-    for i in range(0,  floor(len(video) / step)):
-        fig = axarr[i]
-        fig.text(0.5, -0.2, 'Frame {}/{}'.format(floor(i * step) + 1, len(video)), size=12, ha="center", transform=fig.transAxes)
-        if len(video[i].shape) > 2:
-            if video[i].shape[2] == 4:
-                imgs = np.dsplit(video[floor(i * step)], np.array([3, 6]))
-                fig.imshow(imgs[0])
-                fig.imshow(imgs[1].squeeze(), cmap='seismic_alpha', vmin=-5000, vmax=5000)
-            elif video[i].shape[2] == 3:
-                fig.imshow(video[floor(i * step)])
-            elif video[i].shape[2] == 1:
-                fig.imshow(video[floor(i * step)].squeeze(), cmap='gray')
-            else:
-                imgs = np.dsplit(video[floor(i * step)], 2)
-                fig.imshow(imgs[0].squeeze(), cmap='gray')
-                fig.imshow(imgs[1].squeeze(), cmap='seismic_alpha', vmin=-5000, vmax=5000)
+            return frames
         else:
-            fig.imshow(video[floor(i * step)])
-    f.show()
+            cprint("ERROR: File does not exist '{}'".format(path), 'red')
+            return None
+    except KeyboardInterrupt:
+        return None

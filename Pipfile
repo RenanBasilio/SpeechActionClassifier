@@ -9,7 +9,6 @@ pylint = "*"
 [packages]
 tensorflow = "*"
 matplotlib = "*"
-keras = "*"
 jupyter = "*"
 notebook = "*"
 opencv-python = "*"

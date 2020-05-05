@@ -1,5 +1,8 @@
 import cv2 as cv2
+import numpy as np
+import matplotlib.pyplot as plt
 import os
+import itertools
 from termcolor import colored
 from math import floor
 
@@ -27,7 +30,58 @@ def draw_facial_landmarks(canvas, shape, color=(0,0,0)):
     cv2.polylines(canvas, [shape[60:67]], True, color, 0, cv2.LINE_8) # Mouth Inner
     return canvas
 
-class Entry(object):
-    def __init__(self, filename, classname):
-        self.filename = filename
-        self.classname = classname
+
+def print_video_frames(video, step=2):
+    f, axarr = plt.subplots(1, floor((len(video)) / step), sharey=True)
+    f.set_figwidth(4 * floor((len(video)) / step))
+    f.set_figheight(4)
+    for i in range(0,  floor(len(video) / step)):
+        fig = axarr[i]
+        fig.text(0.5, -0.2, 'Frame {}/{}'.format(floor(i * step) + 1, len(video)), size=12, ha="center", transform=fig.transAxes)
+        if len(video[i].shape) > 2:
+            if video[i].shape[2] == 4:
+                imgs = np.dsplit(video[floor(i * step)], np.array([3, 6]))
+                fig.imshow(imgs[0])
+                fig.imshow(imgs[1].squeeze(), cmap='seismic_alpha', vmin=-5000, vmax=5000)
+            elif video[i].shape[2] == 3:
+                fig.imshow(video[floor(i * step)])
+            elif video[i].shape[2] == 1:
+                fig.imshow(video[floor(i * step)].squeeze(), cmap='gray')
+            else:
+                imgs = np.dsplit(video[floor(i * step)], 2)
+                fig.imshow(imgs[0].squeeze(), cmap='gray')
+                fig.imshow(imgs[1].squeeze(), cmap='seismic_alpha', vmin=-5000, vmax=5000)
+        else:
+            fig.imshow(video[floor(i * step)])
+    f.show()
+
+
+def plot_confusion_matrix(cm, class_names):
+    """
+    Returns a matplotlib figure containing the plotted confusion matrix.
+
+    Args:
+        cm (array, shape = [n, n]): a confusion matrix of integer classes
+        class_names (array, shape = [n]): String names of the integer classes
+    """
+    figure = plt.figure(figsize=(8, 8))
+    plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+    plt.title("Confusion matrix")
+    plt.colorbar()
+    tick_marks = np.arange(len(class_names))
+    plt.xticks(tick_marks, class_names, rotation=45)
+    plt.yticks(tick_marks, class_names)
+
+    # Normalize the confusion matrix.
+    cm = np.around(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis], decimals=2)
+
+    # Use white text if squares are dark; otherwise black.
+    threshold = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        color = "white" if cm[i, j] > threshold else "black"
+        plt.text(j, i, cm[i, j], horizontalalignment="center", color=color)
+
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    return figure
