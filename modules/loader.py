@@ -169,53 +169,49 @@ def compute_dense_optical_flow(prev_image, current_image):
 
 # Loads the video file in the provided path as an array of frames
 def load_video_as_ndarray(path, color_mode='rgb', mirror=True, optical_flow=False, warnings=True):
-    try:
-        path = pathlib.Path(path)
+    path = pathlib.Path(path)
 
-        if path.is_file():
-            #print("Loading file {}...".format(path))
-            cap = cv2.VideoCapture(str(path.absolute()))
-            n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    if path.is_file():
+        #print("Loading file {}...".format(path))
+        cap = cv2.VideoCapture(str(path.absolute()))
+        n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-            if n_frames > 15 and warnings != False:
-                cprint("WARNING: Video file {} contains more than 15 frames (was: {}). Extra frames will be ignored.".format(path, n_frames), 'yellow')
-                if warnings is 'except':
-                    raise Exception("Invalid video data.") 
-            elif n_frames < 15 and warnings:
-                cprint("WARNING: Video file {} contains less than 15 frames (was: {}). Last frame will be duplicated.".format(path, n_frames), 'yellow')
-                if warnings is 'except':
-                    raise Exception("Invalid video data.") 
+        if n_frames > 15 and warnings != False:
+            cprint("WARNING: Video file {} contains more than 15 frames (was: {}). Extra frames will be ignored.".format(path, n_frames), 'yellow')
+            if warnings is 'except':
+                raise Exception("Invalid video data.") 
+        elif n_frames < 15 and warnings:
+            cprint("WARNING: Video file {} contains less than 15 frames (was: {}). Last frame will be duplicated.".format(path, n_frames), 'yellow')
+            if warnings is 'except':
+                raise Exception("Invalid video data.") 
 
-            frames = []
-            last_frame = None
-            for i in range(15):
-                frame = load_frame_as_ndarray(cap, color_mode)
-                if frame is not None:
-                    if optical_flow:
-                        if last_frame is not None:
-                            flow = compute_dense_optical_flow(last_frame, frame)
-                        else:
-                            flow = np.zeros((frame.shape[0], frame.shape[1]), dtype=np.float32)
-                        last_frame = frame
+        frames = []
+        last_frame = None
+        for i in range(15):
+            frame = load_frame_as_ndarray(cap, color_mode)
+            if frame is not None:
+                if optical_flow:
+                    if last_frame is not None:
+                        flow = compute_dense_optical_flow(last_frame, frame)
+                    else:
+                        flow = np.zeros((frame.shape[0], frame.shape[1]), dtype=np.float32)
+                    last_frame = frame
 
-                    if len(frame.shape) < 3:
-                        frame = np.expand_dims(frame, axis=2)
+                if len(frame.shape) < 3:
+                    frame = np.expand_dims(frame, axis=2)
 
-                    if optical_flow:
-                        frame = np.concatenate((frame, np.expand_dims(flow, axis=2)), axis=2)
+                if optical_flow:
+                    frame = np.concatenate((frame, np.expand_dims(flow, axis=2)), axis=2)
 
-                    if mirror:
-                        frame = np.fliplr(frame)
+                if mirror:
+                    frame = np.fliplr(frame)
 
-                    frames.append(frame)
-                else:
-                    frames.append(frames[i-1])
+                frames.append(frame)
+            else:
+                frames.append(frames[i-1])
 
-            frames = np.asarray(frames)
+        frames = np.asarray(frames)
 
-            return frames
-        else:
-            cprint("ERROR: File does not exist '{}'".format(path), 'red')
-            return None
-    except KeyboardInterrupt:
-        return None
+        return frames
+    else:
+        raise FileNotFoundError("File not found: {}".format(path))

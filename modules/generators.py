@@ -3,6 +3,7 @@ import multiprocessing
 import pathlib
 import hashlib
 import pickle
+import signal
 
 from termcolor import cprint
 from tensorflow.keras.utils import Sequence, to_categorical
@@ -32,11 +33,16 @@ class VideoDataGenerator(Sequence):
         self.classes = classes
         self.n_classes = len(classes)
         self.shuffle = shuffle
+
         self.enable_cache = enable_cache
+        
+
         self.procpool = None
         if max_processes > 1:
             cprint("Create Pool", color="blue")
-            self.procpool = multiprocessing.Pool(processes=max_processes)
+            self.procpool = multiprocessing.Pool(processes=max_processes, initializer=init_worker)
+
+        self.version_warn = False
         self.on_epoch_end()
 
     def on_epoch_end(self):
@@ -67,6 +73,8 @@ class VideoDataGenerator(Sequence):
             try:
                 results = self.procpool.starmap_async(load_video_as_ndarray, jobs[1]).get(0xFFFF)
             except:
+                self.procpool.terminate()
+                self.procpool.join()
                 raise
         else:
             for j in jobs[1]:
@@ -74,8 +82,6 @@ class VideoDataGenerator(Sequence):
 
         j = 0
         for i in jobs[0]:
-            if results[j] is None:
-                raise Exception
             X[i,] = results[j]
             if self.enable_cache:
                 self.__write_cache(self.__make_cache_path(entries_temp[i][0].filename.absolute(), entries_temp[i][1]), str(entries_temp[i][0].filename.absolute()), results[j])
@@ -102,8 +108,9 @@ class VideoDataGenerator(Sequence):
         if path.is_file():
             with open(path, mode='rb') as cache_file:
                 file_data = pickle.load(cache_file)
-                if file_data['version'] != self.version:
-                    cprint("WARNING: Cached version not created by this API version. Regenerating cache...")
+                if file_data['version'] != self.version and self.version_warn != True:
+                    self.version_warn = True
+                    cprint("WARNING: Cached version not created by this API version. Regenerating cache...", color="red")
                 elif file_data['uid'] != uid:
                     cprint("WARNING: UID in cached data does not match current UID.\nGOT: '{}' EXPECTED: '{}'".format(file_data['uid'], uid), 'yellow')
                 else:
@@ -119,3 +126,6 @@ class VideoDataGenerator(Sequence):
         }
         with open(path, mode='wb') as cache_file:
             pickle.dump(file_data, cache_file)
+
+def init_worker():
+    signal.signal(signal.SIGINT, signal.SIG_IGN)

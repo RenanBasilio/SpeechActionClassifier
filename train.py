@@ -99,7 +99,7 @@ if __name__ == '__main__':
         figure = plot_confusion_matrix(cm.numpy(), class_names=classes)
         cm_image = plot_to_image(figure)
 
-    # Log the confusion matrix as an image summary.
+        # Log the confusion matrix as an image summary.
         with file_writer_cm.as_default():
             tf.summary.image("Confusion Matrix", cm_image, step=epoch)
 
