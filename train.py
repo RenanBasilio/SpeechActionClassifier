@@ -36,6 +36,7 @@ if __name__ == '__main__':
     export_base.mkdir(parents=True, exist_ok=True)
 
     shutil.copy("train.py", (export_base / "train.py"))
+    shutil.copy(data_dir / "splits.txt", (export_base / "splits.txt"))
 
     params = {
         'color_mode': 'landmarks',
