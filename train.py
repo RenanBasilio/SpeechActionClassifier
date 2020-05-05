@@ -5,7 +5,7 @@ from modules.loader import get_classes, get_files_list
 if __name__ == '__main__':
     import tensorflow as tf
     from tensorflow.keras.models import Sequential
-    from tensorflow.keras.layers import Dense, Flatten, Conv3D, Dropout, MaxPooling3D, AveragePooling3D
+    from tensorflow.keras.layers import Dense, Flatten, Conv3D, Dropout, SpatialDropout3D, MaxPooling3D, AveragePooling3D
 
     import numpy as np
     import pathlib
@@ -40,10 +40,10 @@ if __name__ == '__main__':
     params = {
         'color_mode': 'landmarks',
         'optical_flow': False,
-        'batch_size': 8,
+        'batch_size': 64,
         'shuffle': True,
         'classes': classes,
-        'max_processes': 4
+        'max_processes': 8
     }
 
     partition = get_files_list(data_dir)
@@ -53,15 +53,19 @@ if __name__ == '__main__':
 
     #%% Build Keras model
     model = Sequential([
-        Conv3D(16, (4, 3, 3), activation='relu', input_shape=(training_generator.dim)),
-        MaxPooling3D(),
+        Conv3D(8, (1, 5, 5), activation='relu', input_shape=(training_generator.dim)),
+        MaxPooling3D((1,2,2)),
         Conv3D(32, (3, 3, 3), activation='relu'),
-        MaxPooling3D(),
-        Conv3D(64, (1, 3, 3), activation='relu'),
-        MaxPooling3D(),
+        Conv3D(48, (5, 7, 7), activation='relu'),
+        MaxPooling3D((1,2,2)),
+        Conv3D(64, (3, 3, 3), activation='relu'),
+        AveragePooling3D((2,1,1)),
+        MaxPooling3D((1,2,2)),
+        SpatialDropout3D(0.4),
         Flatten(),
-        Dense(2048, activation='relu'),
-        Dense(1024, activation='relu'),
+        Dense(256, activation='relu'),
+        Dropout(0.25),
+        Dense(64, activation='relu'),
         Dense(2, activation='softmax')
     ])
 
