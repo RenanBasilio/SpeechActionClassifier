@@ -1,0 +1,20 @@
+video2tfrecord
+: Converte arquivos de video .avi e .mp4 nos tfrecords utilizados pelo tensorflow
+https://github.com/ferreirafabio/video2tfrecord
+
+pathlib
+: Para lidar com caminhos no sistema de arquivos
+https://docs.python.org/3/library/pathlib.html
+
+tensorflow - carregar tfrecord
+: Tutorial de como carregar tfrecords no tensorflow
+https://www.tensorflow.org/tutorials/load_data/tfrecord
+
+tensorflow - guia iniciante
+: Guia de como carregar conjuntos de arquivos no tensorflow
+https://www.tensorflow.org/guide/data#consuming_sets_of_files
+https://www.tensorflow.org/tutorials/load_data/images#load_using_tfdata
+
+tensorflow - convnet3d
+: Documentação de rede neural convolucional 3d no tensorflow
+https://www.tensorflow.org/api_docs/python/tf/keras/layers/Conv3D?version=stable

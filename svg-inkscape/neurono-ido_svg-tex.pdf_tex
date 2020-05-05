@@ -1,0 +1,70 @@
+%% Creator: Inkscape inkscape 0.92.4, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'neurono-ido_svg-tex.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{291.50159454bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.54248923)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{neurono-ido_svg-tex.pdf}}%
+    \put(0.10454354,0.51512218){\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Dendrito\end{tabular}}}}%
+    \put(0.34171353,0.35619037){\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Celular\end{tabular}}}}%
+    \put(0.83742247,0.4649662){\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Axônio\end{tabular}}}}%
+    \put(0.53278595,0.41161973){\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Nódulo de\end{tabular}}}}%
+    \put(0.79033251,0.50589244){\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Terminal do\end{tabular}}}}%
+    \put(0.78191159,0.12299713){\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Célula de\end{tabular}}}}%
+    \put(0.78471932,0.0850931){\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Schwann\end{tabular}}}}%
+    \put(0.44190292,0.04077718){\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Bainha de Mielina\end{tabular}}}}%
+    \put(0.35668625,0.09316908){\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Axônio\end{tabular}}}}%
+    \put(-0.00351762,0.00054523){\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Núcleo\end{tabular}}}}%
+    \put(0.55806477,0.37873915){\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Ranvier\end{tabular}}}}%
+    \put(0.34918674,0.3966407){\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Corpo\end{tabular}}}}%
+  \end{picture}%
+\endgroup%
