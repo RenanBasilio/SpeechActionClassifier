@@ -1,6 +1,0 @@
-FacialFeatureExtractor:
-* Use bounding box for normalization instead of extremes
-
-SpeechActionClassifier:
-* Use plotted facial features instead of entire frames as input to CNN
-* Investigate using an LSTM
