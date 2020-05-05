@@ -54,9 +54,9 @@ if __name__ == '__main__':
 
     #%% Build Keras model
     model = Sequential([
-        Conv3D(8, (1, 5, 5), activation='relu', input_shape=(training_generator.dim)),
+        Conv3D(16, (1, 3, 3), activation='relu', input_shape=(training_generator.dim)),
         MaxPooling3D((1,2,2)),
-        Conv3D(32, (3, 3, 3), activation='relu'),
+        Conv3D(24, (3, 3, 3), activation='relu'),
         Conv3D(48, (5, 7, 7), activation='relu'),
         MaxPooling3D((1,2,2)),
         Conv3D(64, (3, 3, 3), activation='relu'),
@@ -64,9 +64,9 @@ if __name__ == '__main__':
         MaxPooling3D((1,2,2)),
         SpatialDropout3D(0.4),
         Flatten(),
-        Dense(256, activation='relu'),
+        Dense(128, activation='relu'),
         Dropout(0.25),
-        Dense(64, activation='relu'),
+        Dense(64, activation='sigmoid'),
         Dense(2, activation='softmax')
     ])
 
