@@ -41,16 +41,15 @@ if __name__ == '__main__':
     params = {
         'color_mode': 'landmarks',
         'optical_flow': False,
-        'batch_size': 8,
         'shuffle': True,
         'classes': classes,
         'max_processes': 4
     }
 
-    partition = get_files_list(data_dir)
+    partition = get_files_list(data_dir, verbose=True)
 
-    training_generator = VideoDataGenerator(partition['Train'], **params)
-    validation_generator = VideoDataGenerator(partition['Test'], **params)
+    training_generator = VideoDataGenerator(partition['Train'], batch_size=46, **params)
+    validation_generator = VideoDataGenerator(partition['Test'], batch_size=60, **params)
 
     #%% Build Keras model
     model = Sequential([
