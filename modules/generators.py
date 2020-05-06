@@ -39,7 +39,6 @@ class VideoDataGenerator(Sequence):
 
         self.procpool = None
         if max_processes > 1:
-            cprint("Create Pool", color="blue")
             self.procpool = multiprocessing.Pool(processes=max_processes, initializer=init_worker)
 
         self.version_warn = False

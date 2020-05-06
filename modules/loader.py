@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from termcolor import cprint
+from termcolor import cprint, colored
 from imutils import face_utils
 from math import floor, ceil
 from matplotlib.colors import LinearSegmentedColormap, DivergingNorm
@@ -48,7 +48,7 @@ def get_splits(splits_file):
             splits[name] = members
     return splits
 
-def get_files_list(path):
+def get_files_list(path, verbose=False):
     path = pathlib.Path(path).resolve()
     
     splits_file = path / "splits.txt"
@@ -64,8 +64,14 @@ def get_files_list(path):
     files = {}
 
     for split in splits.keys():
+
+        loaded = 0
+
         files[split] = []
         for fileset in splits[split]:
+
+            loaded_tags = {}
+
             data_path = path / "unsorted" / fileset
             manual_classes = data_path / "_classes.csv"
             segments_path = data_path / "segments"
@@ -79,6 +85,24 @@ def get_files_list(path):
                     file_path = segments_path / "{:06d}.mp4".format(row.id)
                     if file_path.exists():
                         files[split].append(Entry(file_path, row.tag))
+                        loaded += 1
+                        if row.tag not in loaded_tags.keys():
+                            loaded_tags[row.tag] = 1
+                        else:
+                            loaded_tags[row.tag] += 1
+
+            if verbose:
+                tag_count = 0
+                tag_count_str = ""
+                for key in loaded_tags.keys():
+                    if tag_count_str != "":
+                        tag_count_str += ", "
+                    tag_count_str += "{}: {}".format(key, loaded_tags[key])
+                    tag_count += loaded_tags[key]
+                print("Loaded {} entries from set {} ( {} )".format(tag_count, fileset, tag_count_str))
+
+        if verbose:
+            cprint("Loaded {} entries for split {}.".format(loaded, split), "cyan")
 
     return files
 
