@@ -4,8 +4,8 @@ from modules.loader import get_classes, get_files_list
 
 if __name__ == '__main__':
     import tensorflow as tf
-    from tensorflow.keras.models import Sequential
-    from tensorflow.keras.layers import Dense, Flatten, Conv3D, Dropout, SpatialDropout3D, MaxPooling3D, AveragePooling3D
+    import tensorflow_addons as tfa
+    from sklearn import metrics
 
     import numpy as np
     import pathlib
@@ -17,7 +17,8 @@ if __name__ == '__main__':
     import termcolor
 
     from modules.generators import VideoDataGenerator
-    from modules.utils import plot_confusion_matrix
+    from modules.utils import plot_confusion_matrix, plot_roc_curve
+    import model as modelcfg
 
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -27,54 +28,55 @@ if __name__ == '__main__':
     print("Tensorflow Version: ", tf.__version__)
     print("Num GPUs Available: ", len(gpus))
 
-    #%% Set training parameters
-    data_dir = pathlib.Path("./data")
-    classes = get_classes(data_dir / "classes.txt")
+    if pathlib.Path("envconfig.py").is_file():
+        print("Using environment confuguration from envconfig.py")
+        import envconfig as env
+    else:
+        print("Using default environment configuration.")
+        import envconfig_default as env
+
+    data_dir = pathlib.Path(env.dataset_directory)
 
     # Create an identifier for the model. Currently using time of training.
-    export_base = pathlib.Path("export/{}/".format(datetime.datetime.now().strftime("%Y-%m-%d-%H%M")))
+    export_base = pathlib.Path(env.export_directory) / "{}".format(datetime.datetime.now().strftime("%Y-%m-%d-%H%M"))
     export_base.mkdir(parents=True, exist_ok=True)
 
     shutil.copy("train.py", (export_base / "train.py"))
     shutil.copy(data_dir / "splits.txt", (export_base / "splits.txt"))
 
-    params = {
-        'color_mode': 'landmarks',
-        'optical_flow': False,
-        'batch_size': 64,
-        'shuffle': True,
-        'classes': classes,
-        'max_processes': 8
-    }
+    print("Loading entries...")
+    partition = get_files_list(data_dir, verbose=True)
 
-    partition = get_files_list(data_dir)
+    training_generator = VideoDataGenerator(partition['Train'], 
+        classes=modelcfg.classes, 
+        optical_flow=modelcfg.optical_flow,
+        color_mode=modelcfg.colormode, 
+        **env.train_params
+    )
+        
+    validation_generator = VideoDataGenerator(partition['Test'], 
+        classes=modelcfg.classes, 
+        color_mode=modelcfg.colormode, 
+        optical_flow=modelcfg.optical_flow,
+        **env.val_params
+    )
+    
+    model = modelcfg.get_model((training_generator.dim))
 
-    training_generator = VideoDataGenerator(partition['Train'], **params)
-    validation_generator = VideoDataGenerator(partition['Test'], **params)
+    shutil.copy("model.py", (export_base / "model.py"))
+    shutil.copy(data_dir / "splits.txt", (export_base / "splits.txt"))
 
-    #%% Build Keras model
-    model = Sequential([
-        Conv3D(16, (1, 3, 3), activation='relu', input_shape=(training_generator.dim)),
-        MaxPooling3D((1,2,2)),
-        Conv3D(24, (3, 3, 3), activation='relu'),
-        Conv3D(48, (5, 7, 7), activation='relu'),
-        MaxPooling3D((1,2,2)),
-        Conv3D(64, (3, 3, 3), activation='relu'),
-        AveragePooling3D((2,1,1)),
-        MaxPooling3D((1,2,2)),
-        SpatialDropout3D(0.4),
-        Flatten(),
-        Dense(128, activation='relu'),
-        Dropout(0.25),
-        Dense(64, activation='sigmoid'),
-        Dense(2, activation='softmax')
-    ])
-
-    model.compile(optimizer='nadam', loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(
+        optimizer='nadam', 
+        loss='categorical_crossentropy', 
+        metrics=[
+            'accuracy',
+            tf.metrics.AUC(),
+            tfa.metrics.F1Score(num_classes=len(modelcfg.classes))]
+    )
 
     model.summary()
 
-    #%%
     def plot_to_image(figure):
         """Converts the matplotlib plot specified by 'figure' to a PNG image and
         returns it. The supplied figure is closed and inaccessible after this call."""
@@ -91,29 +93,41 @@ if __name__ == '__main__':
         image = tf.expand_dims(image, 0)
         return image
 
-    def log_confusion_matrix(epoch, logs):
-        cm = np.zeros((2,2))
+    def log_image_metrics(epoch, logs):
+        if 'val_loss' in logs.keys():
+            cm = np.zeros((2,2))
+            test_true = []
+            test_score = []
 
-        # Use the model to predict the values from the validation dataset.
-        for i in validation_generator:
-            test_pred_raw = model.predict(i[0])
-            cm += tf.math.confusion_matrix(np.argmax(i[1], axis=1), np.argmax(test_pred_raw, axis=1), num_classes=2)
+            # Use the model to predict the values from the validation dataset.
+            for i in validation_generator:
+                test_true.extend(np.argmax(i[1], axis=1))
+                test_score.extend(model.predict(i[0]))
+                
+            # Confusion Matrix
+            cm = tf.math.confusion_matrix(test_true, np.argmax(test_score, axis=1), num_classes=2)
 
-        # Log the confusion matrix as an image summary.
-        figure = plot_confusion_matrix(cm.numpy(), class_names=classes)
-        cm_image = plot_to_image(figure)
+            figure = plot_confusion_matrix(cm.numpy(), class_names=modelcfg.classes)
+            cm_image = plot_to_image(figure)
 
-        # Log the confusion matrix as an image summary.
-        with file_writer_cm.as_default():
-            tf.summary.image("Confusion Matrix", cm_image, step=epoch)
+            with file_writer_cm.as_default():
+                tf.summary.image("Confusion Matrix", cm_image, step=epoch)
 
-    # %%
+            # ROC curve
+            fpr, tpr, thresholds = metrics.roc_curve(test_true, np.array(test_score)[:,1], pos_label=1)
+
+            figure = plot_roc_curve(fpr, tpr, logs['val_auc'])
+            roc_image = plot_to_image(figure)
+
+            with file_writer_roc.as_default():
+                tf.summary.image("ROC Curve", roc_image, step=epoch)
+
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=str(export_base.absolute()), histogram_freq=1)
 
     file_writer_cm = tf.summary.create_file_writer(str( (export_base).absolute() / "validation" ), filename_suffix=".cm")
-    cm_callback = tf.keras.callbacks.LambdaCallback(on_epoch_end=log_confusion_matrix)
+    file_writer_roc = tf.summary.create_file_writer(str( (export_base).absolute() / "validation" ), filename_suffix=".roc")
 
-    earlystop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=50, restore_best_weights=False)
+    metrics_callback = tf.keras.callbacks.LambdaCallback(on_epoch_end=log_image_metrics)
 
     checkpoint_loss = tf.keras.callbacks.ModelCheckpoint(
         filepath=(str(export_base.absolute()) + "/model.best-loss.h5"), 
@@ -125,9 +139,15 @@ if __name__ == '__main__':
         monitor='val_accuracy', 
         save_best_only=True)
 
-    history = model.fit(training_generator, validation_data=validation_generator, epochs=999, callbacks=[tensorboard_callback, cm_callback, checkpoint_loss, checkpoint_acc, earlystop])
+    earlystop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=50, restore_best_weights=False)
 
-    # %%
+    history = model.fit(
+        training_generator, 
+        validation_data=validation_generator, 
+        epochs=999, 
+        callbacks=[tensorboard_callback, metrics_callback, checkpoint_loss, checkpoint_acc, earlystop]
+    )
+
     pd.DataFrame.from_dict(history.history).to_csv((export_base / "history.csv"), index=False)
     model.save(export_base / "model.final.h5")
 

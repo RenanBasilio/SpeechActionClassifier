@@ -17,7 +17,7 @@ cache_dir.mkdir(parents=True, exist_ok=True)
 # Necessário para reduzir o custo de memória do treinamento do modelo
 # Código adaptado a partir de https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly (https://github.com/afshinea/keras-data-generator)
 class VideoDataGenerator(Sequence):
-    def __init__(self, list_Entries, max_processes=6, batch_size=4, color_mode='rgb', optical_flow=False, classes=[], shuffle=True, enable_cache=True):
+    def __init__(self, list_Entries, max_workers=0, batch_size=4, color_mode='rgb', optical_flow=False, classes=[], shuffle=True, enable_cache=True):
         self.version = 3
         self.batch_size = batch_size
         self.entries = []
@@ -38,8 +38,8 @@ class VideoDataGenerator(Sequence):
         
 
         self.procpool = None
-        if max_processes > 1:
-            self.procpool = multiprocessing.Pool(processes=max_processes, initializer=init_worker)
+        if max_workers > 0:
+            self.procpool = multiprocessing.Pool(processes=max_workers, initializer=init_worker)
 
         self.version_warn = False
         self.on_epoch_end()
