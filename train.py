@@ -116,7 +116,7 @@ if __name__ == '__main__':
             # ROC curve
             fpr, tpr, thresholds = metrics.roc_curve(test_true, np.array(test_score)[:,1], pos_label=1)
 
-            figure = plot_roc_curve(fpr, tpr, logs['auc'])
+            figure = plot_roc_curve(fpr, tpr, logs['val_auc'])
             roc_image = plot_to_image(figure)
 
             with file_writer_roc.as_default():
