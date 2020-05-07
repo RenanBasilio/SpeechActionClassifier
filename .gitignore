@@ -16,3 +16,4 @@ export/
 models/
 log.txt
 *.tar.gz
+*config.py
