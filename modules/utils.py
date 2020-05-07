@@ -73,7 +73,7 @@ def plot_confusion_matrix(cm, class_names):
     plt.yticks(tick_marks, class_names)
 
     # Normalize the confusion matrix.
-    cm = np.around(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis], decimals=2)
+    #cm = np.around(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis], decimals=2)
 
     # Use white text if squares are dark; otherwise black.
     threshold = cm.max() / 2.
@@ -84,4 +84,17 @@ def plot_confusion_matrix(cm, class_names):
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+    return figure
+
+def plot_roc_curve(fpr, tpr, roc_auc):
+    figure = plt.figure(figsize=(8, 8))
+    plt.title('Receiver Operating Characteristic')
+    plt.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % roc_auc)
+    plt.legend(loc = 'lower right')
+    plt.plot([0, 1], [0, 1],'r--')
+    plt.xlim([0, 1])
+    plt.ylim([0, 1])
+    plt.tight_layout()
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
     return figure
