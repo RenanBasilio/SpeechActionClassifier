@@ -13,11 +13,11 @@ def get_model(input_shape):
         Conv3D(32, (3, 3, 3), activation='relu'),
         MaxPooling3D(),
         Conv3D(64, (1, 3, 3), activation='relu'),
-        SpatialDropout3D(0.4),
+        SpatialDropout3D(0.5),
         MaxPooling3D(),
         Flatten(),
         Dense(256, activation='relu'),
-        Dropout(0.5),
+        Dropout(0.7),
         Dense(128, activation='relu'),
         Dense(2, activation='softmax')
     ])
