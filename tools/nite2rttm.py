@@ -19,7 +19,7 @@ def parse_xml(infile, outfile):
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser(description="Convert a NITE-formatted XML file into an RTTM transcription file.")
     argparser.add_argument('infile', type=argparse.FileType('r'))
-    argparser.add_argument('-o', '--outfile', nargs='?', type=argparse.FileType('w'), default=sys.stdout, help="output file")
+    argparser.add_argument('-o', '--outfile', nargs='?', type=argparse.FileType('w'), default=sys.stdout, help="output file", metavar="PATH")
     args = argparser.parse_args()
     
     parse_xml(args.infile, args.outfile)

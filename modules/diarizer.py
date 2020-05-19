@@ -7,11 +7,40 @@ from modules.loader import compute_facial_landmarks
 from tensorflow.keras.models import load_model
 
 class Segment():
-    def __init__(self, value=None, onset=None, duration=None, confidence=None):
+    def __init__(self, value=None, frame_onset=None, frame_rate=30):
         self.value = value
-        self.onset = onset
-        self.duration = duration
-        self.confidence = confidence
+        self.frame_onset = frame_onset
+        self.frame_duration = 0
+        self.frame_rate = frame_rate
+        self.__frame_confidences = []
+        self.__confidence = None
+
+    @property
+    def frame_confidences(self):
+        return self.__frame_confidences
+
+    @property
+    def confidence(self):
+        if self.__confidence is None:
+            self.__confidence = np.mean(self.__frame_confidences)
+        return self.__confidence
+
+    @property
+    def onset(self):
+        return self.frame_onset / self.frame_rate
+
+    @property
+    def duration(self):
+        return self.frame_duration / self.frame_rate
+
+    def extend(self, confidences):
+        self.__confidence = None
+        if isinstance(confidences, list):
+            self.frame_duration += len(confidences)
+            self.frame_confidences.extend(confidences)
+        else:
+            self.frame_duration += 1
+            self.frame_confidences.append(confidences)
     
     def __str__(self):
         return "CLASS: {} | ONSET: {:.3f} s | DURATION: {:.3f} s | CONFIDENCE: {:.3f}".format(self.value, self.onset, self.duration, self.confidence)
@@ -38,7 +67,10 @@ class Diarizer():
     def diarize(self, video, progress_callback=None):
         capture = cv2.VideoCapture(video)
 
-        length = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
+        vid_props = {
+            "FRAME_COUNT": capture.get(cv2.CAP_PROP_FRAME_COUNT),
+            "FRAME_RATE": capture.get(cv2.CAP_PROP_FPS)
+        }
         curr = 0
 
         done = False
@@ -52,7 +84,7 @@ class Diarizer():
 
                 # Handle progress callback
                 if progress_callback is not None:
-                    progress_callback(curr, length)
+                    progress_callback(curr, vid_props['FRAME_COUNT'])
 
                 # Load frames
                 curr += 1
@@ -65,7 +97,7 @@ class Diarizer():
                     else:
                         # If a frame failed to load or preprocess, commit the ones before it if possible
                         predictions.append([np.zeros((1, 2))])
-                        segments = self.__commit_results(segments, predictions)
+                        segments = self.__commit_results(segments, predictions, vid_props)
                         predictions.clear()
                         window.clear()
                 else:
@@ -79,18 +111,17 @@ class Diarizer():
                     frame.append(prediction)
 
             # Commit the first 'shift' entries and shift the arrays
-            segments = self.__commit_results(segments, predictions[:self.__shift])
+            segments = self.__commit_results(segments, predictions[:self.__shift], vid_props)
             window = window[self.__shift:]
             predictions = predictions[self.__shift:]
 
             # If done, commit all remaining entries
             if done:
-                segments = self.__commit_results(segments, predictions)
+                segments = self.__commit_results(segments, predictions, vid_props)
 
-        segments = self.__finalize(segments, {'FPS':capture.get(cv2.CAP_PROP_FPS)})
         return segments
 
-    def __commit_results(self, transcription, prediction_window):
+    def __commit_results(self, transcription, prediction_window, vid_props):
         # For each frame in the prediction window
         for result_array in prediction_window:
             if len(result_array) > 0:
@@ -106,18 +137,15 @@ class Diarizer():
                 result = -1
                 confidence = 0
 
-            if len(transcription) > 0 and transcription[-1].value == result:
-                # If result same as last segment type, extend it by one frame
-                transcription[-1].duration += 1
-                transcription[-1].confidence.append(confidence)
-            else:
-                # Otherwise start a new segment
+            if len(transcription) == 0 or transcription[-1].value != result:
+                # If first segment or not matching the previous value, start a new segment
                 transcription.append(Segment(
                     result, 
-                    onset=(0 if len(transcription) == 0 else (transcription[-1].onset + transcription[-1].duration)),
-                    duration=1,
-                    confidence=[confidence]
+                    frame_onset=(0 if len(transcription) == 0 else (transcription[-1].frame_onset + transcription[-1].frame_duration)),
+                    frame_rate=vid_props['FRAME_RATE'],
                 ))
+            transcription[-1].extend(confidence)
+
         return transcription
 
     def __preprocess_frame(self, frame):
@@ -128,13 +156,6 @@ class Diarizer():
         if frame is not None:
             frame = np.expand_dims(frame, axis=2)
         return frame
-
-    def __finalize(self, transcription, props):
-        for segment in transcription:
-            segment.onset = segment.onset / props['FPS']
-            segment.duration = segment.duration / props['FPS']
-            segment.confidence = np.mean(segment.confidence)
-        return transcription
 
 # This commit strategy takes the sum of the elements for each column in the input array
 # and chooses the column with the highest total, or -1 if both are equal.
@@ -165,16 +186,13 @@ def strat_weightedfreq(array, weights):
     if len(array) > 0:
         argc = np.zeros(len(array[0][0]))
         for index, e in enumerate(array):
-            if e[0][0] == e[0][1]:
-                argc[0] = 0
-                argc[1] = 0
-            else:
+            if not np.all(e[0] == e[0][0]):
                 argc[np.argmax(e)] += weights[index]
         return argc
 
 # This function computes a set of gaussian weights centered on x=0 and with standard deviation sigma=1. 
 # The returned weights are distributed linearly within the given span and scaled to add up to 1.
-def init_gauss_weights(count, span=(-2, 2)):
+def init_gauss_weights(count, span=(-5, 5)):
     gauss_weights = []
     X, step = np.linspace(span[0], span[1], count, retstep=True)
     for x in X:
