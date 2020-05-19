@@ -22,7 +22,7 @@ if __name__ == "__main__":
     argparser.add_argument('video', type=argparse.FileType('r'), help="input video file")
     argparser.add_argument('model', type=argparse.FileType('r'), help="prediction model to use")
     argparser.add_argument('-o', '--output', nargs='?', 
-        help="output path (default same as video path)", metavar="PATH")
+        help="output file path (default same as video path)", metavar="PATH")
     argparser.add_argument('--conf', nargs='?', 
         default=None, const='',
         help="output confidences file (default same as output path)", metavar="PATH")
@@ -32,11 +32,13 @@ if __name__ == "__main__":
     args = argparser.parse_args()
 
     vidpath = pathlib.Path(args.video.name).resolve()
-    outbase = None
+    outbase = vidpath.parent / vidpath.stem
 
     if args.output is None:
         args.output = open(vidpath.with_suffix('.rttm'), 'w')
-        outbase = vidpath.parent / vidpath.stem
+    else:
+        outbase = pathlib.Path(args.output).parent / pathlib.Path(args.output).stem
+        args.output = open(args.output, 'w')
 
     if args.conf == '':
         args.conf = open(outbase.with_suffix('.conf.csv'), 'w')
