@@ -50,7 +50,7 @@ if __name__ == "__main__":
     elif args.diar is not None:
         args.diar = open(pathlib.Path(args.diar), 'w')
 
-    diarizer = Diarizer(pathlib.Path(args.model.name).absolute(), commit_strategy="gaussf", shift=1)
+    diarizer = Diarizer(pathlib.Path(args.model.name).absolute(), commit_strategy="gaussf", shift=1, classes=classes)
 
     print("Diarizing {}...".format(vidpath))
     start_time = time.time()
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     for item in segments:
         if args.diar is not None:
             args.diar.write("{prediction},{start_frame},{dur_frame},{start_sec:.5f},{dur_sec:.5f},{mean_confidence:.5f},{confidences}\n".format(
-                prediction=('Unknown' if item.value == -1 else classes[item.value]),
+                prediction=item.value,
                 start_frame=item.frame_onset,
                 dur_frame=item.frame_duration,
                 start_sec=item.onset,
@@ -82,13 +82,12 @@ if __name__ == "__main__":
         if args.conf is not None:
             for confidence in item.frame_confidences:
                 row = ""
-                for i in range(len(classes)):
-                    if i > 0:
-                        row += ','
-                    if item.value == i:
+                for c in classes:
+                    if item.value == c:
                         row += ('%.5f' % confidence)
                     else:
                         row += '0.00000'
+                    row += ','
                 args.conf.write(row + '\n')
 
     if args.diar is not None:
