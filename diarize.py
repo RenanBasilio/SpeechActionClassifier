@@ -72,7 +72,7 @@ if __name__ == "__main__":
                 mean_confidence=item.confidence,
                 confidences=','.join(['%.5f' % num for num in item.frame_confidences])
             ))
-        if item.value == 1:
+        if item.value == 'Speak':
             args.output.write("SPEAKER {file} 1 {turn_onset:.6f} {turn_dur:.3f} <NA> <NA> speaker {confidence:.3f} <NA>\n".format(
                 file=vidpath.stem,
                 turn_onset=item.onset,
