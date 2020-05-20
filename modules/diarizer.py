@@ -46,10 +46,11 @@ class Segment():
         return "CLASS: {} | ONSET: {:.3f} s | DURATION: {:.3f} s | CONFIDENCE: {:.3f}".format(self.value, self.onset, self.duration, self.confidence)
 
 class Diarizer():
-    def __init__(self, model, commit_strategy="mean", shift=1):
+    def __init__(self, model, commit_strategy="mean", shift=1, classes=[]):
         assert isinstance(shift, int) and shift > 0
 
-        self.__predictor = load_model(model)
+        self.__classes = classes
+        self.__predictor = load_model(model, compile=False)
         self.__shift = shift
 
         if commit_strategy is "mean":
@@ -128,13 +129,13 @@ class Diarizer():
                 # Compute predictions for each class based on the commit strategy
                 confidences = self.__commit_strategy(result_array)
                 if confidences[0] == confidences[1]:
-                    result = -1
+                    result = "None"
                     confidence = 0
                 else:
-                    result = np.argmax(confidences)
-                    confidence = confidences[result]
+                    result = self.__classes[np.argmax(confidences)]
+                    confidence = confidences[np.argmax(confidences)]
             else:
-                result = -1
+                result = "None"
                 confidence = 0
 
             if len(transcription) == 0 or transcription[-1].value != result:
@@ -192,7 +193,7 @@ def strat_weightedfreq(array, weights):
 
 # This function computes a set of gaussian weights centered on x=0 and with standard deviation sigma=1. 
 # The returned weights are distributed linearly within the given span and scaled to add up to 1.
-def init_gauss_weights(count, span=(-5, 5)):
+def init_gauss_weights(count, span=(-2, 2)):
     gauss_weights = []
     X, step = np.linspace(span[0], span[1], count, retstep=True)
     for x in X:
