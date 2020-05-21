@@ -26,7 +26,7 @@ for model in "loss" "accuracy"; do
             echo "$refsdir/$outname" >> $refsfile
 
             # Diarize
-            python /home/renan/SpeechActionClassifier/diarize.py "$video" "/home/renan/SpeechActionClassifier/export/2020-05-18-1528/model.best-$model.h5" -o "$sysdir/$outname" --diar --conf --strat "$strat" --step "$step"
+            python ./diarize.py "$video" "/home/renan/SpeechActionClassifier/export/2020-05-18-1528/model.best-$model.h5" -o "$sysdir/$outname" --diar --conf --strat "$strat" --step "$step"
 
             # Replace video name in generated file to match reference
             sed -i 's/ 14 / '"14-$model-$strat-$step"' /g' "$sysdir/$outname"
@@ -36,4 +36,4 @@ for model in "loss" "accuracy"; do
 done
 
 # Display metrics
-python /home/renan/SpeechActionClassifier/tools/dscore/score.py --step 0.33 --collar 0.1 -R "$refsfile" -S "$sysfile"
+python ./tools/dscore/score.py --step 0.33 --collar 0.1 -R "$refsfile" -S "$sysfile"
