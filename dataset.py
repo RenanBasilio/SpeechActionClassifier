@@ -17,8 +17,6 @@ import argparse
 import pytz
 import pathlib
 
-log_file = open("log.txt", "w+")
-
 errors = ['Partial', '!! BAD', 'Inaudible', 'Maybe']
 
 face_detector = None
