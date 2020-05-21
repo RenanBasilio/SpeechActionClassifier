@@ -1,10 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from modules.loader import get_classes, get_files_list
-
 if __name__ == '__main__':
     import tensorflow as tf
-    import tensorflow_addons as tfa
     from sklearn import metrics
 
     import numpy as np
@@ -18,6 +15,7 @@ if __name__ == '__main__':
 
     from modules.generators import VideoDataGenerator
     from modules.utils import plot_confusion_matrix, plot_roc_curve
+    from modules.loader import get_classes, get_files_list
 
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -28,7 +26,7 @@ if __name__ == '__main__':
     print("Num GPUs Available: ", len(gpus))
 
     import config.model as modelcfg
-    if pathlib.Path("envconfig.py").is_file():
+    if pathlib.Path("config/envconfig.py").is_file():
         print("Using environment confuguration from envconfig.py")
         import config.envconfig as env
     else:
@@ -63,16 +61,23 @@ if __name__ == '__main__':
     
     model = modelcfg.get_model((training_generator.dim))
 
-    shutil.copy("model.py", (export_base / "model.py"))
+    shutil.copy("./config/model.py", (export_base / "model.py"))
     shutil.copy(data_dir / "splits.txt", (export_base / "splits.txt"))
 
     model.compile(
         optimizer='nadam', 
-        loss='categorical_crossentropy', 
+        loss=tf.losses.CategoricalCrossentropy(), 
         metrics=[
-            'accuracy',
-            tf.metrics.AUC(),
-            tfa.metrics.F1Score(num_classes=len(modelcfg.classes))]
+            tf.metrics.CategoricalCrossentropy(name="basics/loss"),
+            tf.metrics.CategoricalAccuracy(name="basics/accuracy"),
+            tf.metrics.Precision(name="confusion/precision"),
+            tf.metrics.Recall(name="confusion/recall"),
+            tf.metrics.Precision(class_id=0, name="confusion/precision/idle"),
+            tf.metrics.Precision(class_id=1, name="confusion/precision/speak"),
+            tf.metrics.Recall(class_id=0, name="confusion/recall/idle"),
+            tf.metrics.Recall(class_id=1, name="confusion/recall/speak"),
+            tf.metrics.AUC(name="basics/auc")
+        ]
     )
 
     model.summary()
@@ -93,7 +98,7 @@ if __name__ == '__main__':
         image = tf.expand_dims(image, 0)
         return image
 
-    def log_image_metrics(epoch, logs):
+    def log_metrics(epoch, logs):
         if 'val_loss' in logs.keys():
             cm = np.zeros((2,2))
             test_true = []
@@ -104,30 +109,34 @@ if __name__ == '__main__':
                 test_true.extend(np.argmax(i[1], axis=1))
                 test_score.extend(model.predict(i[0]))
                 
-            # Confusion Matrix
-            cm = tf.math.confusion_matrix(test_true, np.argmax(test_score, axis=1), num_classes=2)
+            with train_writer.as_default():
+                # F1 Score
+                f1_score = 2 * ((logs['confusion/precision'] * logs['confusion/recall']) / (logs['confusion/precision'] + logs['confusion/recall']))
+                tf.summary.scalar("epoch_confusion/f1_score", f1_score, step=epoch)
 
-            figure = plot_confusion_matrix(cm.numpy(), class_names=modelcfg.classes)
-            cm_image = plot_to_image(figure)
+            with val_writer.as_default():
+                # F1 Score
+                f1_score = 2 * ((logs['val_confusion/precision'] * logs['val_confusion/recall']) / (logs['val_confusion/precision'] + logs['val_confusion/recall']))
+                tf.summary.scalar("epoch_confusion/f1_score", f1_score, step=epoch)
 
-            with file_writer_cm.as_default():
+                # Confusion Matrix
+                cm = tf.math.confusion_matrix(test_true, np.argmax(test_score, axis=1), num_classes=2)
+                figure = plot_confusion_matrix(cm.numpy(), class_names=modelcfg.classes)
+                cm_image = plot_to_image(figure)
                 tf.summary.image("Confusion Matrix", cm_image, step=epoch)
 
-            # ROC curve
-            fpr, tpr, thresholds = metrics.roc_curve(test_true, np.array(test_score)[:,1], pos_label=1)
-
-            figure = plot_roc_curve(fpr, tpr, logs['val_auc'])
-            roc_image = plot_to_image(figure)
-
-            with file_writer_roc.as_default():
+                # ROC curve
+                fpr, tpr, thresholds = metrics.roc_curve(test_true, np.array(test_score)[:,1], pos_label=1)
+                figure = plot_roc_curve(fpr, tpr, logs['val_basics/auc'])
+                roc_image = plot_to_image(figure)
                 tf.summary.image("ROC Curve", roc_image, step=epoch)
 
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=str(export_base.absolute()), histogram_freq=1)
 
-    file_writer_cm = tf.summary.create_file_writer(str( (export_base).absolute() / "validation" ), filename_suffix=".cm")
-    file_writer_roc = tf.summary.create_file_writer(str( (export_base).absolute() / "validation" ), filename_suffix=".roc")
+    train_writer = tf.summary.create_file_writer(str( (export_base).absolute() / "train" ), filename_suffix=".custom.v2")
+    val_writer = tf.summary.create_file_writer(str( (export_base).absolute() / "validation" ), filename_suffix=".custom.v2")
 
-    metrics_callback = tf.keras.callbacks.LambdaCallback(on_epoch_end=log_image_metrics)
+    metrics_callback = tf.keras.callbacks.LambdaCallback(on_epoch_end=log_metrics)
 
     checkpoint_loss = tf.keras.callbacks.ModelCheckpoint(
         filepath=(str(export_base.absolute()) + "/model.best-loss.h5"), 

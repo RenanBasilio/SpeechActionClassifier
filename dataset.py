@@ -17,8 +17,6 @@ import argparse
 import pytz
 import pathlib
 
-log_file = open("log.txt", "w+")
-
 errors = ['Partial', '!! BAD', 'Inaudible', 'Maybe']
 
 face_detector = None
@@ -375,7 +373,7 @@ if __name__ == '__main__':
             out_path.mkdir(parents=True, exist_ok=True)
             dataset_name="NULL"
             with open(info_file) as f:
-                dataset_name = f.readline()
+                dataset_name = f.readline().split('\n')[0]
             out_file = out_path / ("{}-{}.zip".format(dataset_name, date.today().strftime("%Y-%m-%d")))
         else:
             out_file = pathlib.Path(sys.argv[3]).resolve()
