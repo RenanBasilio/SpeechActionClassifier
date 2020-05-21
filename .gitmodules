@@ -1,3 +1,0 @@
-[submodule "tools/dscore"]
-	path = tools/dscore
-	url = https://github.com/nryant/dscore.git
