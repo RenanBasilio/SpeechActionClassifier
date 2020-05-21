@@ -53,17 +53,22 @@ class Diarizer():
         self.__predictor = load_model(model, compile=False)
         self.__shift = shift
 
-        if commit_strategy is "mean":
+        if commit_strategy == "mean":
             self.__commit_strategy = strat_mean
-        elif commit_strategy is "freq":
+        elif commit_strategy == "median":
+            self.__commit_strategy = strat_median
+        elif commit_strategy == "freq":
             self.__commit_strategy = strat_freq
-        elif commit_strategy is "gaussf":
-            gauss_weights = init_gauss_weights(math.floor(15 / shift)) 
+        elif commit_strategy == "gaussw":
+            gauss_weights = init_gauss_weights(math.floor(15 / shift), (-2, 2)) 
+            self.__commit_strategy = functools.partial(strat_weighted, weights=gauss_weights)
+        elif commit_strategy == "gaussf":
+            gauss_weights = init_gauss_weights(math.floor(15 / shift), (-2, 2)) 
             self.__commit_strategy = functools.partial(strat_weightedfreq, weights=gauss_weights)
         elif callable(commit_strategy):
             self.__commit_strategy = commit_strategy
         else:
-            raise TypeError("commit_strategy can only be either a string in ['mean', 'freq', 'gaussf'] or a callable method taking a numpy 2d array and returning the integer index of the class.")
+            raise ValueError("commit_strategy can only be either a string in ['mean', 'median', 'freq', 'gaussw', 'gaussf'] or a callable method taking a numpy 2d array and returning a numpy array of confidences for each class.")
 
     def diarize(self, video, progress_callback=None):
         capture = cv2.VideoCapture(video)
@@ -97,7 +102,7 @@ class Diarizer():
                         predictions.append([])
                     else:
                         # If a frame failed to load or preprocess, commit the ones before it if possible
-                        predictions.append([np.zeros((1, 2))])
+                        predictions.append(np.zeros((1, 2)))
                         segments = self.__commit_results(segments, predictions, vid_props)
                         predictions.clear()
                         window.clear()
@@ -109,7 +114,7 @@ class Diarizer():
             if len(window) == 15:
                 prediction = self.__predictor.predict(np.expand_dims(np.asarray(window), axis=0))
                 for frame in predictions:
-                    frame.append(prediction)
+                    frame.extend(prediction)
 
             # Commit the first 'shift' entries and shift the arrays
             segments = self.__commit_results(segments, predictions[:self.__shift], vid_props)
@@ -129,13 +134,13 @@ class Diarizer():
                 # Compute predictions for each class based on the commit strategy
                 confidences = self.__commit_strategy(result_array)
                 if confidences[0] == confidences[1]:
-                    result = "None"
+                    result = None
                     confidence = 0
                 else:
                     result = self.__classes[np.argmax(confidences)]
                     confidence = confidences[np.argmax(confidences)]
             else:
-                result = "None"
+                result = None
                 confidence = 0
 
             if len(transcription) == 0 or transcription[-1].value != result:
@@ -150,7 +155,7 @@ class Diarizer():
         return transcription
 
     def __preprocess_frame(self, frame):
-        #frame = cv2.resize(frame, (320, 240))
+        frame = cv2.resize(frame, (320, 240))
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame = np.asarray(frame)
         frame = compute_facial_landmarks(frame)
@@ -163,31 +168,37 @@ class Diarizer():
 def strat_mean(array):
     if len(array) > 0:
         mean_v = np.mean(array, axis=0)
-        return mean_v[0]
+        return mean_v
+
+def strat_median(array):
+    if len(array) > 0:
+        med_v = array[math.floor(len(array)/2)]
+        return med_v
 
 # This commit strategy takes the frequency with which each class in the input array would
 # be selected and chooses the most frequent class, or -1 if both are equal.
 def strat_freq(array):
     if len(array) > 0:
-        argc = np.zeros(len(array[0][0]))
+        argc = np.zeros(len(array[0]))
         for e in array:
             argc[np.argmax(e)] += 1
+        argc = np.asarray(argc) / len(array)
         return argc
 
 # This commit strategy assigns a weight to the probability of each class in the input array,
 # and chooses the class with the highest weighted probability
 def strat_weighted(array, weights):
     if len(array) > 0:
-        weighted_sums = weights[:len(array)].dot(array)
+        weighted_sums = weights[:len(array)].dot(np.asarray(array))
         return weighted_sums
 
 # This commit strategy assigns a weight to each predicted class in the input array, and
 # chooses the most frequent class by the weighted sum of the predictions.
 def strat_weightedfreq(array, weights):
     if len(array) > 0:
-        argc = np.zeros(len(array[0][0]))
+        argc = np.zeros(len(array[0]))
         for index, e in enumerate(array):
-            if not np.all(e[0] == e[0][0]):
+            if not np.all(e == e[0]):
                 argc[np.argmax(e)] += weights[index]
         return argc
 
