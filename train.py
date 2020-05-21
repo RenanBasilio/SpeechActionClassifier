@@ -145,7 +145,7 @@ if __name__ == '__main__':
 
     checkpoint_acc = tf.keras.callbacks.ModelCheckpoint(
         filepath=(str(export_base.absolute()) + "/model.best-accuracy.h5"), 
-        monitor='val_accuracy', 
+        monitor='val_basics/accuracy', 
         save_best_only=True)
 
     earlystop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=50, restore_best_weights=False)
