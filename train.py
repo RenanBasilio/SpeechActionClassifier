@@ -18,7 +18,6 @@ if __name__ == '__main__':
 
     from modules.generators import VideoDataGenerator
     from modules.utils import plot_confusion_matrix, plot_roc_curve
-    import model as modelcfg
 
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -28,12 +27,13 @@ if __name__ == '__main__':
     print("Tensorflow Version: ", tf.__version__)
     print("Num GPUs Available: ", len(gpus))
 
+    import config.model as modelcfg
     if pathlib.Path("envconfig.py").is_file():
         print("Using environment confuguration from envconfig.py")
-        import envconfig as env
+        import config.envconfig as env
     else:
         print("Using default environment configuration.")
-        import envconfig_default as env
+        import config.envconfig_default as env
 
     data_dir = pathlib.Path(env.dataset_directory)
 
