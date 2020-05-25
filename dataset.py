@@ -1,6 +1,5 @@
 from math import floor, ceil
 from datetime import date, datetime
-from pathlib import Path
 from termcolor import cprint, colored
 from modules.loader import load_video_as_ndarray
 from modules.utils import print_progress, write_tee
@@ -13,9 +12,10 @@ import sys
 import os
 import subprocess
 import tarfile
+import zipfile
+import argparse
 import pytz
-
-log_file = open("log.txt", "w+")
+import pathlib
 
 errors = ['Partial', '!! BAD', 'Inaudible', 'Maybe']
 
@@ -254,19 +254,33 @@ def package_dataset(out_file, data_dir):
     changelog = data_dir / "changes.log"
     manifest = data_dir / "MANIFEST"
 
-    tar = tarfile.open(out_file, "w:gz")
     files = [manifest, info_file, classes_file, splits_file, changelog]
     files.extend(list(unsorted_path.glob("**/*.*")))
 
     with open(manifest, 'w', encoding='utf-8') as f:
         for item in files:
-            f.write("%s\n" % Path(item).relative_to(data_dir))
+            f.write("%s\n" % pathlib.Path(item).relative_to(data_dir))
 
-    for idx, name in enumerate(files):
-        tar.add(Path(name), arcname=Path(name).relative_to(data_dir))
-        print_progress(idx, len(files) - 1)
+    archive = None
+    if out_file.suffix == '.zip':
+        archive = zipfile.ZipFile(out_file, 'w', zipfile.ZIP_LZMA)
+        for idx, name in enumerate(files):
+            archive.write(pathlib.Path(name), arcname=pathlib.Path(name).relative_to(data_dir))
+            print_progress(idx, len(files) - 1)
+    elif '.tar' in out_file.suffix == '.tar':
+        archive = tarfile.open(out_file, "w")
+        for idx, name in enumerate(files):
+            archive.add(pathlib.Path(name), arcname=pathlib.Path(name).relative_to(data_dir))
+            print_progress(idx, len(files) - 1)
+    elif out_file.suffixes == ['.tar', '.gz'] or out_file.suffix == '.tgz':
+        archive = tarfile.open(out_file, "w:gz")
+        for idx, name in enumerate(files):
+            archive.add(pathlib.Path(name), arcname=pathlib.Path(name).relative_to(data_dir))
+            print_progress(idx, len(files) - 1)
+    else:
+        cprint("Unsupported archive extension: {}".format(''.join(out_file.suffixes)), color='red', file=sys.stderr)
     
-    tar.close()
+    archive.close()
 
 def update_changelog(data_dir):
     try:
@@ -286,93 +300,110 @@ def update_changelog(data_dir):
             file.write("\n")
         return True
 
-def print_usage():
-    print("Script for dataset management.")
-    print("Usage: ")
-    print("   preprocess_dataset.py <command> <dataset_directory> [<options>]")
-    print("")
-    print("Commands:")
-    print("   sort       Sort dataset into directories according to splits.txt and classes.txt")
-    print("   update     Updates dataset.info in dataset directory")
-    print("   validate   Validates facial recognition for new videos")
-    print("   package    Package dataset into a tarball")
-    print("   clean      Removes all folders created by sort from the output directory")
-    print("")
-    print("Options:")
-    print("   -f, --force-revalidate  Forces validation to run again for files already validated")
-
 if __name__ == '__main__':
-    if len(sys.argv) > 2:
-        data_dir = Path(sys.argv[2]).resolve()
+    parser = argparse.ArgumentParser(description="Script for dataset management.", add_help=False)
 
-        out_path = data_dir
-        #if len(sys.argv) > 3:
-        #    out_path = Path(sys.argv[3]).resolve()
-        #else:
-        #    out_path = data_dir
+    subcommands = parser.add_subparsers(title="commands", dest="command", required=True, metavar="{command}", help="additional help" )
 
-        unsorted_path = data_dir / "unsorted"
-        classes_file = data_dir / "classes.txt"
-        splits_file = data_dir / "splits.txt"
-        changelog = data_dir / "changes.log"
+    update_parser = subcommands.add_parser('update', help='update dataset.info in dataset directory')
+    update_parser.add_argument('-n', '--no-changelog', help="do not ask for a changelog message", action='store_true')
+    update_parser.add_argument('-r', '--revalidate', help="revalidate files already validated", action='store_true')
+    update_parser.add_argument("dataset_directory", help='the directory containing the dataset')
 
-        if sys.argv[1] == "sort":
+    validate_parser = subcommands.add_parser('validate', help='validate facial recognition')
+    validate_parser.add_argument('-r', '--revalidate', help="revalidate files already validated", action='store_true')
+    validate_parser.add_argument("dataset_directory", help='the directory containing the dataset')
 
-            if data_dir.is_dir() and (classes_file).exists() and (splits_file).exists() and (unsorted_path).is_dir():
-                print("Sorting dataset...")
-                print("Classes: {} ({})".format(get_classes(classes_file), classes_file))
-                print("Splits: {} ({})".format(get_splits(splits_file)["Names"], splits_file))
+    package_parser = subcommands.add_parser('package', help='package dataset into an archive', epilog='supported archive formats: .zip (default), .tar, .tar.gz')
+    package_parser.add_argument('-u', '--update', help="update dataset information before packaging", action='store_true')
+    package_parser.add_argument('-n', '--no-changelog', help="do not ask for a changelog message", action='store_true')
+    package_parser.add_argument('-o', '--output', help="output file name (default same as dataset_directory)", metavar='PATH', nargs='?')
+    package_parser.add_argument("dataset_directory", help='the directory containing the dataset')
 
-                sort_dataset(get_splits(splits_file), get_classes(classes_file), unsorted_path, out_path)
+    sort_parser = subcommands.add_parser('sort', help='sort dataset into directories according to splits')
+    sort_parser.add_argument('-o', '--output', help="output file name (default same as dataset_directory)", metavar='PATH', nargs='?')
+    sort_parser.add_argument("dataset_directory", help='the directory containing the dataset')
 
-            else:
-                print_usage()
-        
-        elif sys.argv[1] == "package":
+    clean_parser = subcommands.add_parser('clean', help='removes folders created by sort command')
+    clean_parser.add_argument('-d', '--dir', help="directory to clean (default same as dataset_directory)", metavar='PATH', nargs='?', dest="output")
+    clean_parser.add_argument('-o', '--output', help=argparse.SUPPRESS, metavar='PATH', nargs='?', dest="output")
+    clean_parser.add_argument("dataset_directory", help='the directory containing the dataset')
 
-            if not update_changelog(data_dir):
-                cprint("Packaging dataset without adding a changelog message.", 'red')
+    optional = parser.add_argument_group('optional arguments')
+    optional.add_argument("-h", "--help", action="help", help="show this help message and exit")
 
-            print("Validating new files...")
-            validate(data_dir, revalidate=(any(opt in sys.argv for opt in [ "-f", "--force-revalidate"])), verbose=False)
+    parser.add_argument("placeholder", help='the directory containing the dataset', nargs='?', metavar='<dataset_directory>')
+    
+    args = parser.parse_args()
 
+    data_dir = pathlib.Path(args.dataset_directory).resolve()
+    unsorted_path = data_dir / "unsorted"
+    classes_file = data_dir / "classes.txt"
+    splits_file = data_dir / "splits.txt"
+    info_file = data_dir / "dataset.info"
+    changelog = data_dir / "changes.log"
+
+    out_path = data_dir
+
+    if args.command == "sort":
+        if args.output is not None:
+            out_path = pathlib.Path(args.output)
+
+        if data_dir.is_dir() and (classes_file).exists() and (splits_file).exists() and (unsorted_path).is_dir():
+            print("Sorting dataset...")
+            print("Classes: {} ({})".format(get_classes(classes_file), classes_file))
+            print("Splits: {} ({})".format(get_splits(splits_file)["Names"], splits_file))
+
+            sort_dataset(get_splits(splits_file), get_classes(classes_file), unsorted_path, out_path)
+    
+    elif args.command == "package":
+        if args.output is not None:
+            out_path = pathlib.Path(args.output)
+
+        if not args.no_changelog and not update_changelog(data_dir):
+            cprint("Packaging dataset without adding a changelog message.", 'red')
+
+        if args.update:
             print("Updating dataset information...")
             update_info(data_dir, verbose=False)
-            
-            print("Packaging dataset...")
-            out_file = None
-            if out_path.suffixes == ['.tar', '.gz']:
-                out_file = Path(sys.argv[3]).resolve()
-            else:
-                out_path.mkdir(parents=True, exist_ok=True)
-                out_file = out_path / ("D3PERJ-COPPETEC-{}.tar.gz".format(date.today().strftime("%Y-%m-%d")))
-
-            package_dataset(out_file, data_dir)
-
-            print("\nDone")
-
-        elif sys.argv[1] == "update":
-            update_info(data_dir)
-            update_changelog(data_dir)
-
-        elif sys.argv[1] == "validate":
-            validate(data_dir, revalidate=(any(opt in sys.argv for opt in [ "-f", "--force-revalidate"])))
         
-        elif sys.argv[1] == "clean":
-            splits = get_splits(splits_file)
-            print("This will delete all content from the following directories:")
-            for split in splits['Names']:
-                print("  {}".format(out_path / split))
-            ans = input("Are you sure you wish to continue? (Y/n) ")
-            if ans is "Y":
-                for split in splits['Names']:
-                    shutil.rmtree(out_path / split, ignore_errors=True)
-                print("Done")
-            else:
-                print("Operation cancelled by user.")
-
+        print("Packaging dataset...")
+        out_file = None
+        if len(out_path.suffixes) == 0:
+            out_path.mkdir(parents=True, exist_ok=True)
+            dataset_name="NULL"
+            with open(info_file) as f:
+                dataset_name = f.readline().split('\n')[0]
+            out_file = out_path / ("{}-{}.zip".format(dataset_name, date.today().strftime("%Y-%m-%d")))
         else:
-            print_usage()
+            out_file = pathlib.Path(sys.argv[3]).resolve()
 
-    else:
-        print_usage()
+        package_dataset(out_file, data_dir)
+
+        print("\nDone")
+
+    elif args.command == "update":
+        print("Updating dataset information...")
+        update_info(data_dir)
+        if not args.no_changelog and not update_changelog(data_dir):
+            cprint("Skipped adding a changelog message.", 'red')
+
+    elif args.command == "validate":
+        print("Validating files...")
+        validate(data_dir, revalidate=args.revalidate)
+    
+    elif args.command == "clean":
+        if args.output is not None:
+            out_path = pathlib.Path(args.output)
+
+        splits = get_splits(splits_file)
+        print("This will delete all content from the following directories:")
+        for split in splits['Names']:
+            print("  {}".format(out_path / split))
+        ans = input("Are you sure you wish to continue? (Y/n) ")
+        if ans is "Y":
+            for split in splits['Names']:
+                shutil.rmtree(out_path / split, ignore_errors=True)
+            print("Done")
+        else:
+            print("Operation cancelled by user.")
