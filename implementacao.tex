@@ -5,7 +5,9 @@ Neste capítulo discutiremos tópicos relacionados à implementação do sistema
 
 Na seção \ref{sec:tools} apresentamos as ferramentas principais utilizadas no desenvolvimento deste trabalho.
 Em seguida, na seção \ref{sec:preproc}, apresentamos o trabalho realizado para preparação e pré-processamento dos dados.
-Na seção \ref{sec:sysarch} discutimos a arquitetura do sistema desenvolvido, discussão esta que aprofundamos na seção \ref{sec:topology} através da demonstração da topologia da rede neural utilizada.
+
+Foram desenvolvidos dois conjuntos scripts distintos para este trabalho; um sistema para treinamento da rede neural convolucional, e outro para a diarização de locutor em um vídeo com as características definidas anteriormente.
+Sendo assim, discutiremos a arquitetura utilizada para treinamento do modelo na seção \ref{sec:train}, e a utilizada no processamento de uma mídia de entrada na seção \ref{sec:application}.
 
 \section{Ferramentas}
 \label{sec:tools}
@@ -50,7 +52,7 @@ Tensorflow\cite{tensorflow2015-whitepaper} é um framework de código aberto par
 A biblioteca, construída pela empresa Google, apresenta implementações robustas de diversos algoritmos da área, além de uma API que permite a declaração de uma rede neural em função de suas camadas.
 A biblioteca suporta, ainda, o uso de uma ou mais GPUs para treinamento da rede neural, através da biblioteca cuDNN. No trabalho, essa foi utilizada para assistir na modelagem da rede neural, assim como seu treinamento e posterior execução como parte do sistema completo.
 
-A escolha desta biblioteca se deu devido à sua implementação de algoritmos chave para o desenvolvimento do trabalho, tais como a rede neural convolucional tridimensional, discutida na seção \ref{sec:dnn}.
+A escolha desta biblioteca se deu devido à sua implementação de algoritmos chave para o desenvolvimento do trabalho, tais como a rede neural convolucional tridimensional, discutida na seção \ref{sec:ann}.
 Além disso, suas interfaces nas linguagens de programação C++ e Python, assim como a facilidade de utilização de interface em Python para prototipagem rápida de redes neurais convolucionais com topologias diferentes foram decisivas para sua escolha para a realização do trabalho.
 
 Nesse trabalho, utilizamos a versão do Tensorflow 2.1.0, compilada a partir do código fonte com suporte para GPU e otimizações do referentes à arquitetura da CPU.
@@ -61,17 +63,16 @@ Nesse trabalho, utilizamos a versão do Tensorflow 2.1.0, compilada a partir do 
 No desenvolvimento deste trabalho foi utilizada em caráter primário a linguagem de programação Python.
 Originalmente, o trabalho seria desenvolvido em C++ devido ao mais alto desempenho desta linguagem; no entanto, a utilização de diversas bibliotecas com interface em Python assim como o mais rápido desenvolvimento e prototipagem nesta linguagem levou à decisão final de utiliza-la para a implementação do projeto.
 
-% TODO: Remover texto em strikethrough
 A IDE utilizada no desenvolvimento foi o Visual Studio Code, ferramenta de código aberto criada pela Microsoft, e o Jupyter Notebook\cite{kluyverJupyterNotebooksPublishing2016}, por sua capacidade de subdividir e visualizar o estado do programa em execução.
-\sout{O treinamento da rede neural foi realizado em máquina com sistema operacional Windows 10, equipada com uma CPU Intel Core i7 de quarta geração, 12 GB de memória RAM e uma GPU Nvidia GTX 980 com 4 GB de memória dedicada.}
-O treinamento da rede neural foi realizado em máquina com sistema operacional Ubuntu 16.04, equipada com uma CPU Intel Core i7 de primeira geração, 12 GB de memória RAM, e uma GPU Nvidia GTX 1080 Ti com 12 GB de memória dedicada.
+%O treinamento da rede neural foi realizado em máquina com sistema operacional Windows 10, equipada com uma CPU Intel Core i7 de quarta geração, 12 GB de memória RAM e uma GPU Nvidia GTX 980 com 4 GB de memória dedicada.
+O treinamento da rede neural foi realizado em máquina com sistema operacional Ubuntu Linux 16.04, equipada com uma CPU Intel Core i7 de primeira geração, 12 GB de memória RAM, e uma GPU Nvidia GTX 1080 Ti com 12 GB de memória dedicada.
 
 \subsection{Outras Ferramentas}
 \label{subsec:otools}
 
 Nesta seção apresentamos as demais bibliotecas utilizadas no desenvolvimento do projeto. Em cada subseção descrevemos brevemente a biblioteca, definindo seu papel no projeto.
 
-As bibliotecas se encontram ordenadas por sua função na pipeline do classificador, discutida de forma mais aprofundada na seção \ref{sec:sysarch}.
+As bibliotecas se encontram ordenadas por sua função na pipeline do classificador, discutida de forma mais aprofundada na seção \ref{sec:train}.
 
 \subsubsection{OpenCV}
 
@@ -91,6 +92,11 @@ Pandas\cite{mckinney-proc-scipy-2010} é uma biblioteca de processamento de dado
 Ela foi utilizada no pré-processamento dos dados com a finalidade de manipular os arquivos csv contendo a diarização manual dos vídeos do dataset de depoimentos.
 A biblioteca foi utilizada em sua versão 1.0.0.
 
+\subsubsection{Scikit Learn e dscore}
+
+As bibliotecas Scikit-Learn\cite{pedregosaScikitlearnMachineLearning2011}, biblioteca de aprendizado de máquina tradicional em python, e dscore\cite{ryantNryantDscore2020}, biblioteca para cálculo de métricas de diarização, foram utilizadas para o cálculo de diversas métricas relacionadas ao desempenho do sistema.
+Essas foram utilizadas em suas versões 0.22.2.post1 e 1.1.0, respectivamente.
+
 \section{Preparação dos Dados}
 \label{sec:preproc}
 
@@ -105,35 +111,45 @@ Sendo assim, ao dobrar este tempo, adquirimos a capacidade de detectar por compl
 Estes trechos foram validados para determinar se a face do depoente poderia ser reconhecida, com finalidade de descartar fragmentos nos quais este não olhava em direção à câmera, ou nas quais o detector HOG não poderia identifica-los.
 Cada trecho foi então manualmente classificado quanto à ocorrência de fala pelo depoente, produzindo uma tabela que associava o identificador de cada arquivo à classe correspondente ao mesmo.
 
-Feita essa diarização, os vídeos foram separados em conjuntos de teste e treinamento, tais que vídeos diferentes seriam utilizados para cada fase do treinamento da rede neural.
+Feita essa diarização manual, os vídeos foram separados em conjuntos de teste e treinamento, tais que vídeos diferentes seriam utilizados para cada fase do treinamento da rede neural.
 Fizemos essa separação pois, como os fragmentos possuem relação temporal tanto entre si quanto com outros vídeos do mesmo depoente, seria possível que o treinamento da rede neural utilizando segmentos semelhantes aos fragmentos de teste pudesse inflar artificialmente o desempenho da mesma.
 
-Por fim, as diarizações produzidas manualmente foram utilizadas para organizar os fragmentos em uma estrutura de diretórios, tal que primeiramente estivessem separados por conjunto de teste ou treinamento, depois por vídeo de origem, e por fim por classe.
-Essa estrutura foi construída de tal forma que as informações relevantes ao gerador de amostras da rede neural pudessem ser obtidas todas a partir do caminho para o mesmo no sistema de arquivos.
+%Por fim, as diarizações produzidas manualmente foram utilizadas para organizar os fragmentos em uma estrutura de diretórios, tal que primeiramente estivessem separados por conjunto de teste ou treinamento, depois por vídeo de origem, e por fim por classe.
+%Essa estrutura foi construída de tal forma que as informações relevantes ao gerador de amostras da rede neural pudessem ser obtidas todas a partir do caminho para o mesmo no sistema de arquivos.
 
 Para a execução de todas essas tarefas foram desenvolvidos scripts em Python e Bash, capazes de segmentar os vídeos do dataset e de validar, mover, e organizar os fragmentos extraídos destes.
 O código referente a estes pode ser encontrado no apêndice \ref{apdx:src}.
 
-\section{Arquitetura do Sistema}
-\label{sec:sysarch}
+\section{Treinamento}
+\label{sec:train}
 
-Foram desenvolvidos dois conjuntos scripts distintos para este trabalho; um sistema para treinamento da rede neural convolucional, e outro para a diarização de locutor em um vídeo com as características definidas anteriormente.
-Sendo assim, discutiremos a arquitetura utilizada para treinamento do modelo na seção \ref{subsec:train}, e a utilizada no processamento de uma mídia de entrada na seção \ref{subsec:application}.
+Para o treinamento do modelo foi desenvolvido um sistema composto por dois componentes principais.
 
-\subsection{Treinamento}
-\label{subsec:train}
+\begin{figure}[ht]
+    \centering
+    \fontsize{10pt}{10pt}\selectfont
+    \includesvg[width=0.85\textwidth]{architecture.svg}
+    \caption{A sequência de carregamento dos dados e treinamento do modelo.}
+    \label{fig:arch_train}
+\end{figure}
 
-A arquitetura do sistema de treinamento consiste em um gerador de dados e um modelo de rede neural convolucional a ser treinado.
+Primeiramente, foi construído um gerados de dados com a finalidade de alimentar os dados da entrada ao modelo dinamicamente. As características e funcionalidades se encontram descritas na seção \ref{sec:data-gen}.
+Depois, foi definida a topologia do modelo de rede neural, discutida na seção \ref{sec:topology}, e os critérios e parâmetros relevantes ao fluxo de treinamento, discutidos na seção \ref{sec:train-flow}.
 
+\subsection{Gerador de Dados}
+\label{sec:data-gen}
 A função primária do gerador de dados é carregar dinamicamente os vídeos a serem alimentados ao modelo em cada etapa de seu treinamento.
+Um módulo capaz de realizar tal carregamento dinâmico foi necessário devido ao grande volume de dados sendo processados, por virtude de se tratarem de dados de vídeo.
 Para isto, ele é inicializado com uma lista dos arquivos a serem carregados, assim como uma série de parâmetros que definem aspectos de sua operação, tais como o tamanho da batelada ou o pré-processamento a ser aplicado aos quadros.
 
-O gerador de dados possui 3 modos distintos de operação. Estes são:
-\begin{itemize}
-    \item RGB: Nesse modo, o quadro é codificado em padrão RGB, ou seja, com cores representadas por suas componentes vermelha, verde, e azul, nessa ordem.
-    \item Grayscale: Nesse modo, o quadro RGB é convertido para escala de cinza, segundo a função $Y = 0.299 R + 0.587 G + 0.114 B$.
-    \item Landmarks: Nesse modo, é gerada uma imagem em preto e branco, rasterizada a partir dos pontos identificados pela detecção de marcadores faciais em cada quadro carregado. Este foi o modo utilizado na implementação final do trabalho.
-\end{itemize}
+Cada vídeo fornecido ao gerador é, ainda, invertido horizontalmente.
+Isso é feito para garantir que o modelo fosse treinado para funcionar independentemente do ângulo do rosto do sujeito, desde que reconhecível pelo HOG, visto que na grande maioria dos vídeos do dataset original o falante se encontrava olhando para o lado esquerdo da câmera ou diretamente para esta.
+
+Para acelerar o processo de identificação facial e detecção de marcadores faciais, o gerador é, ainda, capaz de processar múltiplos fragmentos em paralelo na CPU, além de manter um cache dos fragmentos processados em iterações anteriores do treinamento.
+O paralelismo possibilitou a redução do tempo de execução da primeira iteração do treinamento e teste de cerca de 9 horas para aproximadamente uma hora e quarenta minutos, uma redução de 80\% no tempo de execução, enquanto a implementação do cache reduziu o tempo necessário para etapas subsequentes do processo de para cerca de 3 minutos.
+
+\subsection{Pré-Processamento}
+\label{sec:pre-processing}
 
 \begin{figure}[ht]
     \centering
@@ -141,70 +157,61 @@ O gerador de dados possui 3 modos distintos de operação. Estes são:
     \includesvg[width=1\textwidth]{loader_gray.svg}
     \includesvg[width=1\textwidth]{loader_lm.svg}
     \caption{A saída do gerador de dados em cada um de seus três modos de operação.}
-    \label{fig:train_metrics_evo}
+    \label{fig:generator_out}
 \end{figure}
 
-O gerador é capaz, ainda, de manter um \textit{cache} com os resultados de cálculos realizados no carregamento dos quadros, com a finalidade de possibilitar treinamento mais rápido do modelo em épocas ou execuções consecutivas.
+O gerador de dados possui 3 modos distintos de operação, que correspondem aos filtros de pré-processamento que podem ser aplicados aos quadros carregados para compor a entrada do modelo de predição. Estes são:
+
+\begin{itemize}
+    \item RGB: Nesse modo, o quadro é codificado em padrão RGB, ou seja, com cores representadas por suas componentes vermelha, verde, e azul, nessa ordem.
+    \item Grayscale: Nesse modo, o quadro RGB é convertido para escala de cinza, segundo a função $Y = 0.299 R + 0.587 G + 0.114 B$.
+    \item Landmarks: Nesse modo, é gerada uma imagem em preto e branco, rasterizada a partir dos pontos identificados pela detecção de marcadores faciais em cada quadro carregado. Este foi o modo utilizado na implementação final do trabalho.
+\end{itemize}
 
 Em nossa implementação final, utilizamos o modo de \textit{landmarks}. Esse modo de operação implementa o seguinte algoritmo:
 
 \begin{enumerate}
-    \item O gerador verifica se esse fragmento já foi processado anteriormente. Se a resposta for positiva, o resultado do processamento anterior é carregado do cache. Caso contrário, prossegue para a próxima etapa.
     \item O segmento de vídeo é carregado do disco quadro a quadro. 
-    \item Os quadros passam por um identificador facial, que retorna coordenadas de retângulos que contêm rostos no quadro original. 
-    \item Os rostos identificados passam por um detector de marcadores faciais, que retorna o conjunto de 68 pontos correspondentes a seus marcadores. 
-    \item Os pontos são, então, utilizados para o desenho de polígonos representativos do rosto sobre um canvas branco de mesmo tamanho da imagem original, na etapa à qual nos referimos como rasterização. Essa etapa garante a preservação das relações entre os marcadores faciais, que seriam perdidas caso somente os pontos fossem utilizados. 
+    \item Os quadros passam por um identificador facial, que retorna coordenadas de retângulos que contêm rostos no quadro original.
+    \item Os rostos identificados passam por um detector de marcadores faciais, que retorna o conjunto de 68 pontos correspondentes a seus marcadores.
+    \item Os pontos são utilizados para o desenho de polígonos representativos do rosto sobre um canvas branco de mesmo tamanho da imagem original, na etapa à qual nos referimos como rasterização.
     \item A imagem rasterizada é recortada segundo o retângulo delimitado pelo identificador facial e alinhada horizontalmente.
-    \item O resultado da etapa anterior é escrito no cache, a ser utilizado em processamento futuro.
 \end{enumerate}
 
-Em seguida, o modelo da rede neural é configurado. Os detalhes e decisões referentes à configuração deste podem ser encontrados na seção \ref{sec:topology}. 
+\subsection{Topologia do Modelo}
+\label{sec:topology}
+
+Para o modelo de predição, definimos uma topologia baseada na arquitetura VGG\footnote{VGG é uma arquitetura para redes neurais convolucionais para reconhecimento de objetos em fotos, desenvolvida pelo Grupo de Geometria Visual (do inglês Visual Geometry Group) da universidade de Oxford \cite{simonyanVeryDeepConvolutional2015}.}, que consiste em um número de pares de camadas de convolução e \textit{max pooling}, seguidas de camadas densamente conectadas.
+A arquitetura foi adaptada para lidar com dados de caráter tri-dimensional.
 
 \begin{figure}[ht]
     \centering
-    \includesvg[width=0.85\textwidth]{architecture.svg}
-    \caption{A arquitetura do sistema de treinamento.}
-    \label{fig:arch_train}
+    \resizebox{!}{0.7\textheight}{
+        \input{figures/model_typeA.tikz}
+        }
+    \caption{Topologia do Modelo}
+    \label{fig:topology_typeA}
 \end{figure}
 
-O treinamento é então realizado em um loop.
-Para prevenção de \textit{overfitting} na rede neural quanto ao conjunto de treinamento, paramos o mesmo quando o valor da função custo no conjunto de validação não fosse reduzido em até de 10 épocas e restauramos os pesos com melhor desempenho no conjunto de validação.
+\subsection{Treinamento do Modelo}
+\label{sec:train-flow}
 
-Como função de custo, dado que estamos lidando com um problema de classificação, utilizamos a função de entropia categórica cruzada, ou \textit{custo softmax} (equação \ref{eq:categorical_crossentropy}).
-Nessa equação, $\hat{y}$ é o vetor das probabilidades das categorias, e $y$ é a categoria real, codificada \textit{one-hot}.
+Em cada época, o sistema de treinamento do modelo chama o gerador de dados de treinamento, que lhe retorna um número fixo de amostras (batelada) compostas por segmentos de 15 quadros consecutivos.
+O modelo então faz suas predições quanto a estas, e tem seus pesos ajustados através do algoritmo de retro-propagação de forma a minimizar uma função de custo.
 
 \begin{equation} \label{eq:categorical_crossentropy}
     L(y,\hat{y})=-\sum\limits_{j=0}^M\sum\limits_{i=0}^N(y_{ij}*log(\hat{y}_{ij}))
 \end{equation}
 
-Visto que trata-se um problema de classificação binária, seria possível utilizar a função de entropia cruzada binária. 
-Porém, considerando a possibilidade de expansão futura do modelo para detecção de outras ações conversacionais, tais como gestos com a cabeça, decidimos utilizar uma função custo mais escalável para adição de novas classes.
+Como se trata de um problema de classificação, escolhemos como função custo do treinamento a função de entropia categórica cruzada, definida na equação \ref{eq:categorical_crossentropy}. Nessa equação, $\hat{y}$ é o vetor das probabilidades das categorias, e $y$ é a categoria real, codificada \textit{one-hot}\footnote{Codificação one-hot é o processo através do qual itens de um conjunto são codificados tal que sua representação seja uma sequência binária com um único bit ativo.}.
 
-Em cada época, o modelo chama o gerador de dados de treinamento, que lhe retorna um número fixo de amostras (batelada).
-Cada uma dessas amostras é, como discutido anteriormente, um segmento de 15 quadros consecutivos, extraído de um vídeo e pré-processado pelo gerador.
-Essas amostras são alimentadas através do modelo, que faz predições quanto às mesmas e, através do algoritmo de retro propagação, ajusta seus pesos em função da corretude destas.
+Visto que trata-se um problema de classificação binária, seria possível também utilizar a função de entropia cruzada binária; Porém, considerando a possibilidade de expansão futura do modelo para detecção de outras ações conversacionais, tais como gestos com a cabeça, decidimos utilizar uma função custo mais escalável para adição de novas classes.
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.75\textwidth]{training_metrics_evolution.pdf}
-    \caption{Evolução das métricas do treinamento ao longo do tempo. A métrica val\_loss, valor da função custo sobre os resultados do conjunto de validação, foi critério de parada do treinamento.}
-    \label{fig:train_metrics_evo}
-\end{figure}
+Uma vez esgotadas as amostras de teste, o modelo chama, então, o gerador de dados de validação, realizando predições sem retro-propagação sobre as entradas retornadas, e calculando o valor da função custo para os resultados.
+Esta etapa é fundamental para garantirmos que o modelo treinado seja aplicável a dados do mundo real, e não exclusivamente aos dados do conjunto de treinamento.
 
-Ao esgotarem as amostras de teste, o modelo chama, então, o gerador de dados de validação, realizando predições sem retro propagação sobre as entradas retornadas, e calculando o valor da função custo para os resultados.
 Por fim, ao se esgotarem também essas amostras, dá-se o final de uma época do treinamento, e os geradores tem suas listas de arquivos embaralhadas de forma a garantir aleatoriedade na ordem da próxima época.
-Caso o valor da função custo não tenha sido reduzido nas últimas três épocas, o treinamento chega ao seu fim, e os pesos correspondentes ao melhor desempenho obtido no conjunto de validação são restaurados.
+Ainda para prevenção de \textit{overfitting} na rede neural foi definido como critério de parada do treinamento a condição de que não haja redução da função custo durante cinquenta épocas do treinamento.
 
-Como mostra a figura \ref{fig:train_metrics_evo}, que representa a evolução das métricas de desempenho durante o treinamento do modelo, o processo teve duração de 15 épocas.
-
-\subsection{Aplicação}
-\label{subsec:application}
-
-% \input{figures/arch-run}
-
-% TODO: Escrever sobre a arquitetura do sistema
-
-\section{Topologia da Rede Neural}
-\label{sec:topology}
-
-% TODO: Escrever sobre a topologia da rede neural
+\section{Aplicação}
+\label{sec:application}

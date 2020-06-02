@@ -1,0 +1,97 @@
+\newcommand{\GenericLayer}[5]{
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \baselineskip=1.25\baselineskip
+            {\footnotesize{#2} \hfill \footnotesize{#3} \hfill \footnotesize{#4}}%
+            \linebreak
+            {\textbf{#1}}%
+            \linebreak
+            {\small{#5}}
+    \end{minipage}%
+}
+\newcommand{\BasicLayer}[2]{
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \baselineskip=1.25\baselineskip
+            {\textbf{#1}}%
+            \linebreak
+            {\small{#2}}
+    \end{minipage}%
+}
+\newcommand{\ConvLayer}[4]{
+    \GenericLayer{#1}{K: (#2)}{}{\textbf{F: #3}}{#4}%
+}
+\newcommand{\PoolLayer}[3]{
+    \GenericLayer{#1}{S: #2}{}{}{#3}%
+}
+\newcommand{\DenseLayer}[2]{
+    \BasicLayer{#1}{S: #2}%
+}
+\newcommand{\InputLayer}[2]{
+    \BasicLayer{#1}{#2}%
+}
+
+\begin{tikzpicture}[]
+    \node[state, rectangle, align=center, fill=blue!20!white] (input) [] {
+        \InputLayer{Entrada}{$15\times150\times150$}%
+    };
+    \node[state, rectangle, align=center] (conv3d_1) [below=of input] {
+        \ConvLayer{Convolução 3D}{$4\times3\times3$}{16}{$12\times148\times148$}%
+    };
+    \node[state, rectangle, align=center] (maxpool_1) [below=of conv3d_1] {
+        \PoolLayer{Max Pooling 3D}{$(2\times2\times2)$}{$6\times74\times74$}%
+    };
+    \node[state, rectangle, align=center] (conv3d_2) [below=of maxpool_1] {
+        \ConvLayer{Convolução 3D}{$3\times3\times3$}{32}{$4\times72\times72$}%
+    };
+    \node[state, rectangle, align=center] (maxpool_2) [below=of conv3d_2] {
+        \PoolLayer{Max Pooling 3D}{$(2\times2\times2)$}{$2\times36\times36$}%
+    };
+    \node[state, rectangle, align=center] (conv3d_3) [below=of maxpool_2] {
+        \ConvLayer{Convolução 3D}{$1\times3\times3$}{64}{$2\times34\times34$}%
+    };
+    \node[state, rectangle, align=center] (maxpool_3) [below=of conv3d_3] {
+        \PoolLayer{Max Pooling 3D}{$(2\times2\times2)$}{$1\times17\times17$}%
+    };
+    \node[state, rectangle, align=center] (dense_1) [below=of maxpool_3] {
+        \DenseLayer{Densa}{$256$}%
+    };
+    \node[state, rectangle, align=center] (dense_2) [below=of dense_1] {
+        \DenseLayer{Densa}{$128$}%
+    };
+    \node[state, rectangle, align=center, fill=green!20!white] (sofmax) [below=of dense_2] {
+        \DenseLayer{Softmax}{$2$}%
+    };
+    
+    \draw[->] (input) -- (conv3d_1);
+    \draw[->] (conv3d_1) -- (maxpool_1);
+    \draw[->] (maxpool_1) -- (conv3d_2);
+    \draw[->] (conv3d_2) -- (maxpool_2);
+    \draw[->] (maxpool_2) -- (conv3d_3);
+    \draw[->] (conv3d_3) -- (maxpool_3);
+    \draw[->] (maxpool_3) -- (dense_1);
+    \draw[->] (dense_1) -- (dense_2);
+    \draw[->] (dense_2) -- (sofmax);
+    
+    \node[state, rectangle, yshift=-1.1cm, fill=red!20!white] (dropout_1) [right=of input] {
+        \DenseLayer{Dropout Espacial}{$40\%$}%
+    };
+    \node[state, rectangle, yshift=-1.5cm, fill=red!20!white] (dropout_2) [right=of maxpool_2] {
+        \DenseLayer{Dropout Espacial}{$35\%$}%
+    };
+    \node[state, rectangle, yshift=-1.5cm, fill=red!20!white] (dropout_3) [right=of maxpool_3] {
+        \DenseLayer{Dropout}{$50\%$}%
+    };
+    \node[state, rectangle, yshift=-1.1cm, fill=red!20!white] (dropout_4) [right=of dense_1] {
+        \DenseLayer{Dropout}{$25\%$}%
+    };
+    
+    \draw[->] (dropout_1) |- (conv3d_1);
+    \draw[->] (dropout_1) |- (conv3d_2);
+    \draw[->] (dropout_2) |- (conv3d_3);
+    
+    \draw[->] (dropout_3) |- (dense_1);
+    \draw[->] (dropout_4) |- (dense_2);
+    
+    \node[draw=none, fill=none, minimum size=0.3\textwidth] [left=of input] (placeholder) {};
+\end{tikzpicture}

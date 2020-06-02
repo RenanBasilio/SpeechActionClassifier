@@ -1156,7 +1156,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="375.99852"
+     inkscape:cx="496.60652"
      inkscape:cy="195.08557"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -1170,7 +1170,7 @@
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     showguides="true">
+     showguides="false">
     <inkscape:grid
        type="xygrid"
        id="grid4854"
@@ -2021,15 +2021,33 @@
     </g>
     <text
        xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:0;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="-6.5497317"
+       y="37.321095"
+       id="text9367"><tspan
+         sodipodi:role="line"
+         id="tspan9365"
+         x="-6.5497317"
+         y="37.321095"
+         style="font-size:6.3499999px;line-height:1.25;stroke-width:0.26458332">Vídeo</tspan><tspan
+         sodipodi:role="line"
+         x="-6.5497327"
+         y="45.258595"
+         style="font-size:6.3302083px;line-height:1;stroke-width:0.26458332"
+         id="tspan788"><tspan
+   style="font-size:6.3499999px;line-height:1.25"
+   id="tspan5843">(15 Quadros</tspan>)</tspan></text>
+    <text
+       xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:7.91276121px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.19781902"
        x="68.911003"
-       y="35.445728"
+       y="35.954163"
        id="text9367-1"
        transform="scale(0.96082201,1.0407755)"><tspan
          sodipodi:role="line"
          id="tspan9365-3"
          x="68.911003"
-         y="35.445728"
+         y="35.954163"
          style="font-size:6.3499999px;stroke-width:0.19781902">Quadros</tspan></text>
     <g
        id="g9739"
@@ -2540,22 +2558,5 @@
        d="m 132.29166,119.72918 -24.87078,0"
        style="fill:none;stroke:#000000;stroke-width:0.26610956;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#TriangleOutL-4-2-6-4)"
        sodipodi:nodetypes="cc" />
-    <text
-       transform="scale(1.0285095,0.97228076)"
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:8.70804691px;line-height:1;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.21770117"
-       x="-1.7869726"
-       y="38.005859"
-       id="text4883-0-9"><tspan
-         id="tspan9692-9"
-         sodipodi:role="line"
-         x="-1.7869724"
-         y="38.005859"
-         style="font-size:6.4656992px;line-height:1;text-align:center;text-anchor:middle;stroke-width:0.21770117">Vídeo</tspan><tspan
-         sodipodi:role="line"
-         x="-1.7869736"
-         y="46.713905"
-         style="font-size:6.4656992px;line-height:1;text-align:center;text-anchor:middle;stroke-width:0.21770117"
-         id="tspan1264">(15 Quadros)</tspan></text>
   </g>
 </svg>

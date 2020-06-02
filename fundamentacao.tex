@@ -26,7 +26,9 @@ Somente em 2006, Geoffrey Hinton proporia formalmente o conceito de rede neural 
 
 \begin{figure}[ht]
     \centering
-    \input{figures/dnn.tikz}
+    \resizebox{0.7\textwidth}{!}{
+        \input{figures/dnn.tikz}
+    }
     \caption{Ilustração de uma rede neural profunda com 3 camadas.}
     \label{fig:dnn}
 \end{figure}
@@ -34,11 +36,11 @@ Somente em 2006, Geoffrey Hinton proporia formalmente o conceito de rede neural 
 Recentemente, com o desenvolvimento de algoritmos para o treinamento de redes neurais em GPU (do Inglês \textit{Graphics Processing Unit}) que possibilitaram o treinamento mais rápido e eficiente de redes neurais de múltiplas camadas, assim como o crescente volume de dados disponível para treinamento, o tópico de redes neurais vem rapidamente ganhando popularidade.
 Algoritmos desse tipo já são utilizados em diversas áreas da ciência, incluindo aplicações em medicina \cite{hannunCardiologistLevelArrhythmiaDetection2019,phamPredictingHealthcareTrajectories2017,houDeepSFDeepConvolutional2018}, previsão do tempo \cite{akramSequenceSequenceWeather2016}, veículos autônomos \cite{bojarskiEndEndLearning2016,peddagollaLaneDetectionAutonomous}, entre outras \cite{abiodunStateoftheartArtificialNeural2018}.
 
-Tratam-se de algoritmos próprios para problemas que envolvem o reconhecimento de padrões, e a capacidade de treina-los a partir de dados existentes os torna eficazes para aplicação em tópicos nos quais as relações entre os dados de entrada não sejam totalmente conhecidas.
+Tratam-se de algoritmos próprios para problemas que envolvem o reconhecimento de padrões, e a capacidade de treina\-los a partir de dados existentes os torna eficazes para aplicação em tópicos nos quais as relações entre os dados de entrada não sejam totalmente conhecidas.
 
 \subsubsection{Neurônios Artificiais}
 
-Biologicamente, quando o potencial elétrico na base do axônio de um neurônio atinge um limiar pré-determinado através do acúmulo de sinais de entrada recebidos pelos dendritos, um pulso elétrico é gerado e propagado até as sinapses, terminais nos quais o neurônio se conecta com os demais.
+Biologicamente, quando o potencial elétrico na base do axônio de um neurônio atinge um limiar pré\-determinado através do acúmulo de sinais de entrada recebidos pelos dendritos, um pulso elétrico é gerado e propagado até as sinapses, terminais nos quais o neurônio se conecta com os demais.
 Trata-se de um sinal binário; o neurônio pode ou não estar ativado a cada instante. No entanto, a frequência relativa das ativações pode conter informação \cite{behnkeHierarchicalNeuralNetworks2003}.
 
 \begin{figure}[H]
@@ -202,7 +204,7 @@ Originalmente introduzida em \cite{yuilleFeatureExtractionFaces1992} por Yuille 
 \begin{figure}[ht]
     \centering
     \input{figures/facial_alignment.tikz}
-    \caption{Estado do vetor de marcadores faciais em cada iteração do algoritmo de alinhamento facial.}
+    \caption{Estado do vetor de marcadores faciais ao final de cada iteração do algoritmo de alinhamento facial.}
     \label{fig:faciallm_iters}
 \end{figure}
 
