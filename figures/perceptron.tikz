@@ -1,18 +1,25 @@
 \begin{tikzpicture}
     \node[state, circle, align=center] (activation) [] {$\phi(x)$};
+    
     \node[state, circle, align=center] (sum) [left=of activation] {$\sum$};
         \draw [->] (sum) -- (activation);
+        
     \node[state, circle, align=center] (input1) [above left=of sum, yshift=-1cm, xshift=-1cm] {$x_2$};
+        \draw [->] (input1) -- node [midway, above] {$w_2$} (sum);
+        
     \node[state, circle, align=center] (input0) [above=of input1, yshift=-0.5cm] {$x_1$};
+        \draw [->] (input0) -- node [midway, above] {$w_1$} (sum);
+        
     \node[state, circle, align=center] (input2) [below left=of sum, yshift=1cm, xshift=-1cm] {$x_3$};
+        \draw [->] (input2) -- node [midway, above] {$w_3$} (sum);
+        
     \node[state, circle, align=center] (input3) [below=of input2, yshift=-0.5cm] {$x_n$};
         \path (input2) -- (input3) node [font=\Huge, midway, sloped] {$\dots$};
-        \draw [->] (input0) -- node [midway, above=0.3em] {$w_1$} (sum);
-        \draw [->] (input1) -- node [midway, above=0.1em] {$w_2$} (sum);
-        \draw [->] (input2) -- node [midway, above=0.1em] {$w_3$} (sum);
         \draw [->] (input3) -- node [midway, above=0.5em] {$w_n$} (sum);
+        
     \node[draw=none, fill=none] [right=of activation] (output) {Saída};
         \draw [->] (activation) -- (output);
+        
     \node[draw=none, fill=none] [below=of input3, yshift=0.7cm] (inputs) {Entradas};
 
 \end{tikzpicture}

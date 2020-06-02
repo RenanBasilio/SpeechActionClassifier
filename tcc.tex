@@ -53,9 +53,14 @@
 \usepackage{blkarray}
 \usepackage{textcomp}
 \usepackage{tikz}
+\usetikzlibrary{arrows.meta}
 \usepackage{svg}
 \usepackage{amsmath}
 \usepackage[normalem]{ulem}
+\usepackage{enumitem}
+\usepackage[ruled,vlined,portuguese,onelanguage]{algorithm2e}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
 \usetikzlibrary{automata,positioning}
 \graphicspath{{figures/}}
 \newtheorem{defi}{Definição}[chapter]
@@ -70,6 +75,8 @@
 \titlespacing*{\paragraph}
 {0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
 
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
 \newcommand{\Inhib}{\textit{Inhib}}
 \newcommand{\kernel}{\textit{kernel}}
 

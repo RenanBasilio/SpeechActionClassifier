@@ -63,15 +63,15 @@
         \DenseLayer{Softmax}{$2$}%
     };
     
-    \draw[->] (input) -- (conv3d_1);
-    \draw[->] (conv3d_1) -- (maxpool_1);
-    \draw[->] (maxpool_1) -- (conv3d_2);
-    \draw[->] (conv3d_2) -- (maxpool_2);
-    \draw[->] (maxpool_2) -- (conv3d_3);
-    \draw[->] (conv3d_3) -- (maxpool_3);
-    \draw[->] (maxpool_3) -- (dense_1);
-    \draw[->] (dense_1) -- (dense_2);
-    \draw[->] (dense_2) -- (sofmax);
+    \draw[-{Latex[length=2mm]}] (input) -- (conv3d_1);
+    \draw[-{Latex[length=2mm]}] (conv3d_1) -- (maxpool_1);
+    \draw[-{Latex[length=2mm]}] (maxpool_1) -- (conv3d_2);
+    \draw[-{Latex[length=2mm]}] (conv3d_2) -- (maxpool_2);
+    \draw[-{Latex[length=2mm]}] (maxpool_2) -- (conv3d_3);
+    \draw[-{Latex[length=2mm]}] (conv3d_3) -- (maxpool_3);
+    \draw[-{Latex[length=2mm]}] (maxpool_3) -- (dense_1);
+    \draw[-{Latex[length=2mm]}] (dense_1) -- (dense_2);
+    \draw[-{Latex[length=2mm]}] (dense_2) -- (sofmax);
     
     \node[state, rectangle, yshift=-1.1cm, fill=red!20!white] (dropout_1) [right=of input] {
         \DenseLayer{Dropout Espacial}{$40\%$}%
@@ -86,12 +86,12 @@
         \DenseLayer{Dropout}{$25\%$}%
     };
     
-    \draw[->] (dropout_1) |- (conv3d_1);
-    \draw[->] (dropout_1) |- (conv3d_2);
-    \draw[->] (dropout_2) |- (conv3d_3);
+    \draw[-{Latex[length=2mm]}] (dropout_1) |- (conv3d_1);
+    \draw[-{Latex[length=2mm]}] (dropout_1) |- (conv3d_2);
+    \draw[-{Latex[length=2mm]}] (dropout_2) |- (conv3d_3);
     
-    \draw[->] (dropout_3) |- (dense_1);
-    \draw[->] (dropout_4) |- (dense_2);
+    \draw[-{Latex[length=2mm]}] (dropout_3) |- (dense_1);
+    \draw[-{Latex[length=2mm]}] (dropout_4) |- (dense_2);
     
     \node[draw=none, fill=none, minimum size=0.3\textwidth] [left=of input] (placeholder) {};
 \end{tikzpicture}

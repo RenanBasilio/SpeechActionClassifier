@@ -128,7 +128,8 @@ Para o treinamento do modelo foi desenvolvido um sistema composto por dois compo
 \begin{figure}[ht]
     \centering
     \fontsize{10pt}{10pt}\selectfont
-    \includesvg[width=0.85\textwidth]{architecture.svg}
+    \includesvg[width=0.95\textwidth]{figures/architecture.svg}
+    %\includegraphics[width=0.85\textwidth]{figures/architecture.png}
     \caption{A sequência de carregamento dos dados e treinamento do modelo.}
     \label{fig:arch_train}
 \end{figure}
@@ -145,44 +146,60 @@ Para isto, ele é inicializado com uma lista dos arquivos a serem carregados, as
 Cada vídeo fornecido ao gerador é, ainda, invertido horizontalmente.
 Isso é feito para garantir que o modelo fosse treinado para funcionar independentemente do ângulo do rosto do sujeito, desde que reconhecível pelo HOG, visto que na grande maioria dos vídeos do dataset original o falante se encontrava olhando para o lado esquerdo da câmera ou diretamente para esta.
 
-Para acelerar o processo de identificação facial e detecção de marcadores faciais, o gerador é, ainda, capaz de processar múltiplos fragmentos em paralelo na CPU, além de manter um cache dos fragmentos processados em iterações anteriores do treinamento.
-O paralelismo possibilitou a redução do tempo de execução da primeira iteração do treinamento e teste de cerca de 9 horas para aproximadamente uma hora e quarenta minutos, uma redução de 80\% no tempo de execução, enquanto a implementação do cache reduziu o tempo necessário para etapas subsequentes do processo de para cerca de 3 minutos.
+Para acelerar o processo de identificação facial e detecção de marcadores faciais, o gerador é capaz de processar múltiplos fragmentos em paralelo na CPU, além de manter um cache dos fragmentos processados em iterações anteriores do treinamento.
+Esse paralelismo possibilitou a redução do tempo de execução da primeira iteração do treinamento e teste de cerca de 9 horas para aproximadamente uma hora e trinta minutos, uma redução de 83\% no tempo de execução com 6 threads, enquanto a implementação do cache reduziu o tempo necessário para etapas subsequentes do processo de para cerca de 3 minutos.
 
 \subsection{Pré-Processamento}
 \label{sec:pre-processing}
 
+O gerador de dados possui 3 modos distintos de operação, demonstrados na figura \ref{fig:generator_out}, que correspondem aos filtros de pré-processamento que podem ser aplicados aos quadros carregados para compor a entrada do modelo de predição. Estes são:
+
+\begin{enumerate}[label={(\arabic*)}]
+    \item RGB: Nesse modo, o quadro é codificado em padrão RGB, ou seja, com cores representadas por suas componentes vermelha, verde, e azul, nessa ordem.
+    \item Grayscale: Nesse modo, o quadro RGB é convertido para escala de cinza, segundo a função $Y = 0.299 R + 0.587 G + 0.114 B$.
+    \item Landmarks: Nesse modo, é gerada uma imagem em preto e branco, rasterizada a partir dos pontos identificados pela detecção de marcadores faciais em cada quadro carregado. Este foi o modo utilizado na implementação final do trabalho.
+\end{enumerate}
+
 \begin{figure}[ht]
     \centering
-    \includesvg[width=1\textwidth]{loader_rgb.svg}
-    \includesvg[width=1\textwidth]{loader_gray.svg}
-    \includesvg[width=1\textwidth]{loader_lm.svg}
+    \begin{enumerate}[label={(\arabic*)}]
+        \item \parbox{\linewidth}{\centering
+            \includesvg[width=0.9\textwidth]{loader_rgb.svg}
+        }
+        \item \parbox{\linewidth}{\centering
+            \includesvg[width=0.9\textwidth]{loader_gray.svg}
+        }
+        \item \parbox{\linewidth}{\centering
+            \includesvg[width=0.9\textwidth]{loader_lm.svg}
+        }
+    \end{enumerate}
     \caption{A saída do gerador de dados em cada um de seus três modos de operação.}
     \label{fig:generator_out}
 \end{figure}
 
-O gerador de dados possui 3 modos distintos de operação, que correspondem aos filtros de pré-processamento que podem ser aplicados aos quadros carregados para compor a entrada do modelo de predição. Estes são:
+\begin{algorithm}[H]
+    \SetAlgoLined
+    \caption{Pré-processamento de um fragmento de vídeo (landmarks).}
+    \label{alg:pre-processing}
+    \KwResult{Sequência de 15 quadros pré-processados}
+    \While{Quadros Carregados < 15}{
+        Carrega quadro do fragmento\;
+        Detecta faces no quadro carregado usando o detector facial (HOG)\;
+        Calcula os 68 marcadores faciais utilizando o algoritmo de alinhamento facial\;
+        Rasteriza os marcadores obtidos sobre um canvas branco\;
+        Recorta o canvas segundo a região identificada pelo HOG\;
+        Alinha horizontalmente a face detectada e amplia o desenho\;
+    }
+\end{algorithm}
 
-\begin{itemize}
-    \item RGB: Nesse modo, o quadro é codificado em padrão RGB, ou seja, com cores representadas por suas componentes vermelha, verde, e azul, nessa ordem.
-    \item Grayscale: Nesse modo, o quadro RGB é convertido para escala de cinza, segundo a função $Y = 0.299 R + 0.587 G + 0.114 B$.
-    \item Landmarks: Nesse modo, é gerada uma imagem em preto e branco, rasterizada a partir dos pontos identificados pela detecção de marcadores faciais em cada quadro carregado. Este foi o modo utilizado na implementação final do trabalho.
-\end{itemize}
-
-Em nossa implementação final, utilizamos o modo de \textit{landmarks}. Esse modo de operação implementa o seguinte algoritmo:
-
-\begin{enumerate}
-    \item O segmento de vídeo é carregado do disco quadro a quadro. 
-    \item Os quadros passam por um identificador facial, que retorna coordenadas de retângulos que contêm rostos no quadro original.
-    \item Os rostos identificados passam por um detector de marcadores faciais, que retorna o conjunto de 68 pontos correspondentes a seus marcadores.
-    \item Os pontos são utilizados para o desenho de polígonos representativos do rosto sobre um canvas branco de mesmo tamanho da imagem original, na etapa à qual nos referimos como rasterização.
-    \item A imagem rasterizada é recortada segundo o retângulo delimitado pelo identificador facial e alinhada horizontalmente.
-\end{enumerate}
+Em nossa implementação final, utilizamos o modo de \textit{landmarks}. Esse modo implementa o algoritmo \ref{alg:pre-processing}.
 
 \subsection{Topologia do Modelo}
 \label{sec:topology}
 
-Para o modelo de predição, definimos uma topologia baseada na arquitetura VGG\footnote{VGG é uma arquitetura para redes neurais convolucionais para reconhecimento de objetos em fotos, desenvolvida pelo Grupo de Geometria Visual (do inglês Visual Geometry Group) da universidade de Oxford \cite{simonyanVeryDeepConvolutional2015}.}, que consiste em um número de pares de camadas de convolução e \textit{max pooling}, seguidas de camadas densamente conectadas.
+Para o modelo de predição, definimos uma topologia baseada na arquitetura VGG\footnote{VGG é um estilo de arquitetura de rede neural convolucional para reconhecimento de objetos em fotos, desenvolvida pelo Grupo de Geometria Visual (do inglês \textit{Visual Geometry Group}) da universidade de Oxford \cite{simonyanVeryDeepConvolutional2015}.}, definido na figura \ref{fig:topology_typeA}, que consiste em um número de pares de camadas de convolução e \textit{max pooling}, seguidas de camadas densamente conectadas.
 A arquitetura foi adaptada para lidar com dados de caráter tri-dimensional.
+Nesta seção iremos discutir as decisões tomadas neste processo de adaptação da arquitetura, e os fatores que levaram a estas decisões.
 
 \begin{figure}[ht]
     \centering
@@ -192,6 +209,20 @@ A arquitetura foi adaptada para lidar com dados de caráter tri-dimensional.
     \caption{Topologia do Modelo}
     \label{fig:topology_typeA}
 \end{figure}
+
+Primeiramente, na primeira camada convolucional da rede, que frequentemente tem a função de detectar bordas na imagem de entrada, adicionamos uma componente temporal ao \kernel\ com dimensão 4.
+Essa dimensão par não é usual para uma rede neural convolucional, devido ao fato de que não atua sobre um elemento da imagem original alterando-o em relação a seus vizinhos, produzindo ao invés disso um novo elemento a partir da média dos valores internos às regiões de tal dimensão, ponderada pelos pesos do \kernel\ da matriz de convolução.
+Em nosso modelo isso corresponde a construir um conjunto de filtros capazes de identificar variações temporais relevantes em cada sequência de 4 quadros da entrada.
+
+Na segunda camada de convolução, adicionamos uma componente temporal com dimensão 3, igual às demais.
+Isto consiste em avaliar o valor de cada ponto da matriz de entrada em função dos valores de seus vizinhos, o que possibilita a identificação das áreas da matriz relevantes ao problema.
+A baixa dimensão utilizada em relação ao tamanho da entrada faz com que as características observadas sejam características locais, tais como bordas e cantos nas quais ocorram as variações desejadas já previamente identificadas.
+
+Na última camada de convolução, mantivemos caráter bi-dimensional do \kernel\ através da dimensão temporal igual a 1, apesar de constituir uma convolução tri-dimensional.
+Isso corresponde a operar individualmente sobre os quadros da entrada, agora compostos pela combinação temporal dos quadros originais, buscando características destes que sejam relevantes para a classificação, a ser realizada em seguida pelas camadas densas.
+
+Finalmente, o número de neurônios das camadas totalmente conectadas foi reduzido a partir dos valores originais propostos na VGG16.
+Essa redução foi realizada de forma iterativa, buscando manter a acurácia do modelo constante e reduzir o \textit{overfitting} através da eliminação de parâmetros redundantes.
 
 \subsection{Treinamento do Modelo}
 \label{sec:train-flow}
@@ -203,9 +234,28 @@ O modelo então faz suas predições quanto a estas, e tem seus pesos ajustados 
     L(y,\hat{y})=-\sum\limits_{j=0}^M\sum\limits_{i=0}^N(y_{ij}*log(\hat{y}_{ij}))
 \end{equation}
 
-Como se trata de um problema de classificação, escolhemos como função custo do treinamento a função de entropia categórica cruzada, definida na equação \ref{eq:categorical_crossentropy}. Nessa equação, $\hat{y}$ é o vetor das probabilidades das categorias, e $y$ é a categoria real, codificada \textit{one-hot}\footnote{Codificação one-hot é o processo através do qual itens de um conjunto são codificados tal que sua representação seja uma sequência binária com um único bit ativo.}.
+Como se trata de um problema de classificação, escolhemos como função custo do treinamento a função de entropia categórica cruzada, definida na equação \ref{eq:categorical_crossentropy}. Nessa equação, $\hat{y}$ é o vetor das probabilidades das categorias, e $y$ é a categoria real, codificada \textit{one-hot}\footnote{Codificação \textit{one-hot} é uma forma de representar a classe dentre um conjunto de classes à qual um item pertence, na forma de uma sequência binária na qual um único bit, correspondente a esta, esteja no nível lógico 1.}.
 
 Visto que trata-se um problema de classificação binária, seria possível também utilizar a função de entropia cruzada binária; Porém, considerando a possibilidade de expansão futura do modelo para detecção de outras ações conversacionais, tais como gestos com a cabeça, decidimos utilizar uma função custo mais escalável para adição de novas classes.
+
+Como forma de reduzir o \textit{overfitting} da rede neural aos dados do treinamento, aplicamos \textit{Dropout}\footnote{\textit{Dropout} é uma técnica que consiste na remoção aleatória de neurônios temporariamente de uma camada da rede neural durante o treinamento. \textit{Dropout Espacial} é uma variação desta técnica, que consiste em remover neurônios agrupados por região espacial.} às camadas totalmente conectadas desta, e \textit{Dropout Espacial} à saída de suas camadas convolucionais.
+A figura \ref{fig:training_metrics} mostra o resultado da utilização dessas técnicas no treinamento do modelo.
+
+\begin{figure}[ht]
+    \centering
+    \resizebox{0.95\textwidth}{!}{
+        \input{figures/train_metrics.tikz}
+    }
+    \caption{Evolução das métricas de desempenho ao longo dos processos de treinamento e validação do modelo, com e sem \textit{dropout}. Note que, sem \textit{dropout}, a acurácia no conjunto de treinamento tende a 1 e sua função custo tende a 0, enquanto a função custo no conjunto de treinamento não converge. }
+    \label{fig:training_metrics}
+\end{figure}
+
+Além disso, aplicamos regularização L2 sobre o \kernel\ e \textit{bias} de todas as camadas da rede.
+Essa regularização consiste em acrescentar uma penalidade sobre o ajuste do valor de ativação de cada neurônio $x_i$, definida na equação \ref{eq:l2_regularization}, ao valor da função custo definida anteriormente.
+
+\begin{equation}\label{eq:l2_regularization}
+    p_{l_2} = l_2 \sum\limits_{i=0}^n(x_i)^2
+\end{equation}
 
 Uma vez esgotadas as amostras de teste, o modelo chama, então, o gerador de dados de validação, realizando predições sem retro-propagação sobre as entradas retornadas, e calculando o valor da função custo para os resultados.
 Esta etapa é fundamental para garantirmos que o modelo treinado seja aplicável a dados do mundo real, e não exclusivamente aos dados do conjunto de treinamento.
@@ -215,3 +265,80 @@ Ainda para prevenção de \textit{overfitting} na rede neural foi definido como 
 
 \section{Aplicação}
 \label{sec:application}
+
+A aplicação de diarização resultante deste trabalho é capaz de, quando executada sobre um arquivo de vídeo, diarizar o mesmo produzindo um arquivo em formato RTTM\footnote{O formato RTTM, do inglês \textit{Rich Transcription Time Marked}, é um formato de arquivo texto definido pela NIST em 2009 para representação de transcrições. Sua especificação formal pode ser encontrada em \cite{nist2009RT09Rich2009}, publicado pela organização.} identificando os períodos correspondentes à fala do orador. 
+Nesta seção discutiremos de maneira aprofundada as considerações feitas durante o processo de desenvolvimento dessa aplicação, assim como os algoritmos implementados. Essa aplicação implementa o algoritmo \ref{alg:application}.
+
+\begin{algorithm}[ht]
+    \SetAlgoLined
+    \caption{Algoritmo de diarização de mídia.}
+    \label{alg:application}
+    \KwResult{Diarização completa da mídia de entrada.}
+    \While{Mídia de entrada possui quadros}{
+        \While{Quadros Carregados < 15}{
+            Carrega quadro da mídia de entrada\;
+            Aplica pré-processamento sobre o quadro carregado\;
+            Adiciona quadro carregado à janela\;
+        }
+        Realiza predição sobre os quadros da janela utilizando o modelo classificador\;
+        Armazena resultado em listas correspondentes aos quadros\;
+        Consolida os $step$ quadros mais antigos\;
+        Descarta os $step$ quadros mais antigos\;
+    }
+\end{algorithm}
+
+O algoritmo utilizado para pré-processamento dos quadros já foi discutido na seção \ref{sec:pre-processing}, e as características do modelo de classificação foram discutidas na seção \ref{sec:topology}.
+Sendo assim, discutiremos primariamente nesta seção o algoritmo utilizado para consolidação das predições realizadas para os quadros individuais, e ao fim o fluxo de erro adotado quando não é possível obter uma classificação para um determinado quadro.
+
+\subsection{Consolidação das Classificações}
+\label{sec:class-commit}
+
+Com a finalidade de obter maior precisão temporal do que seria possível apenas com a classificação de sequências de 15 quadros, a diarização é feita com tamanho de passo $step \leq 15$ tal cada quadro passe pelo classificador um número $n = \floor{15 / step}$ de vezes, em diferentes posições no fragmento.
+Dessa forma, torna-se necessário consolidar as diversas predições realizadas sobre cada quadro ao adiciona-los à transcrição final.
+
+Para esse processo, implementamos 5 algoritmos distintos. 
+Estes consistem em funções que, quando aplicadas a um conjunto de predições de tamanho variável, retornam um único conjunto de confianças correspondentes a cada classe alvo.
+Com esse propósito, implementamos as funções \textit{mediana}, \textit{média}, \textit{frequência de predição}, \textit{média gaussiana}, e \textit{frequência gaussiana}.
+A classe de maior confiança retornada por estes algoritmos é considerada a classe real do quadro, e é adicionada à diarização.
+
+\subsubsection{Mediana}
+
+A mediana é o algoritmo de consolidação mais simples entre os algoritmos implementados.
+O algoritmo consiste em selecionar as confianças de cada classe referentes à predição realizada com o quadro no centro do fragmento.
+
+\subsubsection{Média}
+
+Este algoritmo consiste em calcular a média aritmética das confianças retornadas pela camada \textit{softmax} do modelo preditor para cada classe.
+Essa média é utilizada como nova confiança do quadro.
+
+\subsubsection{Frequência}
+
+O algoritmo de frequência é bastante semelhante ao algoritmo de média, no entanto ao invés de fazer uso das confianças retornadas pelo modelo este considera as predições deste absolutas e seleciona a predição mais frequente para cada quadro individual.
+
+\subsubsection{Média e Frequência Gaussiana}
+
+Estes algoritmos consistem em implementações dos algoritmos de média e frequência já analisados anteriormente nas quais os valores das predições individuais são ponderados a partir de pesos obtidos a partir dos valores de uma distribuição normal (equação \ref{eq:normal-dist}) em $n$ pontos distribuídos linearmente em $[-2, 2]$.
+
+\begin{equation}\label{eq:normal-dist}
+    \varphi = \frac{1}{\sqrt{2\pi}} e ^ {\frac{-x^2}{2}}
+\end{equation}
+
+A intuição por trás da inclusão destes algoritmos foi de que predições realizadas com o quadro em questão próximo ao centro do fragmento seriam mais representativas da real classe desse do que predições realizadas com o mesmo nas extremidades do fragmento.
+O uso de uma distribuição normal, então, enfatizaria as confianças ou frequências dessas classificações.
+
+\subsection{Fluxo de Erro e Dados Ausentes}
+\label{sec:missing-data}
+
+Caracterizamos como dado ausente todo quadros no qual o algoritmo de detecção facial não é capaz de detectar um rosto na imagem.
+Isso pode ocorrer em diversas situações, desde um movimento por parte do orador que esconda sua face até sua real ausência na gravação.
+Note que neste momento não consideramos detecções incorretas como um dado ausente.
+
+Uma vez que o diarizador encontra um dado ausente, torna-se impossível completar uma sequência de 15 quadros para a realização de novas classificações.
+É necessário, então, consolidar as predições quanto a todos os quadros já feitas anteriormente.
+Isso é feito utilizando os mesmos algoritmos já discutidos na seção \ref{sec:class-commit}.
+
+O quadro que iniciou o erro é, então adicionado à diarização com classe desconhecida.
+Quadros subsequentes que também não possuam faces identificáveis incrementam a duração deste trecho de diarização desconhecida.
+Uma vez carregados consecutivamente 15 novos quadros válidos, essa é encerrada e o diarizador retorna ao fluxo normal.
+
+Adicionalmente, é também considerado com erro qualquer quadro que, ao ter suas classificações consolidadas, apresente confianças iguais para duas ou mais classes.

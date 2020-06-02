@@ -1,0 +1,35 @@
+\begin{tabular}{cc}
+    Custo Treinamento & Acurácia Treinamento \\
+    \begin{tikzpicture}
+        \begin{axis}[xmin=0, ymin=0, xmax=50, ymax=2, every axis plot/.append style={very thick}, minor tick num=5, grid=both, grid style={line width=.1pt, draw=gray!10}, no markers]
+            \addplot table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-21-2357_train-tag-epoch_loss.csv};
+            \addplot table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-29-1814_train-tag-epoch_loss.csv};
+        \end{axis}
+    \end{tikzpicture} 
+    &
+    \begin{tikzpicture}
+        \begin{axis}[xmin=0, ymin=0, xmax=50, ymax=1, every axis plot/.append style={very thick}, minor tick num=5, grid=both, grid style={line width=.1pt, draw=gray!10}, no markers]
+            \addplot table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-21-2357_train-tag-epoch_basics_accuracy.csv};
+            \addplot table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-29-1814_train-tag-epoch_basics_accuracy.csv};
+        \end{axis}
+    \end{tikzpicture} 
+    \\
+    \begin{tikzpicture}
+        \begin{axis}[xmin=0, ymin=0, xmax=50, ymax=2, every axis plot/.append style={very thick}, minor tick num=5, grid=both, grid style={line width=.1pt, draw=gray!10}, no markers]
+            \addplot table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-21-2357_validation-tag-epoch_loss.csv};
+            \addplot table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-29-1814_validation-tag-epoch_loss.csv};
+        \end{axis}
+    \end{tikzpicture} 
+    &
+    \begin{tikzpicture}
+        \begin{axis}[xmin=0, ymin=0, xmax=50, ymax=1, every axis plot/.append style={very thick}, minor tick num=5, grid=both, grid style={line width=.1pt, draw=gray!10}, legend style={at={(0.98,0.02)},anchor=south east}, no markers]
+            \addplot table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-21-2357_validation-tag-epoch_basics_accuracy.csv};
+            \addlegendentry{Com \textit{Dropout}}
+            
+            \addplot table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-29-1814_validation-tag-epoch_basics_accuracy.csv};
+            \addlegendentry{Sem \textit{Dropout}}
+        \end{axis}
+    \end{tikzpicture} 
+    \\
+     Custo Validação & Acurácia Validação \\
+\end{tabular}

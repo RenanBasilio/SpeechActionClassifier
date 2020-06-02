@@ -43,22 +43,22 @@ Tratam-se de algoritmos próprios para problemas que envolvem o reconhecimento d
 Biologicamente, quando o potencial elétrico na base do axônio de um neurônio atinge um limiar pré\-determinado através do acúmulo de sinais de entrada recebidos pelos dendritos, um pulso elétrico é gerado e propagado até as sinapses, terminais nos quais o neurônio se conecta com os demais.
 Trata-se de um sinal binário; o neurônio pode ou não estar ativado a cada instante. No entanto, a frequência relativa das ativações pode conter informação \cite{behnkeHierarchicalNeuralNetworks2003}.
 
-\begin{figure}[H]
+\begin{figure}[ht]
     \centering
     \includesvg[width=0.7\textwidth]{neurono-ido.svg}
     \caption{A estrutura de um neurônio biológico. Imagem adaptada de \cite{dhp1080IdoSkemoPri2016}.}
     \label{fig:bio_neuron}
 \end{figure}
 
-Funções de Ativação, também conhecidas como funções de propagação ou neurônios artificiais quando aplicadas no contexto de redes neurais, buscam modelar de forma simplificada esses aspectos biológicos.
-Elas recebem como entrada os valores resultantes das camadas anteriores, ponderados por pesos específicos a cada conexão, e, quando estes valores atingem um limiar de excitação pré-determinado, os transformam em uma única saída.
-
-\begin{figure}[H]
+\begin{figure}[ht]
     \centering
     \input{figures/perceptron.tikz}
     \caption{O \textit{Perceptron}, uma rede neural com um único neurônio.}
     \label{fig:perceptron}
 \end{figure}
+
+Funções de Ativação, também conhecidas como funções de propagação ou neurônios artificiais quando aplicadas no contexto de redes neurais, buscam modelar de forma simplificada esses aspectos biológicos.
+Elas recebem como entrada os valores resultantes das camadas anteriores, ponderados por pesos específicos a cada conexão, e, quando estes valores atingem um limiar de excitação pré-determinado, os transformam em uma única saída.
 
 Geralmente, a função de ativação é constante e independente do processo de treinamento da rede neural; o ajuste é feito sobre os pesos das conexões, através do algoritmo de retropropagação \cite{dreyfusArtificialNeuralNetworks1990}.
 O algoritmo é capaz de, a partir do resultado de uma camada, calcular o efeito de cada peso sobre o gradiente da função.
@@ -203,8 +203,10 @@ Originalmente introduzida em \cite{yuilleFeatureExtractionFaces1992} por Yuille 
 
 \begin{figure}[ht]
     \centering
-    \input{figures/facial_alignment.tikz}
-    \caption{Estado do vetor de marcadores faciais ao final de cada iteração do algoritmo de alinhamento facial.}
+    \resizebox{0.9\textwidth}{!}{
+        \input{figures/facial_alignment.tikz}
+        }
+    \caption{Estado do vetor de marcadores faciais ao final das primeiras 7 iterações do algoritmo de alinhamento facial.}
     \label{fig:faciallm_iters}
 \end{figure}
 
