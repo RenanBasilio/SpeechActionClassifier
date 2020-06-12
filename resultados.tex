@@ -1,7 +1,169 @@
 \chapter{Resultados}
+\label{chap:results}
 
-\section{Dataset AMI Meeting Corpus}
+Neste capítulo discutiremos os resultados obtidos nos testes realizados com o sistema diarizador.
+Primeiramente, na seção \ref{sec:results-model}, discutiremos os resultados referentes ao modelo classificador treinado como componente preditora do sistema.
+Depois, na seção \ref{sec:results-app}, apresentaremos os resultados referentes à aplicação diarizadora como um todo.
 
-\section{Métricas de Desempenho}
+\section{Modelo Classificador}
+\label{sec:results-model}
 
-\section{Resultados}
+Nesta seção avaliaremos o desempenho do modelo treinado em relação à sua capacidade de classificar corretamente segmentos de vídeo de 15 quadros.
+Para essa finalidade, utilizamos os segmentos de 2 vídeos distintos do dataset que não foram utilizados anteriormente durante o treinamento do modelo, totalizando 990 segmentos válidos com duração de meio segundo e classificados manualmente.
+Além disso, utilizamos também versões destes espelhadas horizontalmente, totalizando 1980 amostras totais para teste do modelo.
+
+Na seção \ref{sec:results-model-gen} apresentamos as métricas gerais de desempenho do modelo, e na seção \ref{sec:results-model-confusion} apresentamos as métricas de confusão, referentes ao desempenho deste em relação a cada uma das classes alvo.
+Todas as métricas serão apresentadas para 3 conjuntos de pesos distintos obtidos durante o processo treinamento do modelo. Estes são:
+\begin{itemize}
+    \item Os pesos que minimizam o valor da custo utilizada;
+    \item Os pesos que maximizam o valor da acurácia do modelo;
+    \item Os pesos obtidos ao final de todas as épocas do treinamento.
+\end{itemize}
+
+\subsection{Métricas Gerais}
+\label{sec:results-model-gen}
+
+As métricas gerais calculadas para o modelo incluem a sua acurácia, que representa a capacidade do modelo de classificar um dado segmento de video corretamente, a entropia categórica (equação \ref{eq:categorical_crossentropy}), que corresponde à certeza do modelo quanto a suas predições, e a área abaixo da curva ROC.
+A figura \ref{fig:general-metrics-val} mostra a evolução dessas métricas ao longo do processo de treinamento do modelo, enquanto a tabela \ref{tab:general-metrics-val} destaca os valores destas métricas para os conjuntos de pesos obtidos ao final do treinamento.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[xmin=0, ymin=0, xmax=68, ymax=1, width=0.65\textwidth, every axis plot/.append style={very thick}, minor tick num=5, grid=both, grid style={line width=.1pt, draw=gray!10}, legend style={at={(1.18,0.02)},anchor=south east}, no markers, legend cell align={left}]
+            \addplot table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-21-2357_validation-tag-epoch_basics_accuracy.csv};
+            \addlegendentry{Acurácia}
+            \addplot[OliveGreen] table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-21-2357_validation-tag-epoch_basics_auc.csv};
+            \addlegendentry{Area Under Curve}
+            \addplot[red] table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-21-2357_validation-tag-epoch_basics_cce.csv};
+            \addlegendentry{Entropia Categórica}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Evolução das métricas gerais sobre o conjunto de validação\\ durante o treinamento do modelo. A linha azul representa a evolução da acurácia, enquanto a linha verde corresponde à evolução da área abaixo da curva ROC, e a linha vermelha à da entropia categórica cruzada.}
+    \label{fig:general-metrics-val}
+\end{figure}
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+        \rule{1cm}{0pt}&\rule{1.5cm}{0pt}&\rule{1.5cm}{0pt}&\rule{1.5cm}{0pt}&\rule{1cm}{0pt}\\[-\arraystretch\normalbaselineskip]
+        \hline
+        Pesos & Época & Acurácia & AUC & Entropia Categórica \\
+        \hline
+        \hline
+        Custo Mínimo & 18 & 0.8596 & 0.9314 & 0.3382 \\
+        \hline
+        Acurácia Máxima & 39 & 0.8656 & 0.9336 & 0.3429 \\
+        \hline
+        Final & 68 & 0.8561 & 0.9236 & 0.4198 \\
+        \hline
+    \end{tabular}
+    \caption{Métricas referentes aos conjuntos de pesos obtidos ao final\\ do processo de treinamento.}
+    \label{tab:general-metrics-val}
+\end{table}
+
+\subsection{Métricas de Confusão}
+\label{sec:results-model-confusion}
+
+As métricas de confusão demonstram a capacidade do modelo de classificar corretamente os itens pertencentes a cada uma das classes.
+Essas incluem a matriz de confusão, que visualiza as classificações feitas pelo diarizador em relação à classe real de cada item, revelando as tendências deste, e os valores de precisão, \textit{recall}, e \textit{$F_1$ Score} calculados a partir desta.
+
+\begin{figure}[ht]
+    \centering
+    \resizebox{0.9\textwidth}{!}{
+        \begin{tabular}{cc}
+            \MakeConfusionMatrix{855}{93}{185}{847} & \MakeConfusionMatrix{845}{103}{163}{869} \\
+            Menor Custo & Maior Acurácia \\
+            & \\
+            \multicolumn{2}{c}{\MakeConfusionMatrix{872}{76}{209}{823}} \\
+            \multicolumn{2}{c}{Final}
+        \end{tabular}
+    }
+    \caption{Matrizes de Confusão para os conjuntos de pesos obtidos ao final \\ do treinamento do modelo. }
+    \label{fig:confusion_matrices}
+\end{figure}
+
+A figura \ref{fig:confusion_matrices} mostra as matrizes de confusão dos conjuntos de pesos treinados que obtiveram melhor desempenho sobre o conjunto de treinamento.
+Observa-se a acurácia do modelo no percentual de valores que se encontram da diagonal principal desta; Esses valores correspondem às classificações corretas dos elementos de cada classe.
+Note, ainda, que os conjuntos de pesos de menor custo e finais do treinamento tendem à esquerda, indicando uma tendência do modelo a classificar negativamente os segmentos observados.
+
+Além disso, para melhor entendimento das propriedades do modelo treinado, calculamos a precisão e o \textit{recall} correspondente a cada classe, assim como o \textit{$F_1$ Score} para os conjuntos de pesos obtidos ao final do processo de treinamento do modelo.
+A precisão, calculada a partir da equação \ref{eq:precision}, representa a probabilidade de que um elemento classificado como pertencente a uma classe pertença realmente à mesma, enquanto a taxa de \textit{recall}, calculada a partir da equação \ref{eq:recall}, representa a capacidade do modelo de classificar corretamente os elementos pertencentes a uma determinada classe.
+Por fim, o \textit{$F_1$ Score}, calculado através da equação \ref{eq:f1-score}, corresponde à média harmônica dessas duas métricas, representando a acurácia do modelo na classificação de uma determinada classe.
+
+\begin{figure}[ht]
+    \centering
+    \resizebox{0.9\textwidth}{!}{
+        \begin{tabular}{cc}
+            \begin{tikzpicture}
+                    \begin{axis}[xmin=0, ymin=0, xmax=68, ymax=1, every axis plot/.append style={very thick}, minor tick num=5, grid=both, grid style={line width=.1pt, draw=gray!10}, legend style={at={(0.98,0.02)},anchor=south east}, no markers]
+                        \addplot table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-21-2357_validation-tag-epoch_confusion_precision_idle.csv};
+                        \addplot table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-21-2357_validation-tag-epoch_confusion_precision_speak.csv};
+                    \end{axis}
+                \end{tikzpicture} & \begin{tikzpicture}
+                    \begin{axis}[xmin=0, ymin=0, xmax=68, ymax=1, every axis plot/.append style={very thick}, minor tick num=5, grid=both, grid style={line width=.1pt, draw=gray!10}, legend style={at={(0.98,0.02)},anchor=south east}, no markers, legend cell align={left}]
+                        \addplot table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-21-2357_validation-tag-epoch_confusion_recall_idle.csv};
+                        \addlegendentry{Idle}
+                        \addplot[red] table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-21-2357_validation-tag-epoch_confusion_recall_speak.csv};
+                        \addlegendentry{Speech}
+                    \end{axis}
+                \end{tikzpicture} \\
+            Precisão & \textit{Recall} \\
+        \end{tabular}
+    }
+    \caption{Evolução da Precisão e \textit{Recall} de cada classe sobre o conjunto de validação durante o processo de treinamento do modelo. A linha azul representa a classe \textit{Idle}, que corresponde à ausência de fala no fragmento, enquanto a linha vermelha representa a classe \textit{Speech}, que corresponde à detecção de fala no fragmento.}
+    \label{fig:class_precision_recall}
+\end{figure}
+
+\begin{equation}\label{eq:precision}
+    Precis\Tilde{a}o = \frac{TP}{TP + FP}
+\end{equation}
+
+\begin{equation}\label{eq:recall}
+    Recall = \frac{TP}{TP + FN}
+\end{equation}
+
+\begin{equation}\label{eq:f1-score}
+    F_1 = 2 \times \frac{precis\Tilde{a}o \times recall}{precis\Tilde{a}o + recall}
+\end{equation}
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+        \hline
+         & \multicolumn{3}{c|}{Idle} & \multicolumn{3}{c|}{Speech}  \\
+        \hline
+        Pesos & Precisão & \textit{Recall} & $F_1$ & Precisão & \textit{Recall} & $F_1$ \\
+        \hline
+        \hline
+        Custo Mínimo & 0.8221 & 0.9019 & 0.8601 & 0.9011 & 0.8207 & 0.8590 \\
+        \hline
+        Acurácia Máxima & 0.8383 & 0.8940 & 0.8652 & 0.8914 & 0.8421 & 0.8660 \\
+        \hline
+        Final & 0.8067 & 0.9155 & 0.8577 & 0.9198 & 0.7975 & 0.8543 \\
+        \hline
+    \end{tabular}
+    \caption{Métricas de confusão para os conjuntos de pesos obtidos ao final de processo de treinamento do modelo.}
+    \label{tab:confusion_metrics_val}
+\end{table}
+
+A figura \ref{fig:class_precision_recall} demonstra a evolução das métricas precisão e \textit{recall} calculadas a partir da matriz de confusão ao longo do processo de treinamento para cada classe, enquanto a tabela \ref{tab:confusion_metrics_val} explicita o seu valor para os conjuntos de pesos obtidos ao final do treinamento.
+
+\section{Aplicação Diarizadora}
+\label{sec:results-app}
+
+Nesta seção avaliaremos o desempenho da aplicação diarizadora.
+Para isso, utilizaremos como métricas de comparação a Taxa de Erro de Diarização (DER, do inglês \textit{Diarization Error Rate}) e a Taxa de Erro de Jaccard (JER, do inglês \textit{Jaccard Error Rate}).
+
+\begin{equation}\label{eq:der}
+    DER = \frac{False\ Alarm + Miss + Overlap + Confusion}{Time} 
+\end{equation}
+
+\begin{equation}\label{eq:jer}
+    JER_{Speaker} = \frac{False\ Alarm + Miss}{Speech_{Ref} + Speech_{Sys}}
+\end{equation}
+
+A Taxa de Erro de Diarização, definida na equação \ref{eq:der}, consiste na fração do tempo total da diarização que não é atribuída corretamente (\textit{False Alarm}), não é identificada (\textit{Miss}), possui sobreposição de locutores (\textit{Overlap}), ou é atribuída ao locutor errado (\textit{Confusion}).
+A métrica foi estabelecida pelo \textit{National Institute of Standards and Technology} norte-americano, NIST, e se encontra definida formalmente em \cite{nist2009RT09Rich2009} e \cite{fiscusRichTranscription20062006}, e é desde então a mais utilizada para medição de desempenho em sistemas de diarização.
+
+Já a Taxa de Erro de Jaccard, definida na equação \ref{eq:jer}, consiste no número de segmentos atribuídos incorretamente na diarização produzida em relação à diarização de referência (\textit{False Alarm}), e vice-versa (\textit{Miss}), em relação ao número total de segmentos de fala do mesmo em ambas as diarizações.
+Sua definição formal foi feita no artigo introdutório do desafio DIHARD II, e pode ser encontrada em  \cite{ryantSecondDIHARDDiarization2019}.

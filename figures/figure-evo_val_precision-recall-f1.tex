@@ -1,0 +1,28 @@
+\resizebox{0.9\textwidth}{!}{
+    \begin{tabular}{cc}
+        \rule{0.2\textwidth}{0pt}&\rule{0.8\textwidth}{0pt}\\[-\arraystretch\normalbaselineskip]
+        & \multirow{29}{*}{\resizebox{1.16\textwidth}{!}{
+            \begin{tikzpicture}
+                \begin{axis}[xmin=0, ymin=0, xmax=68, ymax=1, every axis plot/.append style={very thick}, minor tick num=5, grid=both, grid style={line width=.1pt, draw=gray!10}, legend style={at={(0.98,0.02)},anchor=south east}, no markers]
+                    \addplot[magenta] table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-21-2357_validation-tag-epoch_confusion_f1_score.csv};
+                    \addlegendentry{F1 Score}
+                \end{axis}
+            \end{tikzpicture}
+        }} \\
+        \begin{tikzpicture}
+            \begin{axis}[xmin=0, ymin=0, xmax=68, ymax=1, every axis plot/.append style={very thick}, minor tick num=5, grid=both, grid style={line width=.1pt, draw=gray!10}, legend style={at={(0.98,0.02)},anchor=south east}, no markers]
+                \addplot table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-21-2357_validation-tag-epoch_confusion_precision.csv};
+                \addlegendentry{Precisão}
+            \end{axis}
+        \end{tikzpicture} & \\
+        (1) & \\
+        \begin{tikzpicture}
+            \begin{axis}[xmin=0, ymin=0, xmax=68, ymax=1, every axis plot/.append style={very thick}, minor tick num=5, grid=both, grid style={line width=.1pt, draw=gray!10}, legend style={at={(0.98,0.02)},anchor=south east}, no markers]
+                \addplot[red] table [x=Step, y=Value, col sep=comma] {figures/run-2020-05-21-2357_validation-tag-epoch_confusion_recall.csv};
+                \addlegendentry{Recall}
+            \end{axis}
+        \end{tikzpicture} & 
+        \\
+        (2) & (3) \\
+    \end{tabular}
+}

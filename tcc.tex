@@ -52,6 +52,7 @@
 \usepackage{arydshln}
 \usepackage{blkarray}
 \usepackage{textcomp}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta}
 \usepackage{svg}
@@ -60,6 +61,8 @@
 \usepackage{enumitem}
 \usepackage[ruled,vlined,portuguese,onelanguage]{algorithm2e}
 \usepackage{pgfplots}
+\usepackage[nomessages]{fp}
+\usepackage{multirow}
 \pgfplotsset{compat=1.16}
 \usetikzlibrary{automata,positioning}
 \graphicspath{{figures/}}
@@ -79,6 +82,8 @@
 \newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
 \newcommand{\Inhib}{\textit{Inhib}}
 \newcommand{\kernel}{\textit{kernel}}
+\newcommand{\comment}[1]{}
+\input{texmf/confusionmatrix}
 
 %\includeonly{fundamentacao}
 
