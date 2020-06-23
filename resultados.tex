@@ -46,16 +46,15 @@ A figura \ref{fig:general-metrics-val} mostra a evolução dessas métricas ao l
     \centering
     \begin{tabular}{|c|c|c|c|c|}
         \rule{1cm}{0pt}&\rule{1.5cm}{0pt}&\rule{1.5cm}{0pt}&\rule{1.5cm}{0pt}&\rule{1cm}{0pt}\\[-\arraystretch\normalbaselineskip]
-        \hline
+        \toprule
         Pesos & Época & Acurácia & AUC & Entropia Categórica \\
-        \hline
-        \hline
+        \toprule
         Custo Mínimo & 18 & 0.8596 & 0.9314 & 0.3382 \\
         \hline
         Acurácia Máxima & 39 & 0.8656 & 0.9336 & 0.3429 \\
         \hline
         Final & 68 & 0.8561 & 0.9236 & 0.4198 \\
-        \hline
+        \bottomrule
     \end{tabular}
     \caption{Métricas referentes aos conjuntos de pesos obtidos ao final\\ do processo de treinamento.}
     \label{tab:general-metrics-val}
@@ -129,18 +128,17 @@ Por fim, o \textit{$F_1$ Score}, calculado através da equação \ref{eq:f1-scor
 \begin{table}[ht]
     \centering
     \begin{tabular}{|c|c|c|c|c|c|c|}
-        \hline
+        \toprule
          & \multicolumn{3}{c|}{Idle} & \multicolumn{3}{c|}{Speech}  \\
         \hline
         Pesos & Precisão & \textit{Recall} & $F_1$ & Precisão & \textit{Recall} & $F_1$ \\
-        \hline
-        \hline
+        \toprule
         Custo Mínimo & 0.8221 & 0.9019 & 0.8601 & 0.9011 & 0.8207 & 0.8590 \\
         \hline
         Acurácia Máxima & 0.8383 & 0.8940 & 0.8652 & 0.8914 & 0.8421 & 0.8660 \\
         \hline
         Final & 0.8067 & 0.9155 & 0.8577 & 0.9198 & 0.7975 & 0.8543 \\
-        \hline
+        \bottomrule
     \end{tabular}
     \caption{Métricas de confusão para os conjuntos de pesos obtidos ao final de processo de treinamento do modelo.}
     \label{tab:confusion_metrics_val}
@@ -165,7 +163,7 @@ Para isso, utilizaremos como métricas de comparação a Taxa de Erro de Diariza
 A Taxa de Erro de Diarização, definida na equação \ref{eq:der}, consiste na fração do tempo total da diarização que não é atribuída corretamente (\textit{False Alarm}), não é identificada (\textit{Miss}), possui sobreposição de locutores (\textit{Overlap}), ou é atribuída ao locutor errado (\textit{Confusion}).
 A métrica foi estabelecida pelo \textit{National Institute of Standards and Technology} norte-americano, NIST, e se encontra definida formalmente em \cite{nist2009RT09Rich2009} e \cite{fiscusRichTranscription20062006}, e é desde então a mais utilizada para medição de desempenho em sistemas de diarização.
 
-Já a Taxa de Erro de Jaccard, definida na equação \ref{eq:jer}, consiste no número de segmentos atribuídos incorretamente na diarização produzida em relação à diarização de referência (\textit{False Alarm}), e vice-versa (\textit{Miss}), em relação ao número total de segmentos de fala do mesmo em ambas as diarizações.
+Já a Taxa de Erro de Jaccard, definida na equação \ref{eq:jer}, consiste no número de segmentos atribuídos incorretamente na diarização produzida pelo sistema, em relação à diarização de referência (\textit{False Alarm}), e vice-versa (\textit{Miss}).
 Sua definição formal foi feita no artigo introdutório do desafio DIHARD II, e pode ser encontrada em  \cite{ryantSecondDIHARDDiarization2019}.
 
 Para o ajuste do tamanho do passo e algoritmo de consolidação da aplicação, discutidos na seção \ref{sec:class-commit}, assim como a avaliação da aplicação diarizadora como um todo, executamos a mesma sobre um dos vídeos completos para diversas combinações de parâmetros e para cada um dos modelos treinados. 
@@ -179,9 +177,9 @@ Por fim, ambos os modelos obtido ao final do treinamento e de valor mínimo da f
 \begin{table}[ht]
     \centering
     \begin{tabular}{|c|c|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}|}
-        \hline
+        \toprule
         Modelo & Passo & Mediana & Média & Frequência & Média Gauss. & Freq. Gauss. \\
-        \hline
+        \toprule
         \multirow{4}{*}{\shortstack[c]{Custo\\ Mínimo}} & 1 & 36.08 & 32.80 & 32.90 & 34.78 & 34.65 \\
         \cline{2-7}
         & 3 & 36.31 & {\color{red}\textbf{32.50}} & 32.90 & 35.20 & 34.99 \\
@@ -205,7 +203,7 @@ Por fim, ambos os modelos obtido ao final do treinamento e de valor mínimo da f
         & 5 & 36.08 & 35.00 & 35.00 & 36.05 & 36.08 \\
         \cline{2-7}
         & 15 & 40.61 & 40.61 & 40.61 & 40.61 & 40.61 \\
-        \hline
+        \bottomrule
     \end{tabular}
     \caption{Taxa de Erro de Diarização (DER) para a diarização em função dos parâmetros do diarizador.}
     \label{tab:diarization-results-der}
@@ -214,9 +212,9 @@ Por fim, ambos os modelos obtido ao final do treinamento e de valor mínimo da f
 \begin{table}[ht]
     \centering
     \begin{tabular}{|c|c|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}|}
-        \hline
+        \toprule
         Modelo & Passo & Mediana & Média & Frequência & Média Gauss. & Freq. Gauss. \\
-        \hline
+        \toprule
         \multirow{4}{*}{\shortstack[c]{Custo\\ Mínimo}} & 1 & 37.08 & 34.90 & 34.98 & 36.35 & 36.23 \\
         \cline{2-7}
         & 3 & 37.18 & {\color{red}\textbf{34.63}} & 34.97 & 36.51 & 36.36 \\
@@ -240,7 +238,7 @@ Por fim, ambos os modelos obtido ao final do treinamento e de valor mínimo da f
         & 5 & 36.58 & 35.99 & 35.99 & 36.49 & 36.58 \\
         \cline{2-7}
         & 15 & 39.46 & 39.46 & 39.46 & 39.46 & 39.46 \\
-        \hline
+        \bottomrule
     \end{tabular}
     \caption{Taxa de Erro de Jaccard (JER) para a diarização em função dos parâmetros do diarizador.}
     \label{tab:diarization-results-jer}

@@ -1,3 +1,47 @@
 \chapter{Conclusão}
 
+Neste trabalho, produzimos um sistema capaz de diarizar um vídeo com um único locutor, com resultado comparável aos obtidos através do uso de i-Vectors, tradicional para este propósito quando apenas o áudio da gravação é considerado.
+O sistema apresentou desempenho consideravelmente pior do que o de técnicas de processamento de áudio mais modernas, como o uso de X-vectors extraídos a partir de redes neurais, redes neurais recorrentes, ou clusterização espectral.
+No entanto, devido à sua independência do áudio, esse pode ser utilizado quando o mesmo estiver ausente ou em baixa qualidade para a finalidade proposta.
+
+A tabela \ref{tab:results-comparison} demonstra os resultados obtidos por nosso sistema em relação a outros algoritmos publicados na literatura.
+
+\begin{table}[ht]
+    \centering
+    \resizebox{0.95\textwidth}{!}{
+        \begin{tabular}{>{\centering\arraybackslash}m{4.3cm}|c|c|c|c}
+            \toprule
+            Algoritmo & Dataset & Tipo da Mídia & Locutores & Taxa de Erro\% \\
+            \toprule
+            \makecell{Sistema \\ Proposto} & D3PERJ\footnotemark[1] & Vídeo & 1 & 32.50 (DER) \\ \hline
+            \makecell{LSTM \cite{wangSpeakerDiarizationLSTM2018} \\ (Naive i-Vectors) } & CALLHOME & Áudio & Dinâmico\footnotemark[2] & 32.36 (DER) \\ \hline
+            \makecell{Naive i-Vector \\ Clustering \cite{dimitriadisEnhancementsAudioonlyDiarization2019}} & DIHARD & Áudio & Predefinido\footnotemark[3] & 30.38 (DER) \\ \hline
+            \makecell{State-of-the-Art \\ i-Vector Clustering \cite{dimitriadisEnhancementsAudioonlyDiarization2019}} & DIHARD & Áudio & Dinâmico & 23.99 (DER) \\ \hline
+            \makecell{LSTM \cite{wangSpeakerDiarizationLSTM2018} \\ (Naive X-Vectors)} & CALLHOME & Áudio & Dinâmico\footnotemark[2] & 18.87 (DER) \\ \hline
+            \makecell{Multi-stream \\ LSTM \cite{ephratLookingListenCocktail2018}} & AVSpeech & Misto & 1 & 16.00 (SDR) \\ \hline
+            \makecell{LSTM \cite{wangSpeakerDiarizationLSTM2018} \\ (Spectral X-Vectors)} & CALLHOME & Áudio & Dinâmico\footnotemark[2] & 12.48 (DER) \\
+            \bottomrule
+        \end{tabular}
+    }
+    \caption{Comparação da taxa de erro obtida com as apresentadas em outros trabalhos da literatura, em ordem decrescente.}
+    \label{tab:results-comparison}
+\end{table}
+\footnotetext[1]{Dataset de Depoimentos da Defensoria Pública do Estado do Rio de Janeiro.}
+\footnotetext[2]{O algoritmo é capaz de inferir o número de locutores dinamicamente, mas foi fixado em 2 para essa avaliação.}
+\footnotetext[3]{O número de locutores de cada gravação precisa ser fornecido previamente ao algoritmo.}
+
+Ainda, a arquitetura desenvolvida para o modelo de rede neural se demonstrou sólida, frequentemente tendendo ao \textit{overfitting}, o que demonstra sua aptidão para o problema em questão.
+Dada a introdução de um maior volume de dados para o treinamento da rede, esta poderia vir a apresentar maior acurácia.
+
 \section{Trabalhos Futuros}
+
+Um tópico recorrente no desenvolvimento deste trabalho foi a desconsideração do áudio associado ao vídeo sendo processado.
+Julgamos que seria possível melhorar consideravelmente o desempenho da rede considerando também os níveis de áudio associados às ações que estão sendo classificadas, tal que um movimento do locutor possa ser classificado também em função do efeito que produz sobre a onda de áudio.
+
+Alternativamente, com algumas adaptações do modelo para obter maior precisão sobre a classe positiva, em detrimento do \textit{recall} sobre esta classe e da acurácia geral deste, o sistema poderia ser utilizado para isolar regiões da mídia nas quais o locutor definitivamente falou, dado que poderia ser utilizado para obter um tipo de perfil de sua voz, que possa agir como um centro definitivo para a clusterização tradicional.
+
+Adicionalmente, para obter melhor acurácia, seria possível adaptar o modelo para considerar métricas calculadas sobre os quadros, tais como o fluxo ótico, métrica representativa da variação, e, consequentemente, do movimento, entre dois quadros consecutivos.
+Além disso, a identificação facial pode ser melhorada para permitir reconhecimento de locutores em perfil, visto que a técnica utilizada permite somente a identificação facial frontal, limitação que não se aplica à detecção de marcadores faciais.
+Ainda, o sistema poderia ser adaptado para utilizar uma rede neural recorrente no processamento de cada quadro individualmente, potencialmente melhorando ainda mais seu desempenho.
+
+Finalmente, o sistema pode ser adaptado para lidar com múltiplos locutores no vídeo, utilizando reconhecimento facial e a localização espacial de cada locutor para identificação destes quadro-a-quadro.

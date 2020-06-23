@@ -6,11 +6,11 @@
 
 A diarização de locutor consiste no processo de identificar os diferentes locutores em um conteúdo multimídia de forma a separa-los temporalmente, definindo quando quem falou, e produzir um tipo de roteiro para o mesmo.
 
-Tradicionalmente, tenta-se resolver esse problema através da análise exclusiva do áudio, por meio da extração de \textit{features} na forma de vetores denominados \textit{I-vectors}, e subsequente clusterização destes.
+Tradicionalmente, tenta-se resolver esse problema através da análise exclusiva do áudio, por meio da extração de \textit{features} na forma de vetores denominados \textit{I-vectors}\cite{zewoudieUseLongtermFeatures2018}, e subsequente clusterização destes.
 Porém, trata-se de um problema difícil; o timbre, principal característica sonora responsável pela identificação do locutor pelo ser humano, é de caráter neurológico \cite{oxenhamPitchPerception2012}, produzido pela decomposição da onda sonora em seus harmônicos pelo trato auditivo.
 E, ainda, como propriedade intrínseca da etapa de clusterização, a utilização desses algoritmos depende do conhecimento prévio do número de locutores que participam do áudio.
 
-Dadas essas limitações, temos que o desempenho dos algoritmos considerados estado da arte é insuficiente, com taxa de erro de diarização (a partir daqui chamada de DER, do inglês \textit{Diarization Error Rate}) de cerca de 20\% \cite{zewoudieUseLongtermFeatures2018} nas bases tradicionais.
+Dadas essas limitações, temos que o desempenho dos algoritmos considerados estado da arte é insuficiente, com taxa de erro de diarização (a partir daqui chamada de DER, do inglês \textit{Diarization Error Rate}) de cerca de 20\% nas bases tradicionais.
 Portanto, a busca de outras técnicas capazes de prover um melhor desempenho nos leva a considerar também outros sinais constituintes do conteúdo multimídia, como o de vídeo do orador.
 
 \section{Motivação}
@@ -60,7 +60,7 @@ No capítulo 3 apresentamos a nossa implementação do sistema proposto.
 Abordamos tópicos como as ferramentas utilizadas, pré-processamento dos dados de treinamento, e a arquitetura proposta para a rede neural convolucional.
 Por fim, discutimos a implementação da aplicação final, para lidar com dados não tratados previamente.
 
-No capítulo 4 demonstramos os resultados de nosso método quando aplicado sobre dataset fornecido pela Defensoria Pública do Estado do Rio de Janeiro, \sout{além do dataset AMI Meeting Corpus \cite{mccowanAMIMeetingCorpus2005},} que contém vídeos dos participantes individuais\sout{, em alta resolução e} com as características desejadas.
+No capítulo 4 demonstramos os resultados de nosso método quando aplicado sobre dataset fornecido pela Defensoria Pública do Estado do Rio de Janeiro, que contém vídeos dos participantes individuais\sout{, em alta resolução e} com as características desejadas.
 
 Por fim, no capítulo 5, resumimos e apresentamos nossas conclusões quanto ao trabalho realizado, discutindo os resultados obtidos e os fatores que contribuíram para estes, e enumeramos trabalhos futuros a serem realizados sobre o mesmo tema.
 

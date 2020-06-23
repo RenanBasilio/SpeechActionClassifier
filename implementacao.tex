@@ -115,7 +115,7 @@ Feita essa diarização manual, os vídeos foram separados em conjuntos de teste
 Fizemos essa separação pois, como os fragmentos possuem relação temporal tanto entre si quanto com outros vídeos do mesmo depoente, seria possível que o treinamento da rede neural utilizando segmentos semelhantes aos fragmentos de teste pudesse inflar artificialmente o desempenho da mesma.
 
 %Por fim, as diarizações produzidas manualmente foram utilizadas para organizar os fragmentos em uma estrutura de diretórios, tal que primeiramente estivessem separados por conjunto de teste ou treinamento, depois por vídeo de origem, e por fim por classe.
-%Essa estrutura foi construída de tal forma que as informações relevantes ao gerador de amostras da rede neural pudessem ser obtidas todas a partir do caminho para o mesmo no sistema de arquivos.
+%Essa estrutura foi construída de tal forma que as informações relevantes ao carregador de amostras da rede neural pudessem ser obtidas todas a partir do caminho para o mesmo no sistema de arquivos.
 
 Para a execução de todas essas tarefas foram desenvolvidos scripts em Python e Bash, capazes de segmentar os vídeos do dataset e de validar, mover, e organizar os fragmentos extraídos destes.
 O código referente a estes pode ser encontrado no apêndice \ref{apdx:src}.
@@ -137,22 +137,22 @@ Para o treinamento do modelo foi desenvolvido um sistema composto por dois compo
 Primeiramente, foi construído um gerados de dados com a finalidade de alimentar os dados da entrada ao modelo dinamicamente. As características e funcionalidades se encontram descritas na seção \ref{sec:data-gen}.
 Depois, foi definida a topologia do modelo de rede neural, discutida na seção \ref{sec:topology}, e os critérios e parâmetros relevantes ao fluxo de treinamento, discutidos na seção \ref{sec:train-flow}.
 
-\subsection{Gerador de Dados}
+\subsection{Carregador de Dados}
 \label{sec:data-gen}
-A função primária do gerador de dados é carregar dinamicamente os vídeos a serem alimentados ao modelo em cada etapa de seu treinamento.
+A função primária do carregador de dados é ler dinamicamente os vídeos a serem alimentados ao modelo em cada etapa de seu treinamento.
 Um módulo capaz de realizar tal carregamento dinâmico foi necessário devido ao grande volume de dados sendo processados, por virtude de se tratarem de dados de vídeo.
 Para isto, ele é inicializado com uma lista dos arquivos a serem carregados, assim como uma série de parâmetros que definem aspectos de sua operação, tais como o tamanho da batelada ou o pré-processamento a ser aplicado aos quadros.
 
-Cada vídeo fornecido ao gerador é, ainda, invertido horizontalmente.
+Cada vídeo fornecido ao carregador é, ainda, invertido horizontalmente.
 Isso é feito para garantir que o modelo fosse treinado para funcionar independentemente do ângulo do rosto do sujeito, desde que reconhecível pelo HOG, visto que na grande maioria dos vídeos do dataset original o falante se encontrava olhando para o lado esquerdo da câmera ou diretamente para esta.
 
-Para acelerar o processo de identificação facial e detecção de marcadores faciais, o gerador é capaz de processar múltiplos fragmentos em paralelo na CPU, além de manter um cache dos fragmentos processados em iterações anteriores do treinamento.
+Para acelerar o processo de identificação facial e detecção de marcadores faciais, o carregador é capaz de processar múltiplos fragmentos em paralelo na CPU, além de manter um cache dos fragmentos processados em iterações anteriores do treinamento.
 Esse paralelismo possibilitou a redução do tempo de execução da primeira iteração do treinamento e teste de cerca de 9 horas para aproximadamente uma hora e trinta minutos, uma redução de 83\% no tempo de execução com 6 threads, enquanto a implementação do cache reduziu o tempo necessário para etapas subsequentes do processo de para cerca de 3 minutos.
 
 \subsection{Pré-Processamento}
 \label{sec:pre-processing}
 
-O gerador de dados possui 3 modos distintos de operação, demonstrados na figura \ref{fig:generator_out}, que correspondem aos filtros de pré-processamento que podem ser aplicados aos quadros carregados para compor a entrada do modelo de predição. Estes são:
+O carregador de dados possui 3 modos distintos de operação, demonstrados na figura \ref{fig:generator_out}, que correspondem aos filtros de pré-processamento que podem ser aplicados aos quadros carregados para compor a entrada do modelo de predição. Estes são:
 
 \begin{enumerate}[label={(\arabic*)}]
     \item RGB: Nesse modo, o quadro é codificado em padrão RGB, ou seja, com cores representadas por suas componentes vermelha, verde, e azul, nessa ordem.
@@ -173,7 +173,7 @@ O gerador de dados possui 3 modos distintos de operação, demonstrados na figur
             \includesvg[width=0.9\textwidth]{loader_lm.svg}
         }
     \end{enumerate}
-    \caption{A saída do gerador de dados em cada um de seus três modos de operação.}
+    \caption{A saída do carregador de dados em cada um de seus três modos de operação.}
     \label{fig:generator_out}
 \end{figure}
 
@@ -227,7 +227,7 @@ Essa redução foi realizada de forma iterativa, buscando manter a acurácia do 
 \subsection{Treinamento do Modelo}
 \label{sec:train-flow}
 
-Em cada época, o sistema de treinamento do modelo chama o gerador de dados de treinamento, que lhe retorna um número fixo de amostras (batelada) compostas por segmentos de 15 quadros consecutivos.
+Em cada época, o sistema de treinamento do modelo chama o carregador de dados de treinamento, que lhe retorna um número fixo de amostras (batelada) compostas por segmentos de 15 quadros consecutivos.
 O modelo então faz suas predições quanto a estas, e tem seus pesos ajustados através do algoritmo de retro-propagação de forma a minimizar uma função de custo.
 
 \begin{equation} \label{eq:categorical_crossentropy}
@@ -257,10 +257,10 @@ Essa regularização consiste em acrescentar uma penalidade sobre o ajuste do va
     p_{l_2} = l_2 \sum\limits_{i=0}^n(x_i)^2
 \end{equation}
 
-Uma vez esgotadas as amostras de teste, o modelo chama, então, o gerador de dados de validação, realizando predições sem retro-propagação sobre as entradas retornadas, e calculando o valor da função custo para os resultados.
+Uma vez esgotadas as amostras de teste, o modelo chama, então, o carregador de dados de validação, realizando predições sem retro-propagação sobre as entradas retornadas, e calculando o valor da função custo para os resultados.
 Esta etapa é fundamental para garantirmos que o modelo treinado seja aplicável a dados do mundo real, e não exclusivamente aos dados do conjunto de treinamento.
 
-Por fim, ao se esgotarem também essas amostras, dá-se o final de uma época do treinamento, e os geradores tem suas listas de arquivos embaralhadas de forma a garantir aleatoriedade na ordem da próxima época.
+Por fim, ao se esgotarem também essas amostras, dá-se o final de uma época do treinamento, e os carregadores tem suas listas de arquivos embaralhadas de forma a garantir aleatoriedade na ordem da próxima época.
 Ainda para prevenção de \textit{overfitting} na rede neural foi definido como critério de parada do treinamento a condição de que não haja redução da função custo durante cinquenta épocas do treinamento.
 
 \section{Aplicação}

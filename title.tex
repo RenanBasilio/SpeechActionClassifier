@@ -1,4 +1,4 @@
-\title{Diarização e Identificação de Locutor em Conteúdo de Vídeo Baseada em Análise de Expressão Facial via Aprendizado de Máquina Supervisionado}
+\title{Diarização de Locutor em Conteúdo de Vídeo Baseada em Análise de Expressão Facial via Aprendizado de Máquina Supervisionado}
 \foreigntitle{Facial Expression Analysis for Speaker Diarization and Identification in Video Content via Supervised Machine Learning}
 \author{Renan Fasolato}{Basilio}
 \advisor{Prof.}{Geraldo Zimbrão}{da Silva}{D.Sc.}
@@ -65,6 +65,14 @@
 
 \makecatalog
 
-\dedication{Aos meus pais, que sempre me apoiaram durante toda essa jornada, e minha noiva Allison, que esteve sempre ao meu lado e esperou por mim durante todos esses anos.}
+\dedication{Aos meus pais, que sempre me apoiaram, e minha noiva Allison, que esteve sempre ao meu lado e esperou por mim durante toda a minha jornada universitária.}
+
+\begin{abstract}
+Este trabalho apresenta uma prova de conceito para um sistema diarizador baseado em uma rede neural convolucional capaz de identificar o estado de fala de um locutor a partir de um vídeo do mesmo, sem fazer uso da onda de áudio relacionada, para aplicação em casos onde esta se encontre em baixa qualidade, ruidosa, ou mesmo ausente. Para isso, é realizado um pré-processamento sobre a imagem de entrada de forma a identificar a posição da face do locutor e extrair desta suas feições principais, que servem de entrada para a rede neural. Uma arquitetura para a rede neural baseada em uma VGG, modificada para lidar com dados tridimensionais, foi construída, cuja implementação levou a um modelo com acurácia preditiva de 86.56\%, resultando em uma taxa de erro de diarização de 32.5\% sobre os dados de teste no melhor caso.
+\end{abstract}
+
+\begin{foreignabstract}
+Abstract in English
+\end{foreignabstract}
 
 \tableofcontents
