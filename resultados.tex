@@ -174,7 +174,7 @@ Observe que o melhor algoritmo de consolidação das classificações foi, em to
 Já no tamanho do passo, obtivemos melhores resultados quando este era de 3 quadros para modelos com maior confiança (representados pelo valor mínimo da função custo) ou 1 quadro para o modelo com acurácia máxima.
 Por fim, ambos os modelos obtido ao final do treinamento e de valor mínimo da função custo obtiveram o mesmo desempenho quando quantificado pela DER, enquanto o modelo final obteve desempenho ligeiramente melhor (aprox. $1.2\%$) quando avaliado pela JER.
 
-\begin{table}[ht]
+\begin{table}[H]
     \centering
     \begin{tabular}{|c|c|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}|}
         \toprule
@@ -209,7 +209,7 @@ Por fim, ambos os modelos obtido ao final do treinamento e de valor mínimo da f
     \label{tab:diarization-results-der}
 \end{table}
 
-\begin{table}[ht]
+\begin{table}[H]
     \centering
     \begin{tabular}{|c|c|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}|}
         \toprule
@@ -243,3 +243,36 @@ Por fim, ambos os modelos obtido ao final do treinamento e de valor mínimo da f
     \caption{Taxa de Erro de Jaccard (JER) para a diarização em função dos parâmetros do diarizador.}
     \label{tab:diarization-results-jer}
 \end{table}
+
+A tabela 4.5 demonstra os resultados obtidos por nosso sistema em relação a outros algoritmos publicados na literatura.
+
+\begin{table}[t]
+    \centering
+    \resizebox{0.95\textwidth}{!}{
+        \begin{tabular}{>{\centering\arraybackslash}m{4.3cm}|c|c|c|c}
+            \toprule
+            Algoritmo & Dataset & Tipo da Mídia & Locutores & Taxa de Erro\% \\
+            \toprule
+            \makecell{Sistema \\ Proposto} & D3PERJ\footnotemark[1] & Vídeo & 1 & 32.50 (DER) \\ \hline
+            \makecell{LSTM \cite{wangSpeakerDiarizationLSTM2018} \\ (Naive i-Vectors) } & CALLHOME & Áudio & Dinâmico\footnotemark[2] & 32.36 (DER) \\ \hline
+            \makecell{Naive i-Vector \\ Clustering \cite{dimitriadisEnhancementsAudioonlyDiarization2019}} & DIHARD & Áudio & Predefinido\footnotemark[3] & 30.38 (DER) \\ \hline
+            \makecell{State-of-the-Art \\ i-Vector Clustering \cite{dimitriadisEnhancementsAudioonlyDiarization2019}} & DIHARD & Áudio & Dinâmico & 23.99 (DER) \\ \hline
+            \makecell{LSTM \cite{wangSpeakerDiarizationLSTM2018} \\ (Naive X-Vectors)} & CALLHOME & Áudio & Dinâmico\footnotemark[2] & 18.87 (DER) \\ \hline
+            \makecell{LSTM \cite{wangSpeakerDiarizationLSTM2018} \\ (Spectral X-Vectors)} & CALLHOME & Áudio & Dinâmico\footnotemark[2] & 12.48 (DER) \\ \hline
+            \makecell{Multi-stream \\ LSTM \cite{ephratLookingListenCocktail2018}} & AVSpeech & Misto & 1 & 16.00 (SDR*) \\ 
+            \bottomrule
+        \end{tabular}
+    }
+    \caption{Comparação da taxa de erro obtida com as apresentadas em outros trabalhos da literatura, em ordem decrescente. Note que a o algoritmo \textit{Multi-stream LSTM} se encontra fora de ordem devido à incompatibilidade entre as métricas utilizadas.}
+    \label{tab:results-comparison}
+\end{table}
+\footnotetext[1]{Dataset de Depoimentos da Defensoria Pública do Estado do Rio de Janeiro.}
+\footnotetext[2]{O algoritmo é capaz de inferir o número de locutores dinamicamente, mas foi fixado em 2 para essa avaliação.}
+\footnotetext[3]{O número de locutores de cada gravação precisa ser fornecido previamente ao algoritmo.}
+
+O sistema apresentou desempenho semelhante ao de implementações tradicionais de diarizadores baseados em i-Vectors, mas consideravelmente pior do que aquele obtido através de técnicas mais modernas, tais como o uso de X-Vectors, extraídos por meio de uma rede neural, ou a clusterização espectral.
+Porém, a não uniformidade dos datasets utilizados para teste dos sitemas nos impede de fazer comparações mais relevantes.
+
+Gostaríamos, ainda, de chamar atenção ao algoritmo de diarização de mídia mista proposto por  proposto por Ephrat et al. em \cite{ephratLookingListenCocktail2018}.
+Este sistema foi avaliado utilizando uma métrica não usual, a SDR, do Inglês \textit{Signal-to-Distortion Ratio}, e utilizando apenas com framentos de 3 segundos gerados a partir do dataset AVSpeech, enquanto os demais consideram diarização total de suas mídias.
+Dadas estas particularidades deste, embora incluso neste trabalho, hesitamos na utilização de suas métricas para efeito de comparação.
