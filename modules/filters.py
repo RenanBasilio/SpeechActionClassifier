@@ -1,6 +1,7 @@
 import math
 import dlib
 import numpy as np
+import cv2 as cv2
 from imutils import face_utils
 from modules.utils import draw_facial_landmarks
 from modules.loader import compute_facial_landmarks
@@ -22,12 +23,16 @@ def draw_facial_reco(image, color):
 
     for (i, face) in enumerate(faces):
         #shape = face_predictor(image, face.rect)
+        draw_rect(image, face)
         shape = face_predictor(image, face)
         shape_np = face_utils.shape_to_np(shape)
 
         draw_facial_landmarks(image, shape_np, color=(0, 255, 0))
 
+        break
+
     return image
+
 
 # Computes facial landmarks from 'image'.
 # Returns an image drawn from the computed landmarks.
@@ -39,6 +44,16 @@ def draw_face_chip(image, color):
 def draw_dot(image, color):
     cx, cy = math.floor(image.shape[1] * 0.95), math.floor(image.shape[1] * 0.05)
     rad = math.floor(image.shape[0] * 0.025)
-    y, x = np.ogrid[-rad:rad, -rad:rad]
-    image[cy-rad:cy+rad, cx-rad:cx+rad][x**2 + y**2 <= rad**2] = color
+
+    image = cv2.circle(image, (cx, cy), rad, color, -1)
+
+    return image
+
+def draw_rect(image, rect):
+    x, y, w, h = rect.left(), rect.top(), rect.width(), rect.height()
+    xa, ya, wa, ha = rect.left()-int(rect.width()/6), rect.top()-int(rect.height()/6), int(rect.width()*1.33), int(rect.height()*1.33)
+
+    image = cv2.rectangle(image, (x, y), (x + w, y + h), (0,165,255), 1)
+    image = cv2.rectangle(image, (xa, ya), (xa + wa, ya + ha), (0,0,255), 1)
+
     return image

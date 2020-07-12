@@ -205,6 +205,10 @@ def strat_weightedfreq(array, weights):
 # This function computes a set of gaussian weights centered on x=0 and with standard deviation sigma=1. 
 # The returned weights are distributed linearly within the given span and scaled to add up to 1.
 def init_gauss_weights(count, span=(-2, 2)):
+    assert(count > 0)
+    if count is 1:
+        return [1.0]
+
     gauss_weights = []
     X, step = np.linspace(span[0], span[1], count, retstep=True)
     for x in X:
