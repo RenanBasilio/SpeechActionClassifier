@@ -50,6 +50,7 @@ def sort_dataset(splits, classes, unsorted_dir, out_dir):
     for split in splits["Names"]:
         (out_path / split).mkdir(parents=True, exist_ok=True)
 
+    log_file = open(out_dir / "sorting.log", mode="w+")
     classes_files = list(unsorted_path.glob("**/_classes.csv"))
     manual_classes = [k for k in classes_files if str(k.relative_to(unsorted_path).parent) in splits]
     count = 0
