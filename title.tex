@@ -68,11 +68,19 @@
 \dedication{Aos meus pais, que sempre me apoiaram, e minha noiva Allison, que esteve sempre ao meu lado e esperou por mim durante toda a minha jornada universitária.}
 
 \begin{abstract}
-Este trabalho apresenta uma prova de conceito para um sistema diarizador baseado em uma rede neural convolucional capaz de identificar o estado de fala de um locutor a partir de um vídeo do mesmo, sem fazer uso da onda de áudio relacionada, para aplicação em casos onde esta se encontre em baixa qualidade, ruidosa, ou mesmo ausente. Para isso, é realizado um pré-processamento sobre a imagem de entrada de forma a identificar a posição da face do locutor e extrair desta suas feições principais, que servem de entrada para a rede neural. Uma arquitetura para a rede neural baseada em uma VGG, modificada para lidar com dados tridimensionais, foi construída, cuja implementação levou a um modelo com acurácia preditiva de 86.56\%, resultando em uma taxa de erro de diarização de 32.5\% sobre os dados de teste no melhor caso.
+Este trabalho apresenta uma prova de conceito para um sistema diarizador baseado em uma rede neural convolucional capaz de identificar o estado de fala de um locutor a partir de um vídeo do mesmo, sem fazer uso da onda de áudio relacionada, para aplicação em casos onde esta se encontre em baixa qualidade, ruidosa, ou mesmo ausente. 
+Para isso, é realizado um pré-processamento sobre a imagem de entrada de forma a identificar a posição da face do locutor e extrair desta suas feições principais, que servem de entrada para a rede neural. 
+Uma arquitetura para a rede neural baseada em uma VGG, modificada para lidar com dados tridimensionais, foi construída, cuja implementação levou a um modelo com acurácia preditiva de 86.56\%, resultando em uma taxa de erro de diarização de 32.5 sobre os dados de teste no melhor caso.
 \end{abstract}
 
 \begin{foreignabstract}
-Abstract in English
+This work introduces a proof of concept for a speaker diarization system based on a convolutional neural network capable of identifying speech in a frontal video of a speaker without making use of the associatied audio wave, for use cases in which the latter is either low quality, noisy, or outright missing.
+For this purpose we extract facial landmarks from each frame of the input video, and feed them into the neural network.
+We also propose an architecture for the prediction model based on a VGG deep neural network modified to handle three-dimensional data, with which we obtained a predictive accuracy of 86.56\% on the test dataset, which resulted in a diarization error rate of 32.5.
 \end{foreignabstract}
 
 \tableofcontents
+
+\listoffigures
+
+\listoftables

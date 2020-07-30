@@ -26,8 +26,18 @@ Além disso, essa informação adicional permite viabilizar novos critérios de 
 O problema de diarização de locutor consiste em particionar automaticamente um sinal de áudio tal que cada uma das partições geradas contenha as falas de um único locutor.
 Trata-se de um problema muito relevante à área de reconhecimento de voz, já que entender quem falou em cada momento de uma gravação nos permite contextualizar diversos tópicos que dependem desse tipo de informação para sua legibilidade e interpretação, tais como a geração automática de transcrições de depoimentos judiciais e relatórios médicos eletrônicos.
 
-A solução proposta neste trabalho consiste em construir um sistema capaz de diarizar as falas de um único locutor em tempo real a partir de um vídeo frontal do mesmo.
-Para isso, o sistema de diarização deve ser capaz de, a partir de uma sequência de quadros extraída do vídeo original, determinar se o objeto da gravação está ou não falando. Neste trabalho iremos desconsiderar o áudio associado, já que o processamento deste foge à área de visão computacional.
+A solução proposta neste trabalho consiste em construir um sistema capaz de diarizar as falas de um único locutor em tempo real a partir de um vídeo frontal do mesmo, intuição da qual se encontra demonstrada na figura \ref{fig:intuition}.
+Para isso, o sistema de diarização deve ser capaz de, a partir de uma sequência de quadros extraída do vídeo original, determinar se o objeto da gravação está ou não falando.
+Neste trabalho iremos desconsiderar o áudio associado, já que o processamento deste foge à área de visão computacional.
+
+\begin{figure}[h]
+    \centering
+    \resizebox{\textwidth}{!}{
+        \includegraphics{figures/intro_intuition.png}
+    }
+    \caption{Intuição por trás desta proposta de solução. Note a facilidade de se identificar corretamente a fala do locutor mesmo quando apresentados apenas poucos quadros de um segmento contínuo.}
+    \label{fig:intuition}
+\end{figure}
 
 Com esta finalidade, propomos uma arquitetura em três etapas:
 \begin{enumerate}
@@ -53,15 +63,18 @@ Assim, este trabalho ficará limitado a tratar de casos nos quais estas informa�
 Este trabalho se encontra organizado da seguinte maneira:
 
 No capítulo 2 apresentamos a fundamentação teórica referente às técnicas e tecnologias utilizadas na implementação de cada uma das etapas propostas nesse trabalho.
-Em primeiro momento, fazemos uma revisão das abordagens e implementações formuladas para resolução do problema de alinhamento facial até hoje. 
+Em um primeiro momento, fazemos uma revisão das abordagens e implementações formuladas para resolução do problema de alinhamento facial até hoje. 
 Em seguida, apresentamos os conceitos e técnicas críticas para nossa implementação, sendo estas as redes neurais convolucionais, detecção de objetos por histograma de gradientes orientados, e alinhamento facial.
 
 No capítulo 3 apresentamos a nossa implementação do sistema proposto. 
 Abordamos tópicos como as ferramentas utilizadas, pré-processamento dos dados de treinamento, e a arquitetura proposta para a rede neural convolucional.
 Por fim, discutimos a implementação da aplicação final, para lidar com dados não tratados previamente.
 
-No capítulo 4 demonstramos os resultados de nosso método quando aplicado sobre dataset fornecido pela Defensoria Pública do Estado do Rio de Janeiro, que contém vídeos dos participantes individuais\sout{, em alta resolução e} com as características desejadas.
+No capítulo 4 demonstramos os resultados de nosso método quando aplicado sobre dataset fornecido pela Defensoria Pública do Estado do Rio de Janeiro, que contém vídeos dos participantes individuais com as características desejadas.
 
 Por fim, no capítulo 5, resumimos e apresentamos nossas conclusões quanto ao trabalho realizado, discutindo os resultados obtidos e os fatores que contribuíram para estes, e enumeramos trabalhos futuros a serem realizados sobre o mesmo tema.
 
-No apêndice, apresentamos o código fonte desenvolvido para este trabalho.
+\section{Código Fonte}
+\label{sec:source-code}
+
+Todo o código fonte desenvolvido para este trabalho pode ser obtido online no repositório do GitHub em \url{https://github.com/RenanBasilio/SpeechActionClassifier}.

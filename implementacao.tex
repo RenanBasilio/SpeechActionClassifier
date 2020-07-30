@@ -111,14 +111,10 @@ Sendo assim, ao dobrar este tempo, adquirimos a capacidade de detectar por compl
 Estes trechos foram validados para determinar se a face do depoente poderia ser reconhecida, com finalidade de descartar fragmentos nos quais este não olhava em direção à câmera, ou nas quais o detector HOG não poderia identifica-los.
 Cada trecho foi então manualmente classificado quanto à ocorrência de fala pelo depoente, produzindo uma tabela que associava o identificador de cada arquivo à classe correspondente ao mesmo.
 
-Feita essa diarização manual, os vídeos foram separados em conjuntos de teste e treinamento, tais que vídeos diferentes seriam utilizados para cada fase do treinamento da rede neural.
+Feita essa diarização manual, os vídeos foram separados em conjuntos de treinamento e teste, tal que fragmentos provenientes de um mesmo vídeo nunca seriam utilizados em ambas as fases do processo.
 Fizemos essa separação pois, como os fragmentos possuem relação temporal tanto entre si quanto com outros vídeos do mesmo depoente, seria possível que o treinamento da rede neural utilizando segmentos semelhantes aos fragmentos de teste pudesse inflar artificialmente o desempenho da mesma.
 
-%Por fim, as diarizações produzidas manualmente foram utilizadas para organizar os fragmentos em uma estrutura de diretórios, tal que primeiramente estivessem separados por conjunto de teste ou treinamento, depois por vídeo de origem, e por fim por classe.
-%Essa estrutura foi construída de tal forma que as informações relevantes ao carregador de amostras da rede neural pudessem ser obtidas todas a partir do caminho para o mesmo no sistema de arquivos.
-
 Para a execução de todas essas tarefas foram desenvolvidos scripts em Python e Bash, capazes de segmentar os vídeos do dataset e de validar, mover, e organizar os fragmentos extraídos destes.
-O código referente a estes pode ser encontrado no apêndice \ref{apdx:src}.
 
 \section{Treinamento}
 \label{sec:train}
@@ -134,7 +130,7 @@ Para o treinamento do modelo foi desenvolvido um sistema composto por dois compo
     \label{fig:arch_train}
 \end{figure}
 
-Primeiramente, foi construído um gerados de dados com a finalidade de alimentar os dados da entrada ao modelo dinamicamente. As características e funcionalidades se encontram descritas na seção \ref{sec:data-gen}.
+Primeiramente, foi construído um gerador de dados com a finalidade de alimentar os dados da entrada ao modelo dinamicamente. As características e funcionalidades se encontram descritas na seção \ref{sec:data-gen}.
 Depois, foi definida a topologia do modelo de rede neural, discutida na seção \ref{sec:topology}, e os critérios e parâmetros relevantes ao fluxo de treinamento, discutidos na seção \ref{sec:train-flow}.
 
 \subsection{Carregador de Dados}
@@ -211,7 +207,8 @@ Nesta seção iremos discutir as decisões tomadas neste processo de adaptação
 \end{figure}
 
 Primeiramente, na primeira camada convolucional da rede, que frequentemente tem a função de detectar bordas na imagem de entrada, adicionamos uma componente temporal ao \kernel\ com dimensão 4.
-Essa dimensão par não é usual para uma rede neural convolucional, devido ao fato de que não atua sobre um elemento da imagem original alterando-o em relação a seus vizinhos, produzindo ao invés disso um novo elemento a partir da média dos valores internos às regiões de tal dimensão, ponderada pelos pesos do \kernel\ da matriz de convolução.
+Essa dimensão par não é usual para uma rede neural convolucional, que tradicionalmente busca identificar padrões nas vizinhanças de cada elemento, devido ao fato de que não atua sobre um elemento da imagem original alterando-o em relação a seus vizinhos.
+Ao invés disso, a dimensão par produz um novo elemento, localizado espacialmente em seu centro, e cujo valor é obtido a partir da média ponderada pelos pesos do \kernel\ de células da entrada.
 Em nosso modelo isso corresponde a construir um conjunto de filtros capazes de identificar variações temporais relevantes em cada sequência de 4 quadros da entrada.
 
 Na segunda camada de convolução, adicionamos uma componente temporal com dimensão 3, igual às demais.
@@ -236,7 +233,7 @@ O modelo então faz suas predições quanto a estas, e tem seus pesos ajustados 
 
 Como se trata de um problema de classificação, escolhemos como função custo do treinamento a função de entropia categórica cruzada, definida na equação \ref{eq:categorical_crossentropy}. Nessa equação, $\hat{y}$ é o vetor das probabilidades das categorias, e $y$ é a categoria real, codificada \textit{one-hot}\footnote{Codificação \textit{one-hot} é uma forma de representar a classe dentre um conjunto de classes à qual um item pertence, na forma de uma sequência binária na qual um único bit, correspondente a esta, esteja no nível lógico 1.}.
 
-Visto que trata-se um problema de classificação binária, seria possível também utilizar a função de entropia cruzada binária; Porém, considerando a possibilidade de expansão futura do modelo para detecção de outras ações conversacionais, tais como gestos com a cabeça, decidimos utilizar uma função custo mais escalável para adição de novas classes.
+Visto que trata-se um problema de classificação binária, seria possível também utilizar a função de entropia cruzada binária; Porém, considerando a possibilidade de expansão futura do modelo para detecção de outras ações conversacionais, tais como gestos com a cabeça, decidimos utilizar uma função custo escalável para adição de novas classes.
 
 Como forma de reduzir o \textit{overfitting} da rede neural aos dados do treinamento, aplicamos \textit{Dropout}\footnote{\textit{Dropout} é uma técnica que consiste na remoção aleatória de neurônios temporariamente de uma camada da rede neural durante o treinamento. \textit{Dropout Espacial} é uma variação desta técnica, que consiste em remover neurônios agrupados por região espacial.} às camadas totalmente conectadas desta, e \textit{Dropout Espacial} à saída de suas camadas convolucionais.
 A figura \ref{fig:training_metrics} mostra o resultado da utilização dessas técnicas no treinamento do modelo.
@@ -246,7 +243,7 @@ A figura \ref{fig:training_metrics} mostra o resultado da utilização dessas t�
     \resizebox{0.95\textwidth}{!}{
         \input{figures/train_metrics.tikz}
     }
-    \caption{Evolução das métricas de desempenho ao longo dos processos de treinamento e validação do modelo, com e sem \textit{dropout}, representado pelas linhas azul e vermelha respectivamente. Note que, sem \textit{dropout}, a acurácia no conjunto de treinamento tende a 1 e sua função custo tende a 0, enquanto a função custo no conjunto de treinamento não converge. }
+    \caption{Evolução das métricas de desempenho ao longo dos processos de treinamento e validação do modelo, com e sem \textit{dropout}, representado pelas linhas azul e vermelha respectivamente. Note que, sem \textit{dropout}, a acurácia no conjunto de treinamento tende a 1 e sua função custo tende a 0, enquanto a função custo no conjunto de validação não converge. }
     \label{fig:training_metrics}
 \end{figure}
 
@@ -257,7 +254,7 @@ Essa regularização consiste em acrescentar uma penalidade sobre o ajuste do va
     p_{l_2} = l_2 \sum\limits_{i=0}^n(x_i)^2
 \end{equation}
 
-Uma vez esgotadas as amostras de teste, o modelo chama, então, o carregador de dados de validação, realizando predições sem retro-propagação sobre as entradas retornadas, e calculando o valor da função custo para os resultados.
+Uma vez esgotadas as amostras de treinamento, o modelo chama, então, o carregador de dados de validação, realizando predições sem retro-propagação sobre as entradas retornadas, e calculando o valor da função custo para os resultados.
 Esta etapa é fundamental para garantirmos que o modelo treinado seja aplicável a dados do mundo real, e não exclusivamente aos dados do conjunto de treinamento.
 
 Por fim, ao se esgotarem também essas amostras, dá-se o final de uma época do treinamento, e os carregadores tem suas listas de arquivos embaralhadas de forma a garantir aleatoriedade na ordem da próxima época.
@@ -267,7 +264,8 @@ Ainda para prevenção de \textit{overfitting} na rede neural foi definido como 
 \label{sec:application}
 
 A aplicação de diarização resultante deste trabalho é capaz de, quando executada sobre um arquivo de vídeo, diarizar o mesmo produzindo um arquivo em formato RTTM\footnote{O formato RTTM, do inglês \textit{Rich Transcription Time Marked}, é um formato de arquivo texto definido pela NIST em 2009 para representação de transcrições. Sua especificação formal pode ser encontrada em \cite{nist2009RT09Rich2009}, publicado pela organização.} identificando os períodos correspondentes à fala do orador. 
-Nesta seção discutiremos de maneira aprofundada as considerações feitas durante o processo de desenvolvimento dessa aplicação, assim como os algoritmos implementados. Essa aplicação implementa o algoritmo \ref{alg:application}.
+Essa aplicação implementa o algoritmo \ref{alg:application}, que define uma janela deslizante que percorre o vídeo de entrada, avançando a cada iteração um número fixo de quadros determinado pelo parâmetro \textit{step}.
+A figura \ref{fig:alg_demo} demonstra a execuçã das duas primeiras iterações do algoritmo para a diarização de uma mídia completa.
 
 \begin{algorithm}[ht]
     \SetAlgoLined
@@ -287,13 +285,62 @@ Nesta seção discutiremos de maneira aprofundada as considerações feitas dura
     }
 \end{algorithm}
 
+\begin{figure}[ht]
+    \centering
+    %\input{figures/alg_demo.tikz}
+    \begin{subfigure}[b]{\textwidth}
+        \includegraphics[width=\textwidth]{figures/alg_demo_2.png}
+        \caption{Os 15 primeiros quadros são carregados e pré-processados, produzindo bitmaps traçados a partir dos marcadores faciais detectados.}
+    \end{subfigure}
+    \newline
+    \newline
+    \begin{subfigure}[b]{\textwidth}
+        \includegraphics[width=\textwidth]{figures/alg_demo_4.png}
+        \caption{A janela é classificada pela rede neural, que retorna as probabilidades de cada classe para essa.}
+    \end{subfigure}
+    \newline
+    \newline
+    \begin{subfigure}[b]{\textwidth}
+        \includegraphics[width=\textwidth]{figures/alg_demo_5.png}
+        \caption{As probabilidades retornadas pelo classificador são associadas a cada um dos quadros.}
+    \end{subfigure}
+    \newline
+    \newline
+    \begin{subfigure}[b]{\textwidth}
+        \includegraphics[width=\textwidth]{figures/alg_demo_7.png}
+        \caption{A janela desliza um quadro para a direita, e o próximo quadro é pré-processado. Como o quadro que saiu da janela possui apenas uma classificação, a classe com maior probabilidade é utilizada.}
+    \end{subfigure}
+    \caption{Demonstração do funcionamento do algoritmo para as duas primeiras iterações do processo de diarização de uma mídia completa com $step = 1$.}
+\end{figure}
+
+\begin{figure}[ht]\ContinuedFloat
+    \centering
+    \begin{subfigure}[b]{\textwidth}
+        \includegraphics[width=\textwidth]{figures/alg_demo_9.png}
+        \caption{A nova janela é classificada pela rede neural, produzindo um novo conjunto de probabilidades.}
+    \end{subfigure}
+    \newline
+    \newline
+    \newline
+    \begin{subfigure}[b]{\textwidth}
+        \includegraphics[width=\textwidth]{figures/alg_demo_10.png}
+        \caption{As probabilidades retornadas pelo classificador são associadas a cada um dos quadros.}
+    \end{subfigure}
+    \begin{subfigure}[b]{\textwidth}
+        \includegraphics[width=\textwidth]{figures/alg_demo_12.png}
+        \caption{A janela desliza outro quadro para a direita, e o próximo quadro é pré-processado. Como o quadro que saiu da janela possui mais de uma classificação, suas probabilidades são consolidadas segundo o algoritmo selecionado.}
+    \end{subfigure}
+    \caption{Demonstração do funcionamento do algoritmo para as duas primeiras iterações do processo de diarização de uma mídia completa com $step = 1$.}
+    \label{fig:alg_demo}
+\end{figure}
+
 O algoritmo utilizado para pré-processamento dos quadros já foi discutido na seção \ref{sec:pre-processing}, e as características do modelo de classificação foram discutidas na seção \ref{sec:topology}.
-Sendo assim, discutiremos primariamente nesta seção o algoritmo utilizado para consolidação das predições realizadas para os quadros individuais, e ao fim o fluxo de erro adotado quando não é possível obter uma classificação para um determinado quadro.
+Sendo assim, discutiremos nesta seção, primariamente, as considerações feitas durante o processo de desenvolvimento da aplicação quanto ao algoritmo utilizado para consolidação das predições realizadas para os quadros individuais, e o fluxo de erro adotado quando não é possível obter uma classificação para um determinado quadro.
 
 \subsection{Consolidação das Classificações}
 \label{sec:class-commit}
 
-Com a finalidade de obter maior precisão temporal do que seria possível apenas com a classificação de sequências de 15 quadros, a diarização é feita com tamanho de passo $step \leq 15$ tal cada quadro passe pelo classificador um número $n = \floor{15 / step}$ de vezes, em diferentes posições no fragmento.
+Com a finalidade de obter maior precisão temporal do que seria possível apenas com a classificação de sequências de 15 quadros, a diarização é feita com tamanho de passo $step \leq 15$ tal que cada quadro passe pelo classificador um número $n = \floor{15 / step}$ de vezes, em diferentes posições no fragmento.
 Dessa forma, torna-se necessário consolidar as diversas predições realizadas sobre cada quadro ao adiciona-los à transcrição final.
 
 Para esse processo, implementamos 5 algoritmos distintos. 
@@ -301,7 +348,7 @@ Estes consistem em funções que, quando aplicadas a um conjunto de predições 
 Com esse propósito, implementamos as funções \textit{mediana}, \textit{média}, \textit{frequência de predição}, \textit{média gaussiana}, e \textit{frequência gaussiana}.
 A classe de maior confiança retornada por estes algoritmos é considerada a classe real do quadro, e é adicionada à diarização.
 
-\subsubsection{Mediana}
+\subsubsection{Valor Central}
 
 A mediana é o algoritmo de consolidação mais simples entre os algoritmos implementados.
 O algoritmo consiste em selecionar as confianças de cada classe referentes à predição realizada com o quadro no centro do fragmento.
@@ -317,7 +364,7 @@ O algoritmo de frequência é bastante semelhante ao algoritmo de média, no ent
 
 \subsubsection{Média e Frequência Gaussiana}
 
-Estes algoritmos consistem em implementações dos algoritmos de média e frequência já analisados anteriormente nas quais os valores das predições individuais são ponderados a partir de pesos obtidos a partir dos valores de uma distribuição normal (equação \ref{eq:normal-dist}) em $n$ pontos distribuídos linearmente em $[-2, 2]$.
+Estes algoritmos consistem em implementações dos algoritmos de média e frequência já analisados anteriormente nas quais os valores das predições individuais são ponderados a partir de pesos obtidos a partir de valores de uma distribuição normal (equação \ref{eq:normal-dist}) em $\floor{15 / step}$ pontos distribuídos linearmente em $[-2, 2]$.
 
 \begin{equation}\label{eq:normal-dist}
     \varphi = \frac{1}{\sqrt{2\pi}} e ^ {\frac{-x^2}{2}}

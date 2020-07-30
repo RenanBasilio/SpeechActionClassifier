@@ -65,6 +65,7 @@
 \usepackage{multirow}
 \usepackage{booktabs}
 \usepackage{makecell}
+\usepackage{subcaption}
 \pgfplotsset{compat=1.16}
 \usetikzlibrary{automata,positioning}
 \graphicspath{{figures/}}
@@ -75,10 +76,8 @@
 
 \usepackage{titlesec}
 \setcounter{secnumdepth}{3}
-\titleformat{\paragraph}
-{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
-\titlespacing*{\paragraph}
-{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+\titleformat{\paragraph}{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
 
 \newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
 \newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
@@ -107,7 +106,6 @@
 \bibliography{citations}
 
 \appendix
-\include{codigo}
 
 \end{document}
 %% 

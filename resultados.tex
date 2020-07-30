@@ -167,14 +167,15 @@ Já a Taxa de Erro de Jaccard, definida na equação \ref{eq:jer}, consiste no n
 Sua definição formal foi feita no artigo introdutório do desafio DIHARD II, e pode ser encontrada em  \cite{ryantSecondDIHARDDiarization2019}.
 
 Para o ajuste do tamanho do passo e algoritmo de consolidação da aplicação, discutidos na seção \ref{sec:class-commit}, assim como a avaliação da aplicação diarizadora como um todo, executamos a mesma sobre um dos vídeos completos para diversas combinações de parâmetros e para cada um dos modelos treinados. 
-Além disso, para o cálculo da DER, consideramos um tamanho de passo de $0.033$ segundo, correspondente a um quadro da mídia, e colarinho de $0.1$ segundo.
+Além disso, para o cálculo da DER, consideramos um tamanho de passo de $0.033$ segundo, correspondente a um quadro da mídia.
+Por fim, devido à dificuldade de diarizar as bordas de um segmento de fala de maneira consistente, é utilizado um colarinho de $0.1$ segundo, que corresponde a uma tolerância aplicada às bordas dentro da qual um segmento detectado pelo sistema seja considerado condizente com a diarização de referência.
 
 Os resultados da DER e JER para o vídeo diarizado em função dos parâmetros do diarizador podem observados, respectivamente, nas tabelas \ref{tab:diarization-results-der} e \ref{tab:diarization-results-jer}.
 Observe que o melhor algoritmo de consolidação das classificações foi, em todos os casos, o de média das confianças.
 Já no tamanho do passo, obtivemos melhores resultados quando este era de 3 quadros para modelos com maior confiança (representados pelo valor mínimo da função custo) ou 1 quadro para o modelo com acurácia máxima.
 Por fim, ambos os modelos obtido ao final do treinamento e de valor mínimo da função custo obtiveram o mesmo desempenho quando quantificado pela DER, enquanto o modelo final obteve desempenho ligeiramente melhor (aprox. $1.2\%$) quando avaliado pela JER.
 
-\begin{table}[H]
+\begin{table}[ht]
     \centering
     \begin{tabular}{|c|c|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}|}
         \toprule
@@ -209,7 +210,7 @@ Por fim, ambos os modelos obtido ao final do treinamento e de valor mínimo da f
     \label{tab:diarization-results-der}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[ht]
     \centering
     \begin{tabular}{|c|c|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{1.8cm}|}
         \toprule
