@@ -345,13 +345,13 @@ Dessa forma, torna-se necessário consolidar as diversas predições realizadas 
 
 Para esse processo, implementamos 5 algoritmos distintos. 
 Estes consistem em funções que, quando aplicadas a um conjunto de predições de tamanho variável, retornam um único conjunto de confianças correspondentes a cada classe alvo.
-Com esse propósito, implementamos as funções \textit{mediana}, \textit{média}, \textit{frequência de predição}, \textit{média gaussiana}, e \textit{frequência gaussiana}.
+Com esse propósito, implementamos as funções \textit{valor central}, \textit{média}, \textit{frequência de predição}, \textit{média gaussiana}, e \textit{frequência gaussiana}.
 A classe de maior confiança retornada por estes algoritmos é considerada a classe real do quadro, e é adicionada à diarização.
 
 \subsubsection{Valor Central}
 
-A mediana é o algoritmo de consolidação mais simples entre os algoritmos implementados.
-O algoritmo consiste em selecionar as confianças de cada classe referentes à predição realizada com o quadro no centro do fragmento.
+O algoritmo de valor central é o algoritmo de consolidação mais simples entre os algoritmos implementados.
+Este consiste em selecionar as confianças de cada classe referentes à predição realizada com o quadro no centro do fragmento.
 
 \subsubsection{Média}
 
